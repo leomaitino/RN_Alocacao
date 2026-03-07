@@ -19,9 +19,8 @@ from typing import Any
 # ── Paths ──────────────────────────────────────────────────────────────────────
 BASE_DIR = Path(os.path.dirname(os.path.abspath(__file__)))
 
-# No Render: DATA_DIR = /data (disco persistente)
-# Local:     DATA_DIR = ./data
-DATA_DIR = Path(os.environ.get("DATA_DIR", BASE_DIR / "data"))
+# DATA_DIR: pasta data/ dentro do projeto
+DATA_DIR = BASE_DIR / "data"
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
