@@ -1,0 +1,79 @@
+{
+  "Gama Investimentos": {
+    "fundacao": 2011,
+    "gestor_principal": "Marcos Falcão / Guilherme Gama",
+    "sede": "São Paulo, SP",
+    "descricao": "Fundada em 2011, a Gama Investimentos consolidou-se no mercado brasileiro como gestora independente e pioneira no conceito de hub de feeders. Sua missão é democratizar o acesso do investidor local às estratégias das maiores gestoras globais — como Oaktree, Bridgewater e KKR — que anteriormente eram restritas a grandes investidores institucionais. Faz parte do grupo HMC Capital, plataforma global de investimentos alternativos com forte presença na América Latina. Gerencia aproximadamente R$ 5 bilhões distribuídos em Ações Globais, Crédito Internacional, Multimercados e Alternativos.",
+    "filosofia": "Democratizar o acesso do investidor brasileiro às melhores gestoras do mundo, cuidando de toda a eficiência operacional, tributária e de due diligence."
+  },
+  "AZ Quest Investimentos": {
+    "fundacao": 2001,
+    "gestor_principal": "Walter Maciel (CEO)",
+    "sede": "São Paulo, SP",
+    "descricao": "Fundada em 2001 como Quest Investimentos, a AZ Quest é uma das gestoras independentes mais tradicionais e respeitadas do Brasil. Em 2015, associou-se ao grupo italiano Azimut, um dos maiores grupos independentes de gestão de ativos da Europa. Reconhecida pela forte cultura de análise fundamentalista e equipes especializadas por classe de ativo: Ações, Macro, Crédito Privado e Arbitragem. Com mais de duas décadas de história, a gestora atravessou diversos ciclos econômicos mantendo-se como referência em preservação de capital.",
+    "filosofia": "Preservação de capital com consistência de longo prazo, através de gestão colegiada e análise fundamentalista rigorosa."
+  },
+  "Real Investor Investimentos": {
+    "fundacao": 2008,
+    "gestor_principal": "Cesar Paiva",
+    "sede": "Londrina, PR",
+    "descricao": "Fundada em 2008 em Londrina (PR) por Cesar Paiva, a Real Investor é um dos casos de maior sucesso de gestão fora do eixo Rio-SP. Consolidou-se através de uma filosofia rigorosa baseada nos princípios de Graham e Buffett, com foco na compra de ativos subavaliados abaixo do valor intrínseco. Ganhou notoriedade nacional com o excelente desempenho do Real Investor FIA. Os sócios investem expressivamente nos próprios fundos, garantindo alinhamento total com os cotistas.",
+    "filosofia": "Comprar boas empresas com desconto ao valor intrínseco e ter paciência para esperar o mercado reconhecer esse valor."
+  },
+  "V8 Capital": {
+    "fundacao": null,
+    "gestor_principal": "Equipe V8 Capital",
+    "sede": "São Paulo, SP",
+    "descricao": "A V8 Capital é gestora especializada em estratégias de ações com viés técnico e fundamentalista. Sua filosofia central é capturar valor relativo entre empresas, sem depender da direção geral do mercado para gerar retorno. O fundo Speedway opera comprado nas melhores teses e vendido em ações com fundamentos frágeis, buscando retorno consistente acima do CDI com baixa correlação ao Ibovespa.",
+    "filosofia": "O que importa é a performance de uma empresa contra a outra — não se o mercado está em crise ou em euforia."
+  },
+  "Kapitalo Investimentos": {
+    "fundacao": 2009,
+    "gestor_principal": "Carlos Woelz / Bruno Pannunzio",
+    "sede": "São Paulo, SP",
+    "descricao": "Fundada em 2009 por Carlos Woelz e Bruno Pannunzio, a Kapitalo é uma das maiores e mais respeitadas gestoras independentes do Brasil, com cerca de R$ 20 bilhões sob gestão. Pioneira no modelo multi-gestor, conta com mais de 15 times especializados operando de forma independente sob rigoroso controle de risco centralizado. Atravessou crises de 2014-2016 e 2020 com resiliência acima da média da indústria, com foco obsessivo no controle de drawdown.",
+    "filosofia": "A gestora não depende da visão de um único guru — a Constelação de mais de 15 equipes gera diversificação de ideias única."
+  },
+  "Genoa Capital": {
+    "fundacao": 2020,
+    "gestor_principal": "André Raduan / Emerson Codogno / Mariano Steinert",
+    "sede": "São Paulo, SP",
+    "descricao": "Fundada em 2020 por egressos do Itaú Hedge Plus — um dos multimercados mais icônicos do país — a Genoa é um dos casos de maior sucesso recente da indústria, atingindo R$ 17 bilhões em poucos anos. Conta com mais de 70 profissionais e diferencial em operar mercados emergentes além do Brasil (México, Chile, Argentina), evitando concentração excessiva em EUA. Integra Inteligência Artificial no processo de análise e tomada de decisão.",
+    "filosofia": "Identificar as melhores oportunidades nos mercados emergentes, onde há menos eficiência e mais alfa para capturar."
+  },
+  "Mantaro Capital": {
+    "fundacao": null,
+    "gestor_principal": "Equipe Mantaro Capital",
+    "sede": "São Paulo, SP",
+    "descricao": "A Mantaro Capital é gestora independente fundada por profissionais com vasta experiência em grandes instituições como o Credit Suisse. Nasceu com a filosofia de que o retorno de longo prazo é construído pela captura de altas, mas principalmente pela mitigação de grandes quedas. Mantém estrutura ágil focada em Mid Caps, onde residem as maiores oportunidades de alfa. Os gestores são os principais investidores das próprias estratégias.",
+    "filosofia": "O retorno de longo prazo é construído não apenas capturando as altas, mas principalmente evitando as grandes quedas."
+  },
+  "ALPHAKEY CAPITAL MANAGEMENT INVESTIMENTOS LTDA": {
+    "fundacao": null,
+    "gestor_principal": "Marcos De Callis / Eduardo Cavalheiro",
+    "sede": "São Paulo, SP",
+    "descricao": "A Alpha Key é gestora independente fundada por Marcos De Callis, Eduardo Cavalheiro e outros sócios com décadas de experiência em Schroders, HSBC e Citi. Opera sob modelo meritocrático de partnership, com portfólio enxuto concentrado em poucas estratégias para maximizar alfa. Combina análise bottom-up rigorosa com visão top-down macroeconômica, com governança e padrão de análise de nível internacional.",
+    "filosofia": "Concentrar inteligência em poucas e boas estratégias — quantidade não é qualidade."
+  },
+  "Norte Asset Management": {
+    "fundacao": 2018,
+    "gestor_principal": "Equipe Norte Asset",
+    "sede": "São Paulo, SP",
+    "descricao": "Fundada em 2018 por profissionais vindos do BBM e da Verde Asset, a Norte Asset é reconhecida pela agilidade e capacidade analítica profunda focada no mercado de capitais brasileiro. Especialista em ações com gestão de convicção — não tem medo de posições concentradas quando identifica distorção clara de preço. Como partnership, os sócios detêm o controle e investem capital próprio nos fundos.",
+    "filosofia": "Gestão de convicção: posições concentradas onde identificamos distorção clara entre preço e valor intrínseco."
+  },
+  "Verde Asset Management": {
+    "fundacao": 1997,
+    "gestor_principal": "Luis Stuhlberger / Daniel Leichsenring",
+    "sede": "São Paulo, SP",
+    "descricao": "Fundada em 1997 por Luis Stuhlberger, a Verde Asset é um dos maiores nomes mundiais em gestão de fundos multimercado. O fundo Verde tornou-se uma lenda por entregar retornos compostos extraordinários atravessando todas as crises das últimas três décadas. Mestre em comprar proteções baratas para cenários de cauda. Mantém parceria estratégica com o UBS (ex-Credit Suisse), conferindo robustez institucional total.",
+    "filosofia": "Não é apenas ganhar dinheiro — é não perder dinheiro nos dias ruins. A proteção é parte essencial da estratégia."
+  },
+  "Armor Gestora de Investimentos": {
+    "fundacao": 2019,
+    "gestor_principal": "Equipe Armor Capital",
+    "sede": "São Paulo, SP",
+    "descricao": "Fundada em 2019 por sócios vindos de tesourarias de grandes bancos (BTG Pactual), a Armor Capital consolidou-se rapidamente como referência em estratégias de valor relativo e arbitragem no Brasil. O nome Armor (Armadura) reflete o propósito da casa: proteger o capital através de estratégias descorrelacionadas com o risco direcional puro da bolsa ou dos juros. Agilidade de execução permite aproveitar janelas que gestoras gigantes não conseguem.",
+    "filosofia": "Proteger o capital através de estratégias descorrelacionadas — lucrando com distorções, não apenas com a direção do mercado."
+  }
+}

@@ -1,0 +1,269 @@
+{
+  "_instrucoes": "Adicione cartas, podcasts e relatórios manualmente. Tipo: 'carta' | 'podcast' | 'relatorio'",
+  "itens": [
+    {
+      "gestora": "Gama Investimentos",
+      "tipo": "podcast",
+      "titulo": "[Os Economistas #177] Onde as maiores gestoras do mundo estão investindo?",
+      "descricao": "Discussão sobre o cenário global e por que o brasileiro ainda investe pouco fora. Ótimo para enviar a clientes que resistem à diversificação internacional.",
+      "url": "",
+      "data": ""
+    },
+    {
+      "gestora": "Gama Investimentos",
+      "tipo": "podcast",
+      "titulo": "[Entrevista CEO] Marcos Falcão avalia investimentos estrangeiros",
+      "descricao": "O CEO explica como a gestora acessa gestores famosos no exterior e a importância da descorrelação, mencionando estratégias de tecnologia e China.",
+      "url": "",
+      "data": ""
+    },
+    {
+      "gestora": "Gama Investimentos",
+      "tipo": "podcast",
+      "titulo": "[Foreshadowing] Por que investir em ativos ilíquidos e alternativos?",
+      "descricao": "Guilherme Gama discute o momento atual para ativos de longo prazo e a estrutura da gestora.",
+      "url": "",
+      "data": ""
+    },
+    {
+      "gestora": "AZ Quest Investimentos",
+      "tipo": "relatorio",
+      "titulo": "[AZ Quest] Visão de Mercado e Estratégias",
+      "descricao": "Canal oficial com atualizações mensais sobre desempenho dos fundos e visão macro. Essencial para acompanhar o track record.",
+      "url": "",
+      "data": ""
+    },
+    {
+      "gestora": "AZ Quest Investimentos",
+      "tipo": "podcast",
+      "titulo": "[Macro Review] Entrevista com Walter Maciel (CEO da AZ Quest)",
+      "descricao": "O CEO discute a história da gestora, a parceria com a Azimut e como a casa se posiciona em momentos de incerteza.",
+      "url": "",
+      "data": ""
+    },
+    {
+      "gestora": "AZ Quest Investimentos",
+      "tipo": "podcast",
+      "titulo": "[Tese de Investimento] Gestão de Fundos de Ações e Multimercados",
+      "descricao": "Painel técnico com os principais gestores detalhando o processo de escolha de ativos do Total Return.",
+      "url": "",
+      "data": ""
+    },
+    {
+      "gestora": "Real Investor Investimentos",
+      "tipo": "podcast",
+      "titulo": "[Outliers #83] Real Investor: Um Value Investor fora do eixo Rio-São Paulo",
+      "descricao": "Uma das entrevistas mais completas. Paiva conta a história da gestora e detalha como analisam empresas. Essencial para entender a seriedade da casa.",
+      "url": "",
+      "data": ""
+    },
+    {
+      "gestora": "Real Investor Investimentos",
+      "tipo": "podcast",
+      "titulo": "[Café com a Jú] Entrevista com Cesar Paiva",
+      "descricao": "Conversa recente (setembro de 2025) focada no cenário atual e em como as estratégias multimercado e de ações estão se comportando frente aos juros.",
+      "url": "",
+      "data": "2025-09"
+    },
+    {
+      "gestora": "Real Investor Investimentos",
+      "tipo": "relatorio",
+      "titulo": "[Real Investor] Canal Oficial da Gestora",
+      "descricao": "Cartas trimestrais em vídeo e comentários mensais sobre desempenho dos fundos. Ótimo para clientes que gostam de relatórios detalhados.",
+      "url": "",
+      "data": ""
+    },
+    {
+      "gestora": "V8 Capital",
+      "tipo": "relatorio",
+      "titulo": "[V8 Capital] Apresentação Institucional e Filosofia",
+      "descricao": "Vídeo detalhando como a equipe de gestão processa os dados e escolhe os pares para o fundo Speedway.",
+      "url": "",
+      "data": ""
+    },
+    {
+      "gestora": "V8 Capital",
+      "tipo": "podcast",
+      "titulo": "[Análise de Fundo] Por que ter um Long & Short na carteira?",
+      "descricao": "Especialistas discutindo a tese da V8 e como o fundo Speedway se comporta em diferentes ciclos econômicos.",
+      "url": "",
+      "data": ""
+    },
+    {
+      "gestora": "V8 Capital",
+      "tipo": "podcast",
+      "titulo": "[Podcast] A importância da descorrelação com V8 Capital",
+      "descricao": "Entrevista com os sócios explicando por que o investidor não deve olhar apenas para o Ibovespa e como o Speedway gera valor no zero a zero do mercado.",
+      "url": "",
+      "data": ""
+    },
+    {
+      "gestora": "Kapitalo Investimentos",
+      "tipo": "podcast",
+      "titulo": "[Outliers] Conversa com Carlos Woelz: A Constelação de Investimentos",
+      "descricao": "O sócio-fundador detalha como funciona a divisão de books e por que o modelo da Kapitalo é mais resiliente do que o modelo de gestor único.",
+      "url": "",
+      "data": ""
+    },
+    {
+      "gestora": "Kapitalo Investimentos",
+      "tipo": "relatorio",
+      "titulo": "[Perspectivas 2026] Palavra do Gestor: Resultados e Cenário",
+      "descricao": "Vídeo recente discutindo trajetória dos juros e inflação para 2026 e como os fundos K10 e Kappa estão posicionados para o ambiente de incerteza global.",
+      "url": "",
+      "data": "2026-01"
+    },
+    {
+      "gestora": "Kapitalo Investimentos",
+      "tipo": "podcast",
+      "titulo": "[Estratégias] Onde investir no 2º semestre de 2025",
+      "descricao": "Análise sobre o papel do K10 na previdência e como a multigestão ajuda a manter a consistência em momentos de queda de mercado.",
+      "url": "",
+      "data": "2025-07"
+    },
+    {
+      "gestora": "Genoa Capital",
+      "tipo": "relatorio",
+      "titulo": "[Perspectivas 2026] A Visão da Genoa Capital: Cenário Global e Juros",
+      "descricao": "Entrevista recente (fevereiro de 2026) discutindo a política fiscal dos EUA, juros no Brasil e como o fundo Radar está posicionado para este ano.",
+      "url": "",
+      "data": "2026-02"
+    },
+    {
+      "gestora": "Genoa Capital",
+      "tipo": "podcast",
+      "titulo": "[Genoa Capital] Entrevista com André Raduan: Além do Eixo Tradicional",
+      "descricao": "O cofundador explica a tese de investir em mercados emergentes e como a Genoa se diferencia das demais gestoras macro.",
+      "url": "",
+      "data": ""
+    },
+    {
+      "gestora": "Genoa Capital",
+      "tipo": "relatorio",
+      "titulo": "[Análise Técnica] Como funciona o processo de decisão na Genoa",
+      "descricao": "Detalhes sobre o modelo de gestão colegiada e o uso de dados para montagem das posições do fundo Radar.",
+      "url": "",
+      "data": ""
+    },
+    {
+      "gestora": "Mantaro Capital",
+      "tipo": "relatorio",
+      "titulo": "[Mantaro Capital] Filosofia de Gestão Equity Hedge",
+      "descricao": "Explicação detalhada sobre como a casa utiliza derivativos para proteger a carteira de ações sem abrir mão do ganho de capital.",
+      "url": "",
+      "data": ""
+    },
+    {
+      "gestora": "Mantaro Capital",
+      "tipo": "podcast",
+      "titulo": "[Live Especialista] O papel do Long Biased no cenário de 2026",
+      "descricao": "Discussão sobre por que ter um fundo com proteção ativa é superior a um fundo de ações puro em anos de transição política ou econômica.",
+      "url": "",
+      "data": "2026-01"
+    },
+    {
+      "gestora": "Mantaro Capital",
+      "tipo": "podcast",
+      "titulo": "[Webinar] Seleção de Ações: Onde a Mantaro vê valor agora",
+      "descricao": "Os gestores comentam as principais posições da carteira e como a estratégia de hedge foi montada para o semestre.",
+      "url": "",
+      "data": ""
+    },
+    {
+      "gestora": "ALPHAKEY CAPITAL MANAGEMENT INVESTIMENTOS LTDA",
+      "tipo": "relatorio",
+      "titulo": "[Alpha Key] Estratégia Long Short e Visão para 2026",
+      "descricao": "Relatório de performance e comentários dos gestores sobre como a pulverização do portfólio ajudou a navegar a volatilidade do último ano.",
+      "url": "",
+      "data": "2026-01"
+    },
+    {
+      "gestora": "ALPHAKEY CAPITAL MANAGEMENT INVESTIMENTOS LTDA",
+      "tipo": "podcast",
+      "titulo": "[Marcos De Callis] A Arte da Seleção de Ativos",
+      "descricao": "Entrevista detalhando a carreira dos fundadores e como o DNA de gestoras globais como a Schroders influenciou a criação da Alpha Key.",
+      "url": "",
+      "data": ""
+    },
+    {
+      "gestora": "ALPHAKEY CAPITAL MANAGEMENT INVESTIMENTOS LTDA",
+      "tipo": "podcast",
+      "titulo": "[Painel Técnico] Long Short vs. Long Biased: Quando escolher cada um?",
+      "descricao": "Debate técnico sobre o enquadramento do AlphaKey Long Short em carteiras de previdência e diversificação.",
+      "url": "",
+      "data": ""
+    },
+    {
+      "gestora": "Norte Asset Management",
+      "tipo": "podcast",
+      "titulo": "[Stock Pickers #210] Norte Asset: Onde estão as joias da Bolsa?",
+      "descricao": "Entrevista com os gestores da Norte detalhando as maiores posições do fundo Equity Hedge e por que acreditam na recuperação de certos setores em 2026.",
+      "url": "",
+      "data": ""
+    },
+    {
+      "gestora": "Norte Asset Management",
+      "tipo": "relatorio",
+      "titulo": "[Norte Asset] Canal Oficial: Cartas aos Cotistas",
+      "descricao": "Vídeos mensais onde o time de gestão explica a performance do mês e como as proteções funcionaram nos últimos eventos de mercado.",
+      "url": "",
+      "data": ""
+    },
+    {
+      "gestora": "Norte Asset Management",
+      "tipo": "podcast",
+      "titulo": "[Market Makers] Debate sobre Long Biased com Norte Asset",
+      "descricao": "Discussão técnica sobre a flexibilidade da estratégia Equity Hedge e como ela se diferencia de um fundo de ações puro.",
+      "url": "",
+      "data": ""
+    },
+    {
+      "gestora": "Verde Asset Management",
+      "tipo": "podcast",
+      "titulo": "[Macro Vision] Luis Stuhlberger: O Cenário Global para 2026",
+      "descricao": "Entrevista recente discutindo inflação global, juros nos EUA e por que o Brasil continua sendo uma tese de valor relativo para a Verde.",
+      "url": "",
+      "data": "2026-01"
+    },
+    {
+      "gestora": "Verde Asset Management",
+      "tipo": "podcast",
+      "titulo": "[Market Makers] Daniel Leichsenring: O Economista da Verde",
+      "descricao": "Uma aula sobre macroeconomia. Leichsenring explica como a Verde processa os dados para montar as posições que alimentam fundos como o X60.",
+      "url": "",
+      "data": ""
+    },
+    {
+      "gestora": "Verde Asset Management",
+      "tipo": "carta",
+      "titulo": "[Verde Asset] Cartas Mensais e Comentários do Gestor",
+      "descricao": "A Verde publica vídeos curtos comentando as famosas Cartas da Verde, lidas como bíblias pelos assessores de investimento.",
+      "url": "",
+      "data": ""
+    },
+    {
+      "gestora": "Armor Gestora de Investimentos",
+      "tipo": "relatorio",
+      "titulo": "[Armor Capital] Visão de Mercado e Posicionamento do AXE",
+      "descricao": "Vídeos mensais onde os gestores explicam as principais atribuições de performance e como o fundo está se protegendo contra os riscos fiscais e globais em 2026.",
+      "url": "",
+      "data": "2026-01"
+    },
+    {
+      "gestora": "Armor Gestora de Investimentos",
+      "tipo": "podcast",
+      "titulo": "[Money Times] Entrevista com Gestores da Armor: Como operar a volatilidade?",
+      "descricao": "Discussão sobre o papel dos fundos multimercados ágeis em cenários de juros altos e incerteza política.",
+      "url": "",
+      "data": ""
+    },
+    {
+      "gestora": "Armor Gestora de Investimentos",
+      "tipo": "podcast",
+      "titulo": "[Live Especialista] Armor AXE: Estratégias em Juros e Câmbio",
+      "descricao": "Detalhamento técnico de como o fundo utiliza derivativos para potencializar retornos com risco controlado.",
+      "url": "",
+      "data": ""
+    }
+  ]
+}

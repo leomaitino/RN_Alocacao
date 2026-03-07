@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comparador de Carteiras — RN Investimentos</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Inter:wght@300;400;500;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #090909;
+  --surface:  #111111;
+  --surface2: #161616;
+  --border:   #1f1f1f;
+  --border2:  #2a2a2a;
+  --text1:    #f0ece4;
+  --text2:    #8a8278;
+  --text3:    #4a4740;
+  --cream:    #e8e0d0;
+  --gold:     #c9a96e;
+  --gold2:    #a8864f;
+  --green:    #7aab8a;
+  --red:      #b06060;
+  --teal:     #5a9898;
+  --purple:   #8878b8;
+  --font-s:   'Playfair Display', Georgia, serif;
+  --font-n:   'Inter', system-ui, sans-serif;
+  --font-m:   'DM Mono', monospace;
+
+  /* Carteira colors */
+  --c1: #c9a96e;
+  --c2: #5a9898;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text1);
+  font-family: var(--font-n);
+  font-size: 13px;
+  min-height: 100vh;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  z-index: 100;
+}
+
+/* ── HEADER ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 32px;
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0;
+  background: rgba(9,9,9,0.95);
+  backdrop-filter: blur(8px);
+  z-index: 50;
+}
+.header-logo {
+  font-family: var(--font-m);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.header-logo span { color: var(--gold); }
+.header-logo .divider { color: var(--text3); }
+.header-title {
+  font-family: var(--font-s);
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--text1);
+}
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.nav-link {
+  font-family: var(--font-m);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--text3);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+.nav-link:hover { color: var(--gold); }
+.btn-print {
+  font-family: var(--font-m);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: #000;
+  background: var(--gold);
+  border: none;
+  padding: 5px 12px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-print:hover { background: var(--gold2); }
+
+/* ── MAIN LAYOUT ── */
+.main {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 0;
+  min-height: calc(100vh - 57px);
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  border-right: 1px solid var(--border);
+  padding: 24px 20px;
+  overflow-y: auto;
+  max-height: calc(100vh - 57px);
+  position: sticky;
+  top: 57px;
+}
+
+.sidebar-section {
+  margin-bottom: 28px;
+}
+
+.section-label {
+  font-family: var(--font-m);
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Janela de tempo */
+.period-btns {
+  display: flex;
+  gap: 4px;
+}
+.period-btn {
+  font-family: var(--font-m);
+  font-size: 10px;
+  padding: 5px 10px;
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.15s;
+  letter-spacing: 0.05em;
+}
+.period-btn:hover { border-color: var(--gold); color: var(--gold); }
+.period-btn.active { background: var(--gold); border-color: var(--gold); color: #000; }
+
+/* Rebalanceamento */
+.rebal-btns {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.rebal-btn {
+  font-family: var(--font-m);
+  font-size: 10px;
+  padding: 5px 10px;
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.15s;
+}
+.rebal-btn:hover { border-color: var(--teal); color: var(--teal); }
+.rebal-btn.active { background: var(--teal); border-color: var(--teal); color: #000; }
+
+/* Carteira card */
+.carteira-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+.carteira-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.carteira-nome {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.carteira-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.carteira-input {
+  font-family: var(--font-n);
+  font-size: 12px;
+  font-weight: 500;
+  background: transparent;
+  border: none;
+  color: var(--text1);
+  width: 140px;
+  outline: none;
+}
+.carteira-total {
+  font-family: var(--font-m);
+  font-size: 10px;
+  color: var(--text3);
+}
+.carteira-total.ok { color: var(--green); }
+.carteira-total.over { color: var(--red); }
+
+/* Alocação rows */
+.alloc-row {
+  display: grid;
+  grid-template-columns: 1fr 64px 28px;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 7px;
+}
+.alloc-select {
+  font-family: var(--font-m);
+  font-size: 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  padding: 4px 6px;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  width: 100%;
+}
+.alloc-select:focus { border-color: var(--gold); color: var(--text1); }
+.alloc-input {
+  font-family: var(--font-m);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  color: var(--text1);
+  padding: 4px 6px;
+  border-radius: 2px;
+  outline: none;
+  text-align: right;
+  width: 100%;
+}
+.alloc-input:focus { border-color: var(--gold); }
+.alloc-remove {
+  background: none;
+  border: none;
+  color: var(--text3);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0;
+  transition: color 0.15s;
+}
+.alloc-remove:hover { color: var(--red); }
+
+.btn-add-ativo {
+  width: 100%;
+  padding: 6px;
+  background: transparent;
+  border: 1px dashed var(--border2);
+  color: var(--text3);
+  font-family: var(--font-m);
+  font-size: 10px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.15s;
+  margin-top: 6px;
+  letter-spacing: 0.05em;
+}
+.btn-add-ativo:hover { border-color: var(--gold); color: var(--gold); }
+
+/* Barra visual de alocação */
+.alloc-bar {
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 8px 0 10px;
+  overflow: hidden;
+}
+.alloc-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s;
+}
+
+.btn-calcular {
+  width: 100%;
+  padding: 10px;
+  background: var(--gold);
+  border: none;
+  color: #000;
+  font-family: var(--font-m);
+  font-size: 11px;
+  font-weight: 400;
+  cursor: pointer;
+  border-radius: 2px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: background 0.15s;
+  margin-top: 4px;
+}
+.btn-calcular:hover { background: var(--gold2); }
+
+/* ── CONTENT ── */
+.content {
+  padding: 24px 28px;
+  overflow-y: auto;
+}
+
+/* Chart area */
+.chart-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.chart-title {
+  font-family: var(--font-s);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text1);
+  margin-bottom: 4px;
+}
+.chart-subtitle {
+  font-family: var(--font-m);
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 0.05em;
+  margin-bottom: 16px;
+}
+.chart-wrap {
+  position: relative;
+  height: 320px;
+}
+#mainChart { width: 100%; height: 100%; }
+
+/* Métricas */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.metrics-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 18px;
+}
+.metrics-card-title {
+  font-family: var(--font-m);
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+table.metrics-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+table.metrics-table th {
+  font-family: var(--font-m);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text3);
+  text-align: right;
+  padding: 4px 8px;
+  font-weight: 400;
+}
+table.metrics-table th:first-child { text-align: left; }
+table.metrics-table td {
+  font-family: var(--font-m);
+  font-size: 11px;
+  color: var(--text2);
+  text-align: right;
+  padding: 6px 8px;
+  border-top: 1px solid var(--border);
+}
+table.metrics-table td:first-child {
+  text-align: left;
+  color: var(--text1);
+  font-size: 10px;
+}
+table.metrics-table tr.highlight td { background: rgba(201,169,110,0.04); }
+
+.val-pos { color: var(--green) !important; }
+.val-neg { color: var(--red) !important; }
+.val-gold { color: var(--gold) !important; }
+
+/* Drawdown chart */
+.dd-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+#ddChart { width: 100%; height: 180px; }
+
+/* Empty state */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: var(--text3);
+  font-family: var(--font-m);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-align: center;
+  gap: 8px;
+}
+.empty-state-icon { font-size: 28px; opacity: 0.3; margin-bottom: 4px; }
+
+/* Loading */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  gap: 8px;
+  color: var(--text3);
+  font-family: var(--font-m);
+  font-size: 11px;
+}
+.spinner {
+  width: 16px; height: 16px;
+  border: 1px solid var(--border2);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Tooltip */
+.chart-tooltip {
+  position: absolute;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 2px;
+  padding: 8px 10px;
+  font-family: var(--font-m);
+  font-size: 10px;
+  pointer-events: none;
+  z-index: 10;
+  display: none;
+}
+.tt-date { color: var(--text3); margin-bottom: 4px; }
+.tt-row { display: flex; justify-content: space-between; gap: 16px; }
+.tt-label { color: var(--text2); }
+.tt-val { font-weight: 400; }
+
+/* Legend */
+.chart-legend {
+  display: flex;
+  gap: 20px;
+  margin-top: 12px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-m);
+  font-size: 10px;
+  color: var(--text2);
+}
+.legend-line {
+  width: 20px; height: 2px;
+  border-radius: 1px;
+}
+
+/* Status bar */
+.status-bar {
+  padding: 8px 32px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 24px;
+  font-family: var(--font-m);
+  font-size: 9px;
+  color: var(--text3);
+  letter-spacing: 0.06em;
+}
+.status-item span { color: var(--text2); }
+
+/* ── PRINT ── */
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 12mm 14mm;
+  }
+  body { background: #fff !important; color: #111 !important; }
+  body::before { display: none; }
+
+  .header {
+    position: static !important;
+    background: #fff !important;
+    border-bottom: 1px solid #ccc !important;
+    padding: 8px 0 !important;
+  }
+  .header-logo span { color: #b08040 !important; }
+  .header-logo .divider { color: #999 !important; }
+  .header-logo, .header-title { color: #111 !important; }
+  .btn-print, .header-nav a { display: none !important; }
+
+  .main {
+    display: block !important;
+    min-height: unset !important;
+  }
+  .sidebar { display: none !important; }
+  .content {
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+  .status-bar { display: none !important; }
+
+  .chart-section, .metrics-card, .dd-section {
+    background: #fff !important;
+    border: 1px solid #ddd !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .chart-title { color: #111 !important; }
+  .chart-subtitle { color: #666 !important; }
+  .metrics-card-title { color: #888 !important; border-color: #ddd !important; }
+
+  table.metrics-table th { color: #888 !important; }
+  table.metrics-table td { color: #333 !important; border-color: #eee !important; }
+  table.metrics-table td:first-child { color: #111 !important; }
+  .val-pos { color: #2a7a4a !important; }
+  .val-neg { color: #a03030 !important; }
+  .val-gold { color: #b08040 !important; }
+
+  /* Mostra imagem do canvas e esconde canvas */
+  canvas { display: none !important; }
+  img[id$="_print"] { display: block !important; }
+
+  .legend-item { color: #333 !important; }
+  .metrics-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; }
+
+  .chart-wrap { height: auto !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-logo">
+    <span>RN Investimentos</span>
+    <span class="divider">|</span>
+    Alpha Desk
+  </div>
+  <div class="header-title">Comparador de Carteiras</div>
+  <nav class="header-nav">
+    <a href="index.html" class="nav-link">← Início</a>
+    <a href="dashboard.html" class="nav-link">Multimercados</a>
+    <button class="btn-print" onclick="imprimirPDF()" title="Exportar PDF">⬇ PDF</button>
+  </nav>
+</header>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <!-- Janela -->
+    <div class="sidebar-section">
+      <div class="section-label">Janela de Tempo</div>
+      <div class="period-btns">
+        <button class="period-btn" data-m="12">1A</button>
+        <button class="period-btn active" data-m="36">3A</button>
+        <button class="period-btn" data-m="60">5A</button>
+        <button class="period-btn" data-m="120">10A</button>
+        <button class="period-btn" data-m="0">Máx</button>
+      </div>
+    </div>
+
+    <!-- Rebalanceamento -->
+    <div class="sidebar-section">
+      <div class="section-label">Rebalanceamento</div>
+      <div class="rebal-btns">
+        <button class="rebal-btn active" data-r="none">Sem</button>
+        <button class="rebal-btn" data-r="monthly">Mensal</button>
+        <button class="rebal-btn" data-r="annual">Anual</button>
+      </div>
+    </div>
+
+    <!-- Carteira 1 -->
+    <div class="sidebar-section">
+      <div class="section-label">Carteiras</div>
+
+      <div class="carteira-card" id="card1">
+        <div class="carteira-header">
+          <div class="carteira-nome">
+            <div class="carteira-dot" style="background:var(--c1)"></div>
+            <input class="carteira-input" id="nome1" value="Carteira A" maxlength="24">
+          </div>
+          <div class="carteira-total" id="total1">0%</div>
+        </div>
+        <div class="alloc-bar"><div class="alloc-bar-fill" id="bar1" style="background:var(--c1);width:0%"></div></div>
+        <div id="ativos1"></div>
+        <button class="btn-add-ativo" onclick="addAtivo(1)">+ adicionar ativo</button>
+      </div>
+
+      <div class="carteira-card" id="card2">
+        <div class="carteira-header">
+          <div class="carteira-nome">
+            <div class="carteira-dot" style="background:var(--c2)"></div>
+            <input class="carteira-input" id="nome2" value="Carteira B" maxlength="24">
+          </div>
+          <div class="carteira-total" id="total2">0%</div>
+        </div>
+        <div class="alloc-bar"><div class="alloc-bar-fill" id="bar2" style="background:var(--c2);width:0%"></div></div>
+        <div id="ativos2"></div>
+        <button class="btn-add-ativo" onclick="addAtivo(2)">+ adicionar ativo</button>
+      </div>
+
+      <button class="btn-calcular" onclick="calcular()">Calcular</button>
+    </div>
+
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content" id="content">
+    <div class="empty-state">
+      <div class="empty-state-icon">◈</div>
+      <div>Configure as carteiras e clique em Calcular</div>
+      <div style="color:var(--text3);margin-top:4px;font-size:9px">Dados carregados de benchmarks.json e mercado.json</div>
+    </div>
+  </main>
+
+</div>
+
+<!-- STATUS BAR -->
+<div class="status-bar" id="statusBar">
+  <div>benchmarks <span id="stBench">—</span></div>
+  <div>mercado <span id="stMercado">—</span></div>
+  <div>ativos disponíveis <span id="stAtivos">—</span></div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+let benchmarks = {};
+let mercado = {};
+let allData = {};  // merged: nome -> retornos_diarios
+let windowMonths = 36;
+let rebalMode = 'none';
+
+const COLORS = { 1: '#c9a96e', 2: '#5a9898' };
+
+// ── LOAD DATA ─────────────────────────────────────────────────────────────────
+async function loadData() {
+  const results = await Promise.allSettled([
+    fetch('benchmarks.json').then(r => r.json()),
+    fetch('mercado.json').then(r => r.json()),
+  ]);
+
+  if (results[0].status === 'fulfilled') {
+    benchmarks = results[0].value;
+    document.getElementById('stBench').textContent = '✓';
+  } else {
+    document.getElementById('stBench').textContent = 'não encontrado';
+  }
+
+  if (results[1].status === 'fulfilled') {
+    mercado = results[1].value;
+    document.getElementById('stMercado').textContent = '✓';
+  } else {
+    document.getElementById('stMercado').textContent = 'não encontrado';
+  }
+
+  // Merge: benchmarks first, then mercado overwrites (mercado has longer history)
+  // Exclude benchmark keys that are superseded by mercado or are USD-denominated
+  const BENCH_EXCLUDE = new Set(['IMAB', 'IPCA+3.5%', 'IPCA+6%', 'IPCA+5%', 'IHFA', 'CDI']);
+  allData = {};
+  for (const [k, v] of Object.entries(benchmarks)) {
+    if (v.retornos_diarios && !BENCH_EXCLUDE.has(k)) allData[k] = v.retornos_diarios;
+  }
+  for (const [k, v] of Object.entries(mercado)) {
+    if (v.retornos_diarios) allData[k] = v.retornos_diarios;  // overwrites benchmarks if same key
+  }
+
+  const nAtivos = Object.keys(allData).length;
+  document.getElementById('stAtivos').textContent = nAtivos;
+
+  // Populate existing selects
+  document.querySelectorAll('.alloc-select').forEach(s => populateSelect(s));
+}
+
+function getAtivoOptions() {
+  const opts = Object.keys(allData).sort();
+  return opts;
+}
+
+function populateSelect(sel) {
+  const cur = sel.value;
+  const opts = getAtivoOptions();
+  sel.innerHTML = '<option value="">— escolher —</option>' +
+    opts.map(o => `<option value="${o}" ${o===cur?'selected':''}>${o}</option>`).join('');
+}
+
+// ── CARTEIRA STATE ─────────────────────────────────────────────────────────────
+const state = {
+  1: [{ ativo: '', pct: 0 }],
+  2: [{ ativo: '', pct: 0 }],
+};
+
+function renderAtivos(c) {
+  const el = document.getElementById(`ativos${c}`);
+  el.innerHTML = state[c].map((row, i) => `
+    <div class="alloc-row">
+      <select class="alloc-select" onchange="setAtivo(${c},${i},this.value)">
+        <option value="">— escolher —</option>
+        ${getAtivoOptions().map(o => `<option value="${o}" ${o===row.ativo?'selected':''}>${o}</option>`).join('')}
+      </select>
+      <input class="alloc-input" type="number" min="0" max="100" step="1"
+        value="${row.pct||''}" placeholder="%" 
+        onchange="setPct(${c},${i},this.value)" oninput="setPct(${c},${i},this.value)">
+      <button class="alloc-remove" onclick="removeAtivo(${c},${i})">×</button>
+    </div>
+  `).join('');
+  updateTotal(c);
+}
+
+function addAtivo(c) {
+  state[c].push({ ativo: '', pct: 0 });
+  renderAtivos(c);
+}
+
+function removeAtivo(c, i) {
+  if (state[c].length <= 1) return;
+  state[c].splice(i, 1);
+  renderAtivos(c);
+}
+
+function setAtivo(c, i, val) {
+  state[c][i].ativo = val;
+  updateTotal(c);
+}
+
+function setPct(c, i, val) {
+  state[c][i].pct = parseFloat(val) || 0;
+  updateTotal(c);
+}
+
+function updateTotal(c) {
+  const total = state[c].reduce((s, r) => s + (r.pct || 0), 0);
+  const el = document.getElementById(`total${c}`);
+  const bar = document.getElementById(`bar${c}`);
+  el.textContent = total + '%';
+  el.className = 'carteira-total' + (total === 100 ? ' ok' : total > 100 ? ' over' : '');
+  bar.style.width = Math.min(total, 100) + '%';
+}
+
+// ── SERIES BUILDING ────────────────────────────────────────────────────────────
+function getRetornos(ativo) {
+  return allData[ativo] || null;
+}
+
+function buildPortfolioSeries(carteira, months) {
+  const ativos = carteira.filter(r => r.ativo && r.pct > 0);
+  if (!ativos.length) return null;
+
+  const weights = {};
+  const totalPct = ativos.reduce((s, r) => s + r.pct, 0);
+  for (const r of ativos) {
+    weights[r.ativo] = r.pct / totalPct;
+  }
+
+  // Find the common start date: latest first date among all selected ativos
+  const firstDates = ativos.map(r => {
+    const rd = getRetornos(r.ativo);
+    if (!rd) return null;
+    const keys = Object.keys(rd).sort();
+    return keys.length ? keys[0] : null;
+  }).filter(Boolean);
+
+  if (!firstDates.length) return null;
+  const commonStart = firstDates.reduce((a, b) => a > b ? a : b); // latest of all starts
+
+  // Get cutoff date from window selection
+  const cutoffByWindow = new Date();
+  if (months > 0) cutoffByWindow.setMonth(cutoffByWindow.getMonth() - months);
+  else cutoffByWindow.setFullYear(2000); // "máximo" — will be limited by commonStart
+
+  // Effective cutoff: whichever is later — window or common data start
+  const commonStartDate = new Date(commonStart);
+  const cutoff = cutoffByWindow > commonStartDate ? cutoffByWindow : commonStartDate;
+
+  // Collect all dates across all ativos in window
+  const dateSet = new Set();
+  for (const r of ativos) {
+    const rd = getRetornos(r.ativo);
+    if (!rd) continue;
+    for (const d of Object.keys(rd)) {
+      if (new Date(d) >= cutoff) dateSet.add(d);
+    }
+  }
+  const dates = [...dateSet].sort();
+  if (dates.length < 2) return null;
+
+  // Determine rebalance dates
+  const rebalDates = new Set();
+  rebalDates.add(dates[0]);
+  if (rebalMode === 'annual') {
+    let yr = new Date(dates[0]).getFullYear();
+    while (true) {
+      yr++;
+      const jan = `${yr}-01-01`;
+      const closest = dates.find(d => d >= jan);
+      if (!closest) break;
+      rebalDates.add(closest);
+    }
+  } else if (rebalMode === 'monthly') {
+    let cur = new Date(dates[0]);
+    while (true) {
+      cur.setMonth(cur.getMonth() + 1);
+      const target = cur.toISOString().slice(0, 7);
+      const closest = dates.find(d => d.startsWith(target));
+      if (!closest) break;
+      rebalDates.add(closest);
+    }
+  }
+
+  // Build portfolio value
+  // Each ativo tracked separately, rebalanced at rebal dates
+  let holdings = {}; // ativo -> units (normalized so total = 100 at start)
+  let portVals = [];
+  let portVal = 100;
+
+  // Initialize at first date
+  for (const r of ativos) {
+    holdings[r.ativo] = weights[r.ativo] * portVal;
+  }
+
+  for (let i = 1; i < dates.length; i++) {
+    const d = dates[i];
+
+    // Apply daily returns
+    for (const r of ativos) {
+      const rd = getRetornos(r.ativo);
+      const ret = rd && rd[d] != null ? rd[d] : 0;
+      holdings[r.ativo] *= (1 + ret);
+    }
+
+    portVal = Object.values(holdings).reduce((s, v) => s + v, 0);
+
+    // Rebalance
+    if (rebalDates.has(d) && i > 0) {
+      for (const r of ativos) {
+        holdings[r.ativo] = weights[r.ativo] * portVal;
+      }
+    }
+
+    portVals.push({ d, v: portVal });
+  }
+
+  return portVals;
+}
+
+// ── METRICS ───────────────────────────────────────────────────────────────────
+function calcMetrics(series) {
+  if (!series || series.length < 2) return null;
+
+  const vals  = series.map(p => p.v);
+  const dates = series.map(p => new Date(p.d));
+  const retornos = [];
+  for (let i = 1; i < vals.length; i++) retornos.push(vals[i] / vals[i-1] - 1);
+
+  const n = retornos.length;
+
+  // Anos usando dias corridos reais (não n/252 que superestima)
+  const diasCorridos = (dates[dates.length-1] - dates[0]) / (1000 * 60 * 60 * 24);
+  const anos = Math.max(diasCorridos / 365.25, 0.01);
+
+  const retAcum  = vals[vals.length-1] / vals[0] - 1;
+  const retAnual = Math.pow(1 + retAcum, 1 / anos) - 1;
+
+  const mean     = retornos.reduce((s, r) => s + r, 0) / n;
+  const variance = retornos.reduce((s, r) => s + Math.pow(r - mean, 2), 0) / n;
+  const vol      = Math.sqrt(variance * 252);
+
+  // Risk-free: CDI médio do mesmo período da carteira
+  let rfDaily = 0.000397; // fallback 10.5% a.a.
+  if (allData['CDI']) {
+    const d0str = series[0].d;
+    const d1str = series[series.length-1].d;
+    const cdiPeriodo = Object.entries(allData['CDI'])
+      .filter(([d]) => d >= d0str && d <= d1str)
+      .map(([,v]) => Number(v))
+      .filter(v => !isNaN(v) && v > 0 && v < 0.1);
+    if (cdiPeriodo.length > 0) {
+      rfDaily = cdiPeriodo.reduce((s, v) => s + v, 0) / cdiPeriodo.length;
+    }
+  }
+  const rfAnual = Math.pow(1 + rfDaily, 252) - 1;
+
+  // Sharpe: (retAnual - rfAnual) / vol  — fórmula padrão de mercado
+  const sharpe = vol > 0.0001 ? (retAnual - rfAnual) / vol : 0;
+
+  // Sortino: downside deviation abaixo de zero (não do CDI)
+  const downside = retornos.filter(r => r < 0);
+  const downVar  = downside.length > 0
+    ? downside.reduce((s, r) => s + r*r, 0) / downside.length
+    : 0;
+  const downVol  = Math.sqrt(downVar * 252);
+  const sortino  = downVol > 0.0001 ? (retAnual - rfAnual) / downVol : 0;
+
+  // Drawdown
+  let peak = vals[0], maxDD = 0;
+  const ddSeries = [];
+  for (const v of vals) {
+    if (v > peak) peak = v;
+    const dd = (v - peak) / peak;
+    ddSeries.push(dd);
+    if (dd < maxDD) maxDD = dd;
+  }
+
+  return { retAcum, retAnual, vol, sharpe, sortino, maxDD, ddSeries, n, anos, rfAnual };
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function calcular() {
+  const content = document.getElementById('content');
+  content.innerHTML = '<div class="loading"><div class="spinner"></div> Calculando...</div>';
+
+  setTimeout(() => {
+    const nome1 = document.getElementById('nome1').value || 'Carteira A';
+    const nome2 = document.getElementById('nome2').value || 'Carteira B';
+    const months = windowMonths;
+
+    const s1 = buildPortfolioSeries(state[1], months);
+    const s2 = buildPortfolioSeries(state[2], months);
+
+    if (!s1 && !s2) {
+      content.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠</div><div>Nenhuma série disponível. Verifique os ativos selecionados.</div></div>';
+      return;
+    }
+
+    const m1 = calcMetrics(s1);
+    const m2 = calcMetrics(s2);
+
+    const html = `
+      ${renderMainChart(s1, s2, nome1, nome2)}
+      ${renderMetricsGrid(m1, m2, nome1, nome2)}
+      ${renderDDChart(m1, m2, s1, s2, nome1, nome2)}
+      ${renderAllocTable(nome1, nome2)}
+    `;
+    content.innerHTML = html;
+
+    drawMainChart(s1, s2, nome1, nome2);
+    drawDDChart(m1, m2, s1, s2, nome1, nome2);
+  }, 50);
+}
+
+function renderMainChart(s1, s2, n1, n2) {
+  const rebalLabel = { none: 'sem rebalanceamento', monthly: 'rebal. mensal', annual: 'rebal. anual' }[rebalMode];
+  return `
+    <div class="chart-section">
+      <div class="chart-title">Retorno Acumulado — Base 100</div>
+      <div class="chart-subtitle">${rebalLabel.toUpperCase()}</div>
+      <div class="chart-wrap">
+        <canvas id="mainChart"></canvas>
+        <div class="chart-tooltip" id="mainTT">
+          <div class="tt-date" id="ttDate"></div>
+          <div class="tt-row"><span class="tt-label" id="ttL0"></span><span class="tt-val" id="ttV0"></span></div>
+          <div class="tt-row"><span class="tt-label" id="ttL1"></span><span class="tt-val" id="ttV1"></span></div>
+          <div class="tt-row"><span class="tt-label" id="ttL2"></span><span class="tt-val" id="ttV2"></span></div>
+        </div>
+      </div>
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-line" style="background:#3a4a3e;border-top:1px dashed #3a4a3e;height:0;margin:1px 0"></div>CDI</div>
+        ${s1 ? `<div class="legend-item"><div class="legend-line" style="background:var(--c1)"></div>${n1}</div>` : ''}
+        ${s2 ? `<div class="legend-item"><div class="legend-line" style="background:var(--c2)"></div>${n2}</div>` : ''}
+      </div>
+    </div>
+  `;
+}
+
+function renderMetricsGrid(m1, m2, n1, n2) {
+  const fmt = (v, isP=true) => v == null ? '—' : (isP ? (v>=0?'+':'') + (v*100).toFixed(2) + '%' : v.toFixed(2));
+  const cls = v => v == null ? '' : v >= 0 ? 'val-pos' : 'val-neg';
+
+  const rows = [
+    { label: 'Retorno Acumulado', v1: m1?.retAcum, v2: m2?.retAcum, p: true },
+    { label: 'Retorno Anualizado', v1: m1?.retAnual, v2: m2?.retAnual, p: true },
+    { label: 'Volatilidade', v1: m1?.vol, v2: m2?.vol, p: true, neutral: true },
+    { label: 'Sharpe', v1: m1?.sharpe, v2: m2?.sharpe, p: false },
+    { label: 'Sortino', v1: m1?.sortino, v2: m2?.sortino, p: false },
+    { label: 'Max Drawdown', v1: m1?.maxDD, v2: m2?.maxDD, p: true, invert: true },
+  ];
+
+  const tableRows = rows.map(r => {
+    const f1 = fmt(r.v1, r.p);
+    const f2 = fmt(r.v2, r.p);
+    const c1 = r.neutral ? '' : r.invert ? (r.v1 == null ? '' : r.v1 > r.v2 ? 'val-neg' : 'val-pos') : cls(r.v1);
+    const c2 = r.neutral ? '' : r.invert ? (r.v2 == null ? '' : r.v2 > r.v1 ? 'val-neg' : 'val-pos') : cls(r.v2);
+    // highlight winner
+    const w1 = !r.neutral && r.v1 != null && r.v2 != null && (r.invert ? r.v1 > r.v2 : r.v1 < r.v2);
+    const w2 = !r.neutral && r.v1 != null && r.v2 != null && (r.invert ? r.v2 > r.v1 : r.v2 < r.v1);
+    return `<tr>
+      <td>${r.label}</td>
+      <td class="${c1}${w1?' val-gold':''}">${f1}</td>
+      <td class="${c2}${w2?' val-gold':''}">${f2}</td>
+    </tr>`;
+  }).join('');
+
+  return `
+    <div class="metrics-grid">
+      <div class="metrics-card" style="grid-column:1/-1">
+        <div class="metrics-card-title">Métricas Comparativas</div>
+        <table class="metrics-table">
+          <thead><tr>
+            <th>Métrica</th>
+            <th style="color:var(--c1)">${n1}</th>
+            <th style="color:var(--c2)">${n2}</th>
+          </tr></thead>
+          <tbody>${tableRows}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function renderDDChart(m1, m2, s1, s2, n1, n2) {
+  return `
+    <div class="dd-section">
+      <div class="chart-title" style="font-size:13px;margin-bottom:4px">Drawdown</div>
+      <div class="chart-subtitle">Queda acumulada em relação ao pico</div>
+      <div class="chart-wrap" style="height:180px">
+        <canvas id="ddChart"></canvas>
+      </div>
+    </div>
+  `;
+}
+
+function renderAllocTable(n1, n2) {
+  const buildRows = (c, nome) => {
+    const ativos = state[c].filter(r => r.ativo && r.pct > 0);
+    if (!ativos.length) return `<tr><td colspan="2" style="color:var(--text3)">—</td></tr>`;
+    return ativos.map(r => `<tr><td>${r.ativo}</td><td>${r.pct}%</td></tr>`).join('');
+  };
+
+  return `
+    <div class="metrics-grid">
+      <div class="metrics-card">
+        <div class="metrics-card-title" style="color:var(--c1)">${n1} — Alocação</div>
+        <table class="metrics-table">
+          <thead><tr><th>Ativo</th><th>Peso</th></tr></thead>
+          <tbody>${buildRows(1, n1)}</tbody>
+        </table>
+      </div>
+      <div class="metrics-card">
+        <div class="metrics-card-title" style="color:var(--c2)">${n2} — Alocação</div>
+        <table class="metrics-table">
+          <thead><tr><th>Ativo</th><th>Peso</th></tr></thead>
+          <tbody>${buildRows(2, n2)}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+// ── SVG CHART ─────────────────────────────────────────────────────────────────
+function drawMainChart(s1, s2, n1, n2) {
+  const canvas = document.getElementById('mainChart');
+  if (!canvas) return;
+
+  // Build CDI reference series aligned to the chart window
+  let cdiSeries = null;
+  if (allData['CDI']) {
+    const d0 = (s1 || s2)[0].d;
+    const d1 = (s1 || s2).at(-1).d;
+    const entries = Object.entries(allData['CDI'])
+      .filter(([d]) => d >= d0 && d <= d1)
+      .sort(([a],[b]) => a.localeCompare(b));
+    if (entries.length > 1) {
+      let val = 100;
+      cdiSeries = entries.slice(1).map(([d, r]) => {
+        val *= (1 + r);
+        return { d, v: parseFloat(val.toFixed(4)) };
+      });
+    }
+  }
+
+  const seriesList = [
+    cdiSeries ? { series: cdiSeries, color: '#3a4a3e', name: 'CDI', dash: true } : null,
+    s1 ? { series: s1, color: '#c9a96e', name: n1 } : null,
+    s2 ? { series: s2, color: '#5a9898', name: n2 } : null,
+  ].filter(Boolean);
+
+  drawLineChart(canvas, seriesList, 'mainTT', 'ttDate',
+    [['ttL0','ttV0'],['ttL1','ttV1'],['ttL2','ttV2']],
+    ['CDI', n1, n2]);
+}
+
+function drawDDChart(m1, m2, s1, s2, n1, n2) {
+  const canvas = document.getElementById('ddChart');
+  if (!canvas) return;
+
+  const toSeries = (s, m) => {
+    if (!s || !m) return null;
+    return s.map((p, i) => ({ d: p.d, v: m.ddSeries[i] * 100 }));
+  };
+
+  drawLineChart(canvas, [
+    s1 ? { series: toSeries(s1, m1), color: '#c9a96e', name: n1 } : null,
+    s2 ? { series: toSeries(s2, m2), color: '#5a9898', name: n2 } : null,
+  ].filter(Boolean), null, null, null, null, true);
+}
+
+function drawLineChart(canvas, seriesList, ttId, ttDateId, ttVals, ttNames, invertY=false) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const W = rect.width, H = rect.height;
+  const PAD = { top: 10, right: 12, bottom: 28, left: 52 };
+  const cW = W - PAD.left - PAD.right;
+  const cH = H - PAD.top - PAD.bottom;
+
+  // Collect all values for scale
+  let allVals = [];
+  let allDates = new Set();
+  for (const s of seriesList) {
+    for (const p of s.series) {
+      allVals.push(p.v);
+      allDates.add(p.d);
+    }
+  }
+  const dates = [...allDates].sort();
+  const minV = Math.min(...allVals);
+  const maxV = Math.max(...allVals);
+  const vRange = maxV - minV || 1;
+  const vPad = vRange * 0.05;
+  const vMin = minV - vPad, vMax = maxV + vPad;
+
+  const xOf = d => PAD.left + (dates.indexOf(d) / (dates.length - 1)) * cW;
+  const yOf = v => invertY
+    ? PAD.top + ((v - vMin) / (vMax - vMin)) * cH
+    : PAD.top + (1 - (v - vMin) / (vMax - vMin)) * cH;
+
+  // Grid
+  ctx.strokeStyle = '#1f1f1f';
+  ctx.lineWidth = 1;
+  const yTicks = 5;
+  for (let i = 0; i <= yTicks; i++) {
+    const v = vMin + (i / yTicks) * (vMax - vMin);
+    const y = yOf(v);
+    ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(W - PAD.right, y); ctx.stroke();
+    ctx.fillStyle = '#4a4740';
+    ctx.font = `9px 'DM Mono', monospace`;
+    ctx.textAlign = 'right';
+    ctx.fillText(invertY ? v.toFixed(1) + '%' : v.toFixed(1), PAD.left - 4, y + 3);
+  }
+
+  // X axis labels
+  const nLabels = Math.min(6, dates.length);
+  ctx.fillStyle = '#4a4740';
+  ctx.textAlign = 'center';
+  for (let i = 0; i < nLabels; i++) {
+    const idx = Math.round(i / (nLabels - 1) * (dates.length - 1));
+    const d = dates[idx];
+    const x = xOf(d);
+    const label = new Date(d).toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' });
+    ctx.fillText(label, x, H - PAD.bottom + 14);
+  }
+
+  // Lines
+  for (const s of seriesList) {
+    const map = {};
+    for (const p of s.series) map[p.d] = p.v;
+
+    ctx.strokeStyle = s.color;
+    ctx.lineWidth = s.dash ? 1 : 1.5;
+    ctx.lineJoin = 'round';
+    if (s.dash) ctx.setLineDash([4, 4]);
+    else ctx.setLineDash([]);
+    ctx.beginPath();
+    let first = true;
+    for (const d of dates) {
+      if (map[d] == null) continue;
+      const x = xOf(d), y = yOf(map[d]);
+      if (first) { ctx.moveTo(x, y); first = false; }
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Zero line for drawdown
+  if (invertY) {
+    const y0 = yOf(0);
+    ctx.strokeStyle = '#2a2a2a';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(PAD.left, y0); ctx.lineTo(W - PAD.right, y0); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Tooltip
+  if (ttId) {
+    const tt = document.getElementById(ttId);
+    canvas.onmousemove = (e) => {
+      const r = canvas.getBoundingClientRect();
+      const mx = e.clientX - r.left;
+      const idx = Math.round((mx - PAD.left) / cW * (dates.length - 1));
+      if (idx < 0 || idx >= dates.length) { tt.style.display = 'none'; return; }
+      const d = dates[idx];
+      document.getElementById(ttDateId).textContent = new Date(d).toLocaleDateString('pt-BR');
+      for (let i = 0; i < seriesList.length && i < (ttVals||[]).length; i++) {
+        const map = {};
+        for (const p of seriesList[i].series) map[p.d] = p.v;
+        document.getElementById(ttVals[i][0]).textContent = (ttNames || [])[i] || '';
+        const v = map[d];
+        document.getElementById(ttVals[i][1]).textContent = v != null ? v.toFixed(2) : '—';
+        document.getElementById(ttVals[i][1]).style.color = seriesList[i].color;
+      }
+      tt.style.display = 'block';
+      tt.style.left = (Math.min(mx + 12, W - 140)) + 'px';
+      tt.style.top = '8px';
+    };
+    canvas.onmouseleave = () => { tt.style.display = 'none'; };
+  }
+}
+
+// ── CONTROLS ──────────────────────────────────────────────────────────────────
+document.querySelectorAll('.period-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.period-btn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    windowMonths = parseInt(b.dataset.m);
+  });
+});
+
+document.querySelectorAll('.rebal-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.rebal-btn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    rebalMode = b.dataset.r;
+  });
+});
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+
+// Pre-populate example portfolios
+state[1] = [
+  { ativo: 'IMA-B',  pct: 30 },
+  { ativo: 'CDI',    pct: 20 },
+  { ativo: 'IBOV',   pct: 45 },
+  { ativo: 'IHFA',   pct: 5  },
+];
+state[2] = [
+  { ativo: 'IMA-B',  pct: 20 },
+  { ativo: 'CDI',    pct: 20 },
+  { ativo: 'IHFA',   pct: 40 },
+  { ativo: 'IBOV',   pct: 20 },
+];
+
+loadData().then(() => {
+  renderAtivos(1);
+  renderAtivos(2);
+});
+
+// ── PRINT / PDF ───────────────────────────────────────────────────────────────
+function imprimirPDF() {
+  // Capture charts as images before printing
+  const charts = ['mainChart', 'ddChart'];
+  charts.forEach(id => {
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+    // Replace canvas with img for print
+    const img = document.createElement('img');
+    img.id = id + '_print';
+    img.src = canvas.toDataURL('image/png');
+    img.style.width = '100%';
+    img.style.display = 'none';
+    canvas.parentNode.insertBefore(img, canvas.nextSibling);
+  });
+  window.print();
+  // Remove temp imgs after print
+  charts.forEach(id => {
+    const img = document.getElementById(id + '_print');
+    if (img) img.remove();
+  });
+}
+</script>
+</body>
+</html>

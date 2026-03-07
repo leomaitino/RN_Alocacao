@@ -1,0 +1,2692 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alpha Desk — Fundos Multimercado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* ── RN Investimentos brand palette ── */
+  --bg:       #090909;
+  --surface:  #111111;
+  --surface2: #171717;
+  --surface3: #1e1e1e;
+  --border:   #1f1f1f;
+  --border2:  #2a2a2a;
+  --text:     #f0ece4;
+  --text2:    #8a8278;
+  --text3:    #4a4740;
+  --cream:    #e8e0d0;
+  --gold:     #c9a96e;
+  /* functional colors kept for badges/charts */
+  --accent:   #c9a96e;
+  --accent2:  #dfc08a;
+  --green:    #7aab8a;
+  --red:      #b06060;
+  --yellow:   #c9a96e;
+  --purple:   #8878b8;
+  --teal:     #5a9898;
+  --orange:   #b88050;
+  --font-d:   'Playfair Display', Georgia, serif;
+  --font-m:   'DM Mono', monospace;
+  --font-s:   'Inter', system-ui, sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-s);font-size:14px;line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased;}
+body::before{content:'';display:block;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.3;position:fixed;top:0;left:0;right:0;z-index:999;}
+::-webkit-scrollbar{width:5px;height:5px;} ::-webkit-scrollbar-track{background:var(--bg);} ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* HEADER */
+.header{background:var(--bg);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:58px;position:sticky;top:0;z-index:100;}
+.logo{font-family:var(--font-d);font-size:18px;font-weight:500;letter-spacing:.3px;color:var(--cream);display:flex;align-items:center;gap:10px;}
+.logo-dot{width:1px;height:16px;background:var(--border2);}
+.header-meta{font-family:var(--font-m);font-size:11px;color:var(--text3);text-align:right;}
+.header-meta span{color:var(--text2);}
+
+/* TABS */
+.tabs-bar{background:var(--bg);border-bottom:1px solid var(--border);padding:0 32px;display:flex;position:sticky;top:58px;z-index:99;overflow-x:auto;}
+.tab{padding:12px 18px;font-size:12px;font-weight:400;letter-spacing:.3px;font-family:var(--font-m);color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .18s;white-space:nowrap;text-transform:uppercase;}
+.tab:hover{color:var(--text2);}
+.tab.active{color:var(--cream);border-bottom-color:var(--gold);font-weight:500;}
+
+/* MAIN */
+.main{padding:22px 28px;max-width:1700px;margin:0 auto;}
+.tab-content{display:none;animation:fadeIn .2s ease;}
+.tab-content.active{display:block;}
+
+/* LOADING */
+.loading{display:flex;align-items:center;justify-content:center;height:200px;gap:12px;font-family:var(--font-m);color:var(--text3);font-size:13px;}
+.spinner{width:20px;height:20px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px;}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:2px;padding:14px 16px;position:relative;overflow:hidden;}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--kpi-color,var(--accent));opacity:.7;}
+.kpi-label{font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;}
+.kpi-value{font-family:var(--font-m);font-size:20px;font-weight:500;line-height:1;margin-bottom:4px;}
+.kpi-sub{font-size:11px;font-family:var(--font-m);color:var(--text3);}
+
+/* FILTER BAR */
+.filters-bar{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;display:flex;gap:10px;align-items:flex-end;margin-bottom:10px;flex-wrap:wrap;}
+.filter-group{display:flex;flex-direction:column;gap:4px;}
+.filter-label{font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.8px;}
+.filter-select{background:var(--surface);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-size:12px;font-family:var(--font-s);padding:6px 9px;cursor:pointer;outline:none;min-width:140px;}
+.filter-select:focus{border-color:var(--accent);}
+.search-input{background:var(--surface);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-size:12px;padding:6px 9px;outline:none;width:180px;}
+.search-input:focus{border-color:var(--accent);}
+.search-input::placeholder{color:var(--text3);}
+
+/* PERIOD SELECTOR */
+.period-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+.period-selector{display:flex;gap:3px;background:var(--surface);border-radius:7px;padding:3px;border:1px solid var(--border);}
+.period-btn{padding:4px 10px;border-radius:5px;font-size:11px;font-family:var(--font-m);cursor:pointer;color:var(--text3);border:none;background:transparent;transition:all .15s;}
+.period-btn.active{background:var(--gold);color:var(--bg);font-weight:600;}
+
+/* SUBGROUP PILLS */
+.sg-pill{padding:5px 13px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border2);color:var(--text2);background:transparent;font-family:var(--font-s);transition:all .2s;}
+.sg-pill:hover{border-color:var(--accent);color:var(--accent2);}
+.sg-pill.active{background:rgba(201,169,110,.15);border-color:var(--accent);color:var(--accent2);}
+
+/* TABLE */
+.table-wrapper{background:var(--bg);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+.table-header-bar{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.table-title{font-size:13px;font-weight:600;}
+.badge{font-size:10px;font-family:var(--font-m);padding:2px 7px;border-radius:4px;background:var(--surface);color:var(--text2);border:1px solid var(--border2);white-space:nowrap;}
+.badge.blue{background:rgba(201,169,110,.12);color:var(--accent2);border-color:rgba(201,169,110,.25);}
+.badge.green{background:rgba(61,214,140,.12);color:var(--green);border-color:rgba(61,214,140,.25);}
+.badge.yellow{background:rgba(245,200,66,.12);color:var(--yellow);border-color:rgba(245,200,66,.25);}
+.badge.purple{background:rgba(155,114,245,.12);color:var(--purple);border-color:rgba(155,114,245,.25);}
+.badge.teal{background:rgba(45,212,200,.12);color:var(--teal);border-color:rgba(45,212,200,.25);}
+.badge.orange{background:rgba(245,137,74,.12);color:var(--orange);border-color:rgba(245,137,74,.25);}
+table{width:100%;border-collapse:collapse;}
+thead th{padding:8px 12px;text-align:left;font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid var(--border);background:var(--surface);cursor:pointer;white-space:nowrap;user-select:none;}
+thead th:hover{color:var(--text2);}
+tbody tr{border-bottom:1px solid var(--border);transition:background .12s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:rgba(255,255,255,.022);}
+td{padding:9px 12px;font-size:12px;vertical-align:middle;}
+.num{font-family:var(--font-m);font-size:12px;text-align:right;}
+.pos{color:var(--green);} .neg{color:var(--red);} .neu{color:var(--text3);}
+.fund-name{font-weight:500;font-size:13px;}
+.fund-gestora{font-size:11px;color:var(--text3);font-family:var(--font-m);}
+
+/* PAGINATION */
+.pagination{padding:10px 16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.page-info{font-size:11px;font-family:var(--font-m);color:var(--text3);}
+.page-btns{display:flex;gap:4px;}
+.page-btn{background:transparent;border:1px solid var(--border2);border-radius:5px;color:var(--text2);font-size:11px;font-family:var(--font-m);padding:4px 9px;cursor:pointer;transition:all .15s;}
+.page-btn:hover{border-color:var(--accent);color:var(--accent2);}
+.page-btn.active{background:rgba(201,169,110,.15);border-color:var(--accent);color:var(--accent2);}
+.page-btn:disabled{opacity:.3;cursor:default;}
+
+/* BUTTONS */
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:6px;padding:6px 13px;font-size:12px;cursor:pointer;font-family:var(--font-s);transition:all .2s;}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent2);}
+.btn-primary{background:var(--accent);color:#fff;border:none;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;}
+.btn-rec{background:rgba(61,214,140,.15);color:var(--green);border:1px solid rgba(61,214,140,.3);border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font-m);transition:all .2s;}
+.btn-rec:hover{background:rgba(61,214,140,.25);}
+.btn-rec.active{background:rgba(61,214,140,.9);color:var(--bg);}
+
+/* VOL / CAP BADGES */
+.vol-alta{background:rgba(245,200,66,.1);color:var(--yellow);border:1px solid rgba(245,200,66,.25);}
+.vol-media{background:rgba(201,169,110,.1);color:var(--accent2);border:1px solid rgba(201,169,110,.25);}
+.vol-baixa{background:rgba(61,214,140,.1);color:var(--green);border:1px solid rgba(61,214,140,.25);}
+.vol-na{background:var(--surface);color:var(--text3);border:1px solid var(--border);}
+.vol-badge{font-size:10px;font-family:var(--font-m);padding:2px 6px;border-radius:3px;white-space:nowrap;}
+.cap-aberta{color:var(--gold);} .cap-fechada{color:var(--red);}
+
+/* QUANT */
+.quartil-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.quartil-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 15px;}
+.quartil-card-label{font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;}
+.quartil-card-value{font-family:var(--font-m);font-size:17px;font-weight:600;margin-bottom:10px;}
+.quartil-bar-track{height:5px;background:var(--border2);border-radius:3px;position:relative;overflow:visible;}
+.quartil-bar-fill{height:5px;border-radius:3px;transition:width .5s ease;}
+.quartil-marker{position:absolute;top:-4px;width:12px;height:12px;border-radius:50%;border:2px solid var(--bg);transform:translateX(-50%);transition:left .5s ease;}
+.quartil-labels{display:flex;justify-content:space-between;font-size:9px;font-family:var(--font-m);color:var(--text3);margin-top:4px;}
+.quartil-rank{font-size:10px;font-family:var(--font-m);color:var(--text3);margin-top:5px;}
+.q-badge{display:inline-block;width:22px;height:22px;border-radius:4px;font-size:11px;font-family:var(--font-m);font-weight:700;text-align:center;line-height:22px;}
+.q-badge.q1{background:rgba(61,214,140,.2);color:#3dd68c;}
+.q-badge.q2{background:rgba(201,169,110,.2);color:#7eb3ff;}
+.q-badge.q3{background:rgba(245,200,66,.2);color:#f5c842;}
+.q-badge.q4{background:rgba(240,92,110,.2);color:#f05c6e;}
+.rank-table{width:100%;border-collapse:collapse;font-size:12px;}
+.rank-table th{padding:8px 11px;text-align:left;font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border);background:var(--surface);white-space:nowrap;cursor:pointer;}
+.rank-table th:hover{color:var(--text2);}
+.rank-table td{padding:8px 11px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.rank-table tr:hover{background:rgba(255,255,255,.02);}
+.star-row{display:flex;gap:2px;}
+.star{width:9px;height:9px;border-radius:50%;}
+.star.on{background:var(--yellow);box-shadow:0 0 4px var(--yellow);}
+.star.off{background:var(--border2);}
+.score-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px 24px;}
+.score-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:12px;flex-wrap:wrap;}
+.grade-circle{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-m);font-size:20px;font-weight:700;border:3px solid;flex-shrink:0;}
+
+/* WEIGHT SLIDERS */
+.weight-panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:14px;}
+.weight-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:12px;}
+.weight-item label{font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.6px;display:flex;justify-content:space-between;margin-bottom:5px;}
+.weight-item label span{color:var(--accent2);font-weight:600;}
+input[type=range]{width:100%;accent-color:var(--accent);height:4px;cursor:pointer;}
+
+/* GESTORAS */
+.gestora-card{background:var(--bg);border:1px solid var(--border);border-radius:2px;padding:15px;cursor:pointer;transition:all .2s;}
+.gestora-card:hover{border-color:var(--border2);transform:translateY(-1px);}
+
+/* GRAPHS */
+.chart-container{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;}
+.chart-canvas{width:100%;position:relative;}
+svg text{font-family:var(--font-m);}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;right:28px;z-index:2000;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:12px 18px;font-family:var(--font-m);font-size:12px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,.4);transform:translateY(80px);opacity:0;transition:all .3s ease;pointer-events:none;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.green{border-left:3px solid var(--green);color:var(--green);}
+.toast.red{border-left:3px solid var(--red);color:var(--red);}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:flex;align-items:center;justify-content:center;}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:28px;width:340px;text-align:center;}
+.modal h3{font-family:var(--font-d);font-size:20px;margin-bottom:8px;}
+.modal p{font-size:12px;color:var(--text3);font-family:var(--font-m);margin-bottom:16px;}
+.modal input{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-size:14px;padding:10px;outline:none;text-align:center;letter-spacing:2px;font-family:var(--font-m);margin-bottom:12px;}
+.modal input:focus{border-color:var(--accent);}
+.modal-error{color:var(--red);font-size:11px;font-family:var(--font-m);margin-top:-8px;margin-bottom:12px;min-height:16px;}
+
+/* CORR TABLE */
+.corr-table{border-collapse:collapse;font-family:var(--font-m);font-size:11px;}
+.corr-table th,.corr-table td{padding:6px 10px;border:1px solid var(--border);text-align:center;}
+.corr-table th{background:var(--surface);color:var(--text3);font-size:10px;}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo"><span style="font-family:var(--font-d);font-size:18px;font-weight:500;letter-spacing:.3px;color:var(--cream);">RN Investimentos</span><div class="logo-dot"></div><span style="font-family:var(--font-m);font-size:10px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;">Alpha Desk</span></div>
+  <div class="header-meta" id="headerMeta">Carregando...</div>
+</header>
+
+<nav class="tabs-bar">
+  <div class="tab active"  onclick="switchTab('home',this)">Recomendados</div>
+  <div class="tab"         onclick="switchTab('comparacao',this)">Lista Completa</div>
+  <div class="tab"         onclick="switchTab('quant',this)">Análise Quantitativa</div>
+  <div class="tab"         onclick="switchTab('graficos',this)">Gráficos</div>
+  <div class="tab"         onclick="switchTab('gestoras',this)">Gestoras</div>
+</nav>
+
+<!-- ═══ TAB 0: HOME — RECOMENDADOS ════════════════════════════════ -->
+<div id="tab-home" class="tab-content active">
+<div class="main">
+  <div id="homeLoading" style="display:flex;align-items:center;gap:12px;height:120px;font-family:var(--font-m);color:var(--text3);font-size:13px;">
+    <div class="spinner"></div>Carregando recomendados...
+  </div>
+  <div id="homeContent" style="display:none;">
+    <!-- KPIs da carteira -->
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+      <div>
+        <div style="font-family:var(--font-d);font-size:28px;font-weight:400;letter-spacing:-.3px;line-height:1.1;color:var(--cream);">Carteira Recomendada</div>
+        <div style="font-size:12px;color:var(--text3);font-family:var(--font-m);margin-top:3px;" id="homeSubtitle"></div>
+      </div>
+      <div style="display:flex;gap:7px;align-items:center;">
+        <div class="period-selector" id="homePeriodSel">
+          <button class="period-btn" data-field="rent_dia"  onclick="setHomePeriod(this)">Dia</button>
+          <button class="period-btn" data-field="rent_mes"  onclick="setHomePeriod(this)">Mês</button>
+          <button class="period-btn" data-field="rent_ano"  onclick="setHomePeriod(this)">Ano</button>
+          <button class="period-btn active" data-field="rent_12m" onclick="setHomePeriod(this)">12M</button>
+          <button class="period-btn" data-field="rent_24m"  onclick="setHomePeriod(this)">24M</button>
+          <button class="period-btn" data-field="rent_36m"  onclick="setHomePeriod(this)">36M</button>
+        </div>
+      </div>
+    </div>
+    <div id="homeKPIs" class="kpi-grid" style="grid-template-columns:repeat(6,1fr);margin-bottom:20px;"></div>
+    <!-- GRÁFICO: Portfólio RN vs Benchmarks -->
+    <div class="table-wrapper" style="margin-bottom:16px;">
+      <div class="table-header-bar">
+        <div class="table-title">Portfólio RN vs Benchmarks</div>
+        <div style="display:flex;gap:7px;align-items:center;">
+          <div class="period-selector" id="homeChartPeriodSel">
+            <button class="period-btn" data-m="12"  onclick="setHomeChartPeriod(this)">12M</button>
+            <button class="period-btn active" data-m="36" onclick="setHomeChartPeriod(this)">36M</button>
+            <button class="period-btn" data-m="60"  onclick="setHomeChartPeriod(this)">5A</button>
+          </div>
+        </div>
+      </div>
+      <div style="padding:12px 0 4px;">
+        <div id="homeChartTitle" style="font-size:10px;font-family:var(--font-m);color:var(--text3);margin-bottom:6px;padding:0 16px;">Cota Normalizada (base 100)</div>
+        <div id="homeChartWrapper" style="width:100%;min-height:280px;padding:0 8px;"></div>
+        <div id="homeChartLegend" style="display:flex;gap:14px;flex-wrap:wrap;padding:10px 16px 4px;"></div>
+      </div>
+    </div>
+
+    <!-- CORRELAÇÃO: carteira vs benchmarks -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+      <div class="table-wrapper">
+        <div class="table-header-bar"><div class="table-title">Correlação — Fundos da Carteira</div></div>
+        <div id="homeCorrTable" style="padding:8px;overflow-x:auto;"></div>
+      </div>
+      <div class="table-wrapper">
+        <div class="table-header-bar"><div class="table-title">Correlação — Carteira vs Índices</div></div>
+        <div id="homeCorrBench" style="padding:16px;font-family:var(--font-m);font-size:12px;"></div>
+      </div>
+    </div>
+
+    <!-- Tabela de recomendados -->
+    <div class="table-wrapper">
+      <div class="table-header-bar">
+        <div class="table-title">Fundos Recomendados</div>
+        <div style="display:flex;gap:7px;">
+          <span class="badge green" id="homeBadge"></span>
+          <button class="btn-ghost" onclick="switchTab('graficos',document.querySelectorAll('.tab')[3]);showPortfolioRN=true;renderCharts();" style="font-size:11px;padding:5px 9px;">📈 Ver gráfico</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table id="homeTable">
+          <thead><tr>
+            <th>Fundo</th><th>Classe XP</th>
+            <th id="homeThRent">Retorno 12M</th>
+            <th>Sharpe 36M</th><th>Sortino 36M</th><th>Vol 36M</th><th>DD 36M</th>
+            <th>PL (R$M)</th><th>Captação</th><th>Remover</th>
+          </tr></thead>
+          <tbody id="homeTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <!-- Empty state -->
+    <div id="homeEmpty" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:60px;text-align:center;">
+      <div style="font-size:32px;margin-bottom:12px;">✦</div>
+      <div style="font-family:var(--font-d);font-size:20px;margin-bottom:8px;">Nenhum fundo recomendado ainda</div>
+      <div style="font-size:13px;color:var(--text3);font-family:var(--font-m);margin-bottom:20px;">Vá para Lista Completa ou Análise Quantitativa e marque fundos com + Rec</div>
+      <button class="btn-primary" onclick="switchTab('comparacao',document.querySelectorAll('.tab')[1])">Ir para Lista Completa</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ TAB 1: COMPARAÇÃO ═══════════════════════════════════════════ -->
+<div id="tab-comparacao" class="tab-content">
+<div class="main">
+  <div class="loading" id="loadingMain"><div class="spinner"></div>Carregando dados...</div>
+  <div id="comparacaoContent" style="display:none">
+    <div class="kpi-grid" id="kpiGrid"></div>
+    <div class="filters-bar">
+      <div class="filter-group"><div class="filter-label">Classificação XP</div>
+        <select class="filter-select" id="filterClassXP" onchange="applyFilters()"><option value="">Todas</option></select></div>
+      <div class="filter-group"><div class="filter-label">Tipo Investidor</div>
+        <select class="filter-select" id="filterTipoInv" onchange="applyFilters()">
+          <option value="">Todos</option><option>Geral</option><option>Qualificado</option><option>Profissional</option></select></div>
+      <div class="filter-group"><div class="filter-label">Captação</div>
+        <select class="filter-select" id="filterCaptacao" onchange="applyFilters()">
+          <option value="">Todas</option><option value="aberta">Aberta</option><option value="fechada">Fechada</option></select></div>
+      <div class="filter-group"><div class="filter-label">Volatilidade</div>
+        <select class="filter-select" id="filterVol" onchange="applyFilters()">
+          <option value="">Todas</option><option>Alta</option><option>Média</option><option>Baixa</option></select></div>
+      <div class="filter-group"><div class="filter-label">Buscar</div>
+        <input class="search-input" id="searchInput" placeholder="Nome ou gestora..." oninput="applyFilters()"></div>
+      <button class="btn-ghost" onclick="clearFilters()" style="font-size:11px;padding:6px 11px;align-self:flex-end;">↺ Limpar</button>
+    </div>
+    <div class="period-row">
+      <span style="font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.8px;">Período</span>
+      <div class="period-selector">
+        <button class="period-btn" data-field="rent_dia" onclick="setPeriod(this)">Dia</button>
+        <button class="period-btn" data-field="rent_mes" onclick="setPeriod(this)">Mês</button>
+        <button class="period-btn" data-field="rent_ano" onclick="setPeriod(this)">Ano</button>
+        <button class="period-btn active" data-field="rent_12m" onclick="setPeriod(this)">12M</button>
+        <button class="period-btn" data-field="rent_24m" onclick="setPeriod(this)">24M</button>
+        <button class="period-btn" data-field="rent_36m" onclick="setPeriod(this)">36M</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;" id="subgroupTabs"></div>
+    <div class="table-wrapper">
+      <div class="table-header-bar">
+        <div class="table-title">Ranking de Fundos</div>
+        <div style="display:flex;gap:7px;align-items:center;">
+          <span class="badge blue" id="badgeTotal"></span>
+          <span class="badge green" id="badgeRec" style="display:none"></span>
+          <button class="btn-ghost" onclick="exportCSV()" style="font-size:11px;padding:5px 9px;">↓ CSV</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table id="fundTable">
+          <thead><tr>
+            <th style="width:28px">#</th>
+            <th onclick="sortBy('nome')">Fundo</th>
+            <th onclick="sortBy('rent')" id="thRent">Retorno ↓</th>
+            <th onclick="sortBy('sharpe')">Sharpe</th>
+            <th onclick="sortBy('volatilidade')">Vol</th>
+            <th onclick="sortBy('drawdown_max')">Max DD</th>
+            <th onclick="sortBy('pl')">PL (R$M)</th>
+            <th>Aplic. Mín</th><th>Liquidez</th><th>Tipo Inv</th><th>Captação</th><th>Classe XP</th><th>Rec.</th>
+          </tr></thead>
+          <tbody id="fundTableBody"></tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <div class="page-info" id="pageInfo"></div>
+        <div class="page-btns" id="pageBtns"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ TAB 2: ANÁLISE QUANTITATIVA ════════════════════════════════ -->
+<div id="tab-quant" class="tab-content">
+<div class="main">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+    <div>
+      <div style="font-family:var(--font-d);font-size:22px;margin-bottom:2px;">Análise Quantitativa</div>
+      <div style="font-size:12px;color:var(--text3);font-family:var(--font-m);" id="qSubtitle">Ranking por score ponderado · clique num fundo para o scorecard</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <div class="filter-group"><div class="filter-label">Buscar fundo</div>
+        <input class="search-input" id="qSearchInput" placeholder="Nome ou gestora..." oninput="renderQuantRanking()" style="min-width:180px;"></div>
+      <div class="filter-group"><div class="filter-label">Categoria XP</div>
+        <select class="filter-select" id="qCatSel" onchange="onQuantCatChange()" style="min-width:190px;"><option value="">Todas as categorias</option></select></div>
+      <div class="filter-group"><div class="filter-label">Período</div>
+        <select class="filter-select" id="qPeriodSel" onchange="renderQuantRanking()">
+          <option value="12m">12 meses</option><option value="24m">24 meses</option><option value="36m">36 meses</option></select></div>
+      <button class="btn-ghost" onclick="exportQuantCSV()" style="font-size:11px;padding:6px 11px;align-self:flex-end;">↓ CSV</button>
+    </div>
+  </div>
+
+  <!-- WEIGHT PANEL -->
+  <div class="weight-panel">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <div>
+        <div style="font-size:12px;font-weight:600;">Pesos das métricas</div>
+        <div style="font-size:10px;font-family:var(--font-m);color:var(--text3);margin-top:2px;">Ajuste livremente · salve com senha para persistir</div>
+      </div>
+      <div style="display:flex;gap:7px;align-items:center;">
+        <span style="font-size:11px;font-family:var(--font-m);color:var(--text3);">Total: <span id="weightTotal" style="color:var(--accent2);">100%</span></span>
+        <button class="btn-ghost" onclick="resetWeights()" style="font-size:11px;padding:4px 10px;">↺ Equalizar</button>
+        <button class="btn-ghost" onclick="requestSavePesos()" style="font-size:11px;padding:4px 10px;border-color:var(--accent);color:var(--accent2);">💾 Salvar pesos</button>
+      </div>
+    </div>
+    <div class="weight-grid" id="weightGrid"></div>
+  </div>
+
+  <!-- RANKING TABLE -->
+  <div class="table-wrapper" style="margin-bottom:20px;">
+    <div class="table-header-bar">
+      <div class="table-title" id="qRankTitle">Ranking Geral</div>
+      <div style="display:flex;gap:7px;align-items:center;">
+        <span class="badge blue" id="qBadgeTotal"></span>
+        <span class="badge green" id="qBadgeRec" style="display:none"></span>
+      </div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="rank-table" id="quantTable">
+        <thead><tr>
+          <th style="width:28px;">#</th>
+          <th>Fundo</th>
+          <th>Score</th>
+          <th>Sharpe 36M</th>
+          <th>Sortino 36M</th>
+          <th>Vol 36M</th>
+          <th>Corr. CDI</th>
+          <th>Var PL 12M</th>
+          <th>PL (R$M)</th>
+          <th style="width:70px;">Rec.</th>
+          <th>Classe XP</th>
+        </tr></thead>
+        <tbody id="quantRankBody"></tbody>
+      </table>
+    </div>
+    <div class="pagination">
+      <div class="page-info" id="qPageInfo"></div>
+      <div class="page-btns" id="qPageBtns"></div>
+    </div>
+  </div>
+
+  <!-- SCORECARD -->
+  <div id="quantScorecard" style="display:none;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <div style="font-size:12px;font-weight:600;color:var(--text3);font-family:var(--font-m);letter-spacing:.5px;">▼ SCORECARD</div>
+      <button class="btn-ghost" onclick="closeScorecard()" style="font-size:11px;padding:4px 10px;">✕ Fechar</button>
+    </div>
+    <div id="quantScorecardInner"></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ TAB 3: GRÁFICOS ══════════════════════════════════════════════ -->
+<div id="tab-graficos" class="tab-content">
+<div class="main">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+    <div>
+      <div style="font-family:var(--font-d);font-size:22px;margin-bottom:2px;">Gráficos</div>
+      <div style="font-size:12px;color:var(--text3);font-family:var(--font-m);">Compare fundos pelo retorno acumulado e correlação</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <div class="filter-group"><div class="filter-label">Modo Y</div>
+        <select class="filter-select" id="chartModeY" onchange="renderCharts()" style="min-width:200px;">
+          <option value="base100">Cota normalizada (base 100)</option>
+          <option value="excess">Retorno vs CDI (%)</option>
+        </select></div>
+      <div class="filter-group"><div class="filter-label">Período</div>
+        <select class="filter-select" id="chartPeriod" onchange="renderCharts()">
+          <option value="12">12 meses</option><option value="24">24 meses</option>
+          <option value="36">36 meses</option><option value="60">5 anos</option>
+        </select></div>
+    </div>
+  </div>
+
+  <!-- Fund selector -->
+  <div class="table-wrapper" style="margin-bottom:16px;">
+    <div class="table-header-bar">
+      <div class="table-title">Selecionar fundos para comparação</div>
+      <div style="display:flex;gap:7px;align-items:center;">
+        <span class="badge blue" id="chartSelectedCount">0 selecionados</span>
+        <button class="btn-ghost" onclick="addPortfolioRN()" style="font-size:11px;padding:5px 9px;">✦ Portfólio RN</button>
+        <button class="btn-ghost" onclick="clearChartSelection()" style="font-size:11px;padding:5px 9px;">↺ Limpar</button>
+      </div>
+    </div>
+    <div style="padding:10px 16px;display:flex;gap:8px;flex-wrap:wrap;border-bottom:1px solid var(--border);">
+      <input class="search-input" id="chartSearch" placeholder="Buscar fundo..." oninput="renderChartFundList()" style="width:220px;">
+      <select class="filter-select" id="chartCatFilter" onchange="renderChartFundList()" style="min-width:160px;">
+        <option value="">Todas categorias</option></select>
+    </div>
+    <div id="chartFundList" style="max-height:200px;overflow-y:auto;"></div>
+  </div>
+
+  <!-- Charts -->
+  <div id="chartsArea" style="display:none;">
+    <div class="chart-container" style="margin-bottom:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div style="font-size:13px;font-weight:600;" id="chartTitle">Retorno Acumulado</div>
+        <div id="chartLegend" style="display:flex;gap:12px;flex-wrap:wrap;"></div>
+      </div>
+      <div class="chart-canvas" id="lineChartWrapper"></div>
+    </div>
+
+    <div class="chart-container">
+      <div style="font-size:13px;font-weight:600;margin-bottom:16px;">Correlação entre os fundos selecionados</div>
+      <div id="corrTableWrapper" style="overflow-x:auto;"></div>
+    </div>
+  </div>
+
+  <div id="chartsEmpty" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:60px;text-align:center;color:var(--text3);font-family:var(--font-m);font-size:13px;">
+    Selecione fundos acima para gerar os gráficos
+  </div>
+</div>
+</div>
+
+<!-- ═══ TAB 4: GESTORAS ══════════════════════════════════════════════ -->
+<div id="tab-gestoras" class="tab-content">
+<div class="main">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+    <div id="gestorasHeaderEl">
+      <div style="font-family:var(--font-d);font-size:22px;margin-bottom:2px;">Gestoras</div>
+      <div style="font-size:12px;color:var(--text3);font-family:var(--font-m);">Ordenadas por score médio dos fundos · clique para ver perfil</div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button id="gestoraBackBtn" class="btn-ghost" onclick="closeGestora()" style="display:none;font-size:12px;">← Voltar</button>
+      <input class="search-input" id="gestorasSearch" placeholder="Buscar gestora..." oninput="renderGestorasList()">
+    </div>
+  </div>
+  <div id="gestorasContent"></div>
+  <div id="gestoraDetail" style="display:none;"></div>
+</div>
+</div>
+
+<!-- PASSWORD MODAL -->
+
+<!-- GESTORA EDITOR MODAL -->
+<div id="gestoraEditorModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:2000;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--surface);border:1px solid var(--border2);border-radius:14px;width:min(680px,100%);max-height:90vh;overflow-y:auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px 16px;border-bottom:1px solid var(--border);">
+      <div>
+        <div style="font-size:16px;font-weight:600;" id="gesEditorTitle">Editar Gestora</div>
+        <div style="font-size:11px;color:var(--text3);font-family:var(--font-m);margin-top:2px;">Salva em data/gestoras.json</div>
+      </div>
+      <button onclick="closeGestoraEditor()" style="background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:4px 8px;">✕</button>
+    </div>
+    <div style="padding:20px 24px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+        <div>
+          <label style="font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.8px;">Fundação</label>
+          <input id="gesEdFundacao" type="number" min="1900" max="2030"
+            style="width:100%;margin-top:4px;background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:8px 10px;color:var(--text1);font-family:var(--font-m);font-size:13px;">
+        </div>
+        <div>
+          <label style="font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.8px;">Gestor Principal</label>
+          <input id="gesEdGestor" type="text" placeholder="Nome do gestor"
+            style="width:100%;margin-top:4px;background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:8px 10px;color:var(--text1);font-family:var(--font-m);font-size:13px;">
+        </div>
+      </div>
+      <div style="margin-bottom:12px;">
+        <label style="font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.8px;">Sede</label>
+        <input id="gesEdSede" type="text" placeholder="São Paulo, SP"
+          style="width:100%;margin-top:4px;background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:8px 10px;color:var(--text1);font-family:var(--font-m);font-size:13px;">
+      </div>
+      <div style="margin-bottom:12px;">
+        <label style="font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.8px;">Descrição</label>
+        <textarea id="gesEdDesc" rows="4" placeholder="Histórico e perfil da gestora..."
+          style="width:100%;margin-top:4px;background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:8px 10px;color:var(--text1);font-family:var(--font-m);font-size:13px;resize:vertical;"></textarea>
+      </div>
+      <div style="margin-bottom:12px;">
+        <label style="font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.8px;">Filosofia de Investimento</label>
+        <textarea id="gesEdFilosofia" rows="3" placeholder="Abordagem, processo decisório..."
+          style="width:100%;margin-top:4px;background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:8px 10px;color:var(--text1);font-family:var(--font-m);font-size:13px;resize:vertical;"></textarea>
+      </div>
+
+      <div style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:14px;">
+        <div style="font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;">Links — Cartas ao Cotista</div>
+        <div id="gesEdCartas"></div>
+        <button onclick="addGesLink('cartas')" style="margin-top:6px;background:none;border:1px dashed var(--border2);border-radius:6px;padding:6px 12px;color:var(--text3);font-family:var(--font-m);font-size:11px;cursor:pointer;width:100%;">+ Adicionar carta</button>
+      </div>
+
+      <div style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:20px;">
+        <div style="font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;">Links — Podcasts / Vídeos</div>
+        <div id="gesEdPodcasts"></div>
+        <button onclick="addGesLink('podcasts')" style="margin-top:6px;background:none;border:1px dashed var(--border2);border-radius:6px;padding:6px 12px;color:var(--text3);font-family:var(--font-m);font-size:11px;cursor:pointer;width:100%;">+ Adicionar podcast</button>
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button onclick="closeGestoraEditor()" style="background:none;border:1px solid var(--border2);border-radius:8px;padding:9px 18px;color:var(--text2);font-family:var(--font-m);font-size:12px;cursor:pointer;">Cancelar</button>
+        <button onclick="saveGestoraEditor()" style="background:var(--accent);border:none;border-radius:8px;padding:9px 18px;color:#fff;font-family:var(--font-m);font-size:12px;cursor:pointer;font-weight:600;">💾 Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="toastEl" class="toast"></div>
+
+<!-- HOME FUND DETAIL MODAL -->
+<div id="homeFundModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1500;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--surface);border:1px solid var(--border2);border-radius:14px;width:min(760px,100%);max-height:90vh;overflow-y:auto;">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:20px 24px 16px;border-bottom:1px solid var(--border);">
+      <div>
+        <div id="hfmName" style="font-size:18px;font-weight:600;"></div>
+        <div id="hfmGestora" style="font-size:12px;color:var(--text3);font-family:var(--font-m);margin-top:3px;"></div>
+      </div>
+      <button onclick="closeHomeFundModal()" style="background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:4px 8px;">✕</button>
+    </div>
+    <div style="padding:20px 24px;">
+      <!-- Rentabilidades -->
+      <div style="font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;">Rentabilidade</div>
+      <div id="hfmRents" style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:20px;"></div>
+      <!-- Métricas quant com quartis -->
+      <div style="font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;">Análise Quantitativa — Quartis vs universo</div>
+      <div id="hfmQuant" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;"></div>
+      <!-- Info geral -->
+      <div style="font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;">Informações gerais</div>
+      <div id="hfmInfo" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-family:var(--font-m);font-size:12px;"></div>
+    </div>
+  </div>
+</div>
+<div id="pwModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closePwModal()">
+  <div class="modal">
+    <h3>Acesso restrito</h3>
+    <p>Insira a senha para marcar fundos recomendados</p>
+    <input type="password" id="pwInput" placeholder="••••••••" onkeydown="if(event.key==='Enter')checkPassword()">
+    <div class="modal-error" id="pwError"></div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn-ghost" onclick="closePwModal()" style="flex:1;">Cancelar</button>
+      <button class="btn-primary" onclick="checkPassword()" style="flex:1;">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// GLOBAL STATE
+// ══════════════════════════════════════════════════════════
+let allFunds = [];
+let filteredFunds = [];
+let benchmarks = {};
+let cotasSeries = {};  // cnpj -> {datas, valores}
+let currentPeriodField = 'rent_12m';
+let currentSort = { field: 'rent', dir: 'desc' };
+let currentSubgroup = '';
+let currentPage = 1;
+const PAGE_SIZE = 25;
+
+let selectedQuantFund = null;
+let quantPage = 1;
+const QUANT_PAGE_SIZE = 30;
+let quantScoredCache = null;
+
+let chartSelectedCNPJs = new Set();
+
+let gestoraData = {};
+
+let pwPendingCNPJ = null;
+const PW = 'itau4647';
+let authUnlocked = false;
+
+// ══════════════════════════════════════════════════════════
+// QUANT METRICS CONFIG
+// ══════════════════════════════════════════════════════════
+// ── 11 métricas: Sharpe 12/24/36M + Sortino/DD/Vol/Consist/CorrCDI (36M) + VarPL (12M) + PL + Longevidade
+// Pesos padrão: Sharpe 36M=3, 24M=2, 12M=1 | resto=1
+const QUANT_METRICS = [
+  // Sharpe — 3 janelas, pesos crescentes para refletir consistência de longo prazo
+  { key:'sharpe',     label:'Sharpe 12M',      dir:'higher', period:true,  periodFixed:'12m', fmt:'num3', defaultWeight:1 },
+  { key:'sharpe',     label:'Sharpe 24M',      dir:'higher', period:true,  periodFixed:'24m', fmt:'num3', defaultWeight:2 },
+  { key:'sharpe',     label:'Sharpe 36M',      dir:'higher', period:true,  periodFixed:'36m', fmt:'num3', defaultWeight:3 },
+  // Risco — todos em 36M fixo
+  { key:'sortino',    label:'Sortino 36M',     dir:'higher', period:false, fixedKey:'sortino_36m',         fmt:'num3', defaultWeight:1 },
+  { key:'drawdown_max',label:'Drawdown 36M',   dir:'lower',  period:false, fixedKey:'drawdown_max_36m',    fmt:'pct',  defaultWeight:1 },
+  { key:'volatilidade',label:'Volatilidade 36M',dir:'lower', period:false, fixedKey:'volatilidade_36m',    fmt:'pct',  defaultWeight:1 },
+  { key:'consistencia',label:'Consistência 36M',dir:'higher',period:false, fixedKey:'consistencia_36m',    fmt:'pct1', defaultWeight:1 },
+  // Correlação CDI 36M — lower is better (menor correlação = mais alfa real)
+  { key:'corr_cdi_36m',label:'Corr. CDI 36M',  dir:'lower',  period:false, fixedKey:'corr_cdi_36m',        fmt:'num3', defaultWeight:1 },
+  // Dinâmica de captação
+  { key:'variacao_pl_12m',label:'Var. PL 12M', dir:'higher', period:false, fmt:'pct1', defaultWeight:1 },
+  // Estrutural
+  { key:'pl',               label:'PL (R$M)',   dir:'higher', period:false, fmt:'money', defaultWeight:1 },
+  { key:'longevidade_anos', label:'Longevidade',dir:'higher', period:false, fmt:'anos',  defaultWeight:1 },
+];
+
+let weights = QUANT_METRICS.map(m => m.defaultWeight);
+
+// Columns shown in the quant ranking table (compact — 6 key metrics)
+const TABLE_DISPLAY_COLS = [
+  { key:'sharpe_36m',       fmt:'num3',  dir:'higher' },
+  { key:'sortino_36m',      fmt:'num3',  dir:'higher' },
+  { key:'volatilidade_36m', fmt:'pct',   dir:'lower'  },
+  { key:'corr_cdi_36m',     fmt:'num3',  dir:'lower'  },
+  { key:'variacao_pl_12m',  fmt:'pct1',  dir:'higher' },
+  { key:'pl',               fmt:'money', dir:'higher' },
+];
+
+let currentQuantPool = [];  // updated on every render for percentile calc
+
+// ══════════════════════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════════════════════
+async function loadData() {
+  try {
+    const [fr, br, mr, er] = await Promise.all([
+      fetch('./data/fundos.json'), fetch('./data/benchmarks.json'), fetch('./data/meta.json'),
+      fetch('/api/load-estado').catch(()=>null)
+    ]);
+    allFunds = await fr.json();
+    benchmarks = await br.json();
+    const meta = await mr.json();
+
+    // Apply saved estado (recomendados + pesos)
+    if (er && er.ok) {
+      const estado = await er.json();
+      // Restore recomendados
+      if (estado.recomendados?.length) {
+        const recSet = new Set(estado.recomendados);
+        allFunds.forEach(f => { if (recSet.has(f.cnpj)) f.recomendado = true; });
+        console.log(`Recomendados restaurados: ${estado.recomendados.length}`);
+        setTimeout(()=>{ renderHome(); showToast(`✦ ${estado.recomendados.length} recomendados restaurados`, 'green'); }, 800);
+      }
+      // Restore pesos
+      if (estado.pesos?.length === weights.length) {
+        weights = estado.pesos;
+        console.log('✓ Pesos restaurados:', weights);
+        // Sliders will be rebuilt in initQuant below
+      }
+    }
+
+    // Try cotas (may not exist yet)
+    try {
+      const cotasResp = await fetch('./data/cotas.json?v=' + Date.now());
+      cotasSeries = await cotasResp.json();
+      const nSeries = Object.keys(cotasSeries).length;
+      const sample = nSeries > 0 ? Object.values(cotasSeries)[0] : null;
+      console.log(`cotas.json: ${nSeries} séries${sample ? ' · ' + sample.datas.length + ' pontos/fundo' : ''}`);
+    } catch(e) { cotasSeries = {}; console.warn('cotas.json não carregado:', e); }
+
+    document.getElementById('headerMeta').innerHTML =
+      `Atualização: <span>${meta.ultima_atualizacao?.slice(0,10)||'—'}</span> &nbsp;·&nbsp; ` +
+      `Fundos: <span>${meta.total_fundos}</span> &nbsp;·&nbsp; Plataforma: <span>XP Investimentos</span>`;
+
+    initHome();
+    initComparacao();
+    initQuant();
+    initGraficos();
+    initGestoras();
+
+    document.getElementById('loadingMain').style.display = 'none';
+    document.getElementById('comparacaoContent').style.display = 'block';
+  } catch(e) {
+    document.getElementById('loadingMain').innerHTML =
+      `<div style="color:var(--red);font-family:var(--font-m);font-size:13px;text-align:center;">
+        ⚠ Erro ao carregar dados.<br>
+        <span style="font-size:11px;color:var(--text3);">Execute: <code>python -m http.server 8080</code> → acesse localhost:8080</span>
+      </div>`;
+    console.error(e);
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// FORMAT HELPERS
+// ══════════════════════════════════════════════════════════
+function fmtPct(v, d=2) {
+  if (v==null||isNaN(v)) return '<span class="neu">—</span>';
+  const p=v*100, cls=p>0?'pos':p<0?'neg':'neu', s=p>0?'+':'';
+  return `<span class="${cls}">${s}${p.toFixed(d)}%</span>`;
+}
+function fmtDD(v) {
+  // Drawdown is stored as positive (0.15 = 15% loss) — show as negative red
+  if (v==null||isNaN(v)) return '<span class="neu">—</span>';
+  return `<span class="neg">-${(v*100).toFixed(2)}%</span>`;
+}
+
+function fmtNum(v, d=2) {
+  if (v==null||isNaN(v)) return '<span class="neu">—</span>';
+  return `<span class="num">${Number(v).toFixed(d)}</span>`;
+}
+function fmtMoney(v) {
+  if (v==null||isNaN(v)) return '<span class="neu">—</span>';
+  return `<span class="num">${v>=1000?(v/1000).toFixed(1)+'B':v.toFixed(0)+'M'}</span>`;
+}
+function fmtAplic(v) {
+  if (!v) return '—';
+  if (v>=1e6) return `R$ ${(v/1e6).toFixed(0)}M`;
+  if (v>=1000) return `R$ ${(v/1000).toFixed(0)}k`;
+  return `R$ ${v.toFixed(0)}`;
+}
+function formatQuantVal(key, val, fmt) {
+  if (val==null||isNaN(val)) return '—';
+  if (fmt==='num3') return val.toFixed(3);
+  if (fmt==='pct')  {
+    // drawdown keys stored as positive — display as loss
+    if (key&&key.includes('drawdown')) return '-'+(val*100).toFixed(2)+'%';
+    return (val*100).toFixed(2)+'%';
+  }
+  if (fmt==='pct1') return (val*100).toFixed(1)+'%';
+  if (fmt==='money') return val>=1000?'R$ '+(val/1000).toFixed(1)+'B':'R$ '+val.toFixed(0)+'M';
+  if (fmt==='anos') return val.toFixed(1)+' a';
+  return val.toFixed(2);
+}
+function getRentVal(f) { return f[currentPeriodField]??null; }
+
+const CLASS_COLORS={'Macro Alta Vol':'blue','Macro Média Vol':'blue','Macro Baixa Vol':'blue','Long Short Neutro':'green','Long Short Direcional':'green','Quantitativo':'purple','Multiestratégia':'teal','Alternativo Líquido':'orange','Alternativo Ilíquido':'orange'};
+function classBadge(cls) {
+  const c=CLASS_COLORS[cls]||'';
+  return `<span class="badge ${c}" style="font-size:9px;">${(cls||'—').replace(' Vol','').replace('Internacional ','Intl ')}</span>`;
+}
+function volBadge(g) {
+  const m={'Alta':'vol-alta','Média':'vol-media','Baixa':'vol-baixa','N/A':'vol-na'};
+  return `<span class="vol-badge ${m[g]||'vol-na'}">${g||'N/A'}</span>`;
+}
+function quartilColor(q) { return['','#3dd68c','#7eb3ff','#f5c842','#f05c6e'][q]||'#5a6478'; }
+function pctToQ(pct) {
+  if (pct==null) return null;
+  return pct>=75?1:pct>=50?2:pct>=25?3:4;
+}
+function calcPercentile(val, arr, dir) {
+  const clean=arr.filter(v=>v!=null&&!isNaN(v));
+  if (!clean.length||val==null) return null;
+  const below=dir==='higher'?clean.filter(v=>v<val).length:clean.filter(v=>v>val).length;
+  return Math.round(below/clean.length*100);
+}
+function qBadgeHtml(r) {
+  return r.q?`<span class="q-badge q${r.q}">Q${r.q}</span>`:'<span class="neu" style="font-size:10px;">—</span>';
+}
+
+
+// ══════════════════════════════════════════════════════════
+// TAB 0: HOME — RECOMENDADOS
+// ══════════════════════════════════════════════════════════
+let homePeriodField = 'rent_12m';
+
+function initHome() {
+  renderHome();
+}
+
+function setHomePeriod(btn) {
+  document.querySelectorAll('#homePeriodSel .period-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  homePeriodField = btn.dataset.field;
+  const labels = {rent_dia:'Dia',rent_mes:'Mês',rent_ano:'Ano',rent_12m:'12M',rent_24m:'24M',rent_36m:'36M'};
+  const th = document.getElementById('homeThRent');
+  if (th) th.textContent = 'Retorno ' + labels[homePeriodField];
+  renderHome();
+}
+
+function renderHome() {
+  const recs = allFunds.filter(f => f.recomendado);
+  document.getElementById('homeLoading').style.display = 'none';
+  document.getElementById('homeContent').style.display = 'block';
+
+  const homeEmpty = document.getElementById('homeEmpty');
+  const homeTable = document.getElementById('homeTable');
+
+  if (!recs.length) {
+    homeEmpty.style.display = 'block';
+    homeTable.style.display = 'none';
+    document.getElementById('homeKPIs').innerHTML = '';
+    document.getElementById('homeBadge').textContent = '';
+    document.getElementById('homeSubtitle').textContent = '';
+    return;
+  }
+
+  homeEmpty.style.display = 'none';
+  homeTable.style.display = '';
+
+  document.getElementById('homeBadge').textContent = `${recs.length} fundos`;
+  const gestoras = new Set(recs.map(f => f.gestora));
+  const classes  = new Set(recs.map(f => f.class_xp).filter(Boolean));
+  document.getElementById('homeSubtitle').textContent =
+    `${gestoras.size} gestoras · ${classes.size} estratégias`;
+
+  // ── KPIs da carteira ──
+  const get  = field => recs.map(f => f[field]).filter(v => v != null);
+  const avg  = arr => arr.length ? arr.reduce((s,v)=>s+v,0)/arr.length : null;
+  const wavg = field => { // equal-weight average
+    const vals = get(field); return avg(vals);
+  };
+
+  const ret   = wavg(homePeriodField);
+  const sh    = wavg('sharpe');
+  const so    = wavg('sortino');
+  const vol   = wavg('volatilidade');
+  const dd    = wavg('drawdown_max');
+  const pl    = recs.reduce((s,f)=>(f.pl||0)+s, 0);
+
+  const p = (v, d=1) => v!=null ? `${v>=0?'+':''}${(v*100).toFixed(d)}%` : '—';
+  const n = (v, d=2) => v!=null ? v.toFixed(d) : '—';
+
+  document.getElementById('homeKPIs').innerHTML = [
+    {l:'Retorno médio', v:`<span class="${ret>=0?'pos':'neg'}">${p(ret)}</span>`, s:'período selecionado', c:'var(--green)'},
+    {l:'Sharpe médio',  v:n(sh), s:'ponderado igual', c:'var(--yellow)'},
+    {l:'Sortino médio', v:n(so), s:'ponderado igual', c:'var(--accent)'},
+    {l:'Vol. média',    v:p(vol,2), s:'anualizada', c:'var(--purple)'},
+    {l:'Max DD médio',  v:`<span class="neg">${p(dd,2)}</span>`, s:'histórico', c:'var(--red)'},
+    {l:'PL total',      v:pl>=1000?`R$ ${(pl/1000).toFixed(1)}B`:`R$ ${pl.toFixed(0)}M`, s:`${recs.length} fundos`, c:'var(--teal)'},
+  ].map(k => `<div class="kpi-card" style="--kpi-color:${k.c}">
+    <div class="kpi-label">${k.l}</div>
+    <div class="kpi-value">${k.v}</div>
+    <div class="kpi-sub">${k.s}</div>
+  </div>`).join('');
+
+  // ── Tabela ──
+  const sorted = [...recs].sort((a,b) => (b[homePeriodField]??-99) - (a[homePeriodField]??-99));
+  document.getElementById('homeTableBody').innerHTML = sorted.map(f => `
+    <tr style="cursor:pointer;" onclick="openHomeFundDetail('${f.cnpj}')">
+      <td><div class="fund-name">${f.nome}</div>
+          <div style="font-size:10px;color:var(--text3);font-family:var(--font-m);">${f.gestora}</div></td>
+      <td>${classBadge(f.class_xp)}</td>
+      <td class="num">${fmtPct(f[homePeriodField])}</td>
+      <td class="num">${fmtNum(f.sharpe_36m??f.sharpe)}</td>
+      <td class="num">${fmtNum(f.sortino_36m??f.sortino)}</td>
+      <td class="num">${f.volatilidade_36m!=null?fmtPct(f.volatilidade_36m):'<span class="neu">—</span>'}</td>
+      <td class="num">${fmtDD(f.drawdown_max_36m??f.drawdown_max)}</td>
+      <td class="num">${fmtMoney(f.pl)}</td>
+      <td>${f.captacao_aberta?'<span class="cap-aberta">Aberta</span>':'<span class="cap-fechada">Fechada</span>'}</td>
+      <td onclick="event.stopPropagation()">
+        <button class="btn-rec active" onclick="requestRec('${f.cnpj}')">✕ Remover</button>
+      </td>
+    </tr>`).join('');
+
+  // Update chart and correlation after table render
+  renderHomeChart();
+  renderHomeCorrTable();
+}
+
+// ══════════════════════════════════════════════════════════
+// TAB 1: COMPARAÇÃO
+// ══════════════════════════════════════════════════════════
+function initComparacao() {
+  const sel=document.getElementById('filterClassXP');
+  [...new Set(allFunds.map(f=>f.class_xp).filter(Boolean))].sort().forEach(c=>{
+    const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);
+  });
+  populateSubgroups();
+  applyFilters();
+}
+function populateSubgroups() {
+  const groups=[{l:'Todos',v:''},{l:'Macro',v:'macro'},{l:'Long & Short',v:'ls'},{l:'Quantitativo',v:'Quantitativo'},{l:'Multiestratégia',v:'Multiestratégia'},{l:'Alternativo',v:'alt'},{l:'Internacional',v:'int'}];
+  document.getElementById('subgroupTabs').innerHTML=groups.map(g=>{
+    const n=g.v===''?allFunds.length:allFunds.filter(f=>matchSG(f,g.v)).length;
+    return `<button class="sg-pill ${g.v===currentSubgroup?'active':''}" onclick="setSG('${g.v}',this)">${g.l} (${n})</button>`;
+  }).join('');
+}
+function matchSG(f,v) {
+  if (!v) return true;
+  const c=(f.class_xp||'').toLowerCase();
+  if (v==='macro') return c.includes('macro');
+  if (v==='ls') return c.includes('long short');
+  if (v==='alt') return c.includes('alternativo');
+  if (v==='int') return c.includes('internacional');
+  return f.class_xp===v;
+}
+function setSG(v,el) {
+  currentSubgroup=v;
+  document.querySelectorAll('.sg-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');currentPage=1;applyFilters();
+}
+function applyFilters() {
+  const cXP=document.getElementById('filterClassXP').value;
+  const tI=document.getElementById('filterTipoInv').value;
+  const cap=document.getElementById('filterCaptacao').value;
+  const vol=document.getElementById('filterVol').value;
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  filteredFunds=allFunds.filter(f=>{
+    if (cXP&&f.class_xp!==cXP) return false;
+    if (tI&&f.tipo_investidor!==tI) return false;
+    if (cap==='aberta'&&!f.captacao_aberta) return false;
+    if (cap==='fechada'&&f.captacao_aberta) return false;
+    if (vol&&f.grupo_vol!==vol) return false;
+    if (currentSubgroup&&!matchSG(f,currentSubgroup)) return false;
+    if (q&&!(f.nome+f.gestora).toLowerCase().includes(q)) return false;
+    return true;
+  });
+  sortFunds();currentPage=1;renderKPIs();renderTable();
+}
+function clearFilters() {
+  ['filterClassXP','filterTipoInv','filterCaptacao','filterVol'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('searchInput').value='';
+  currentSubgroup='';
+  document.querySelectorAll('.sg-pill').forEach(p=>p.classList.remove('active'));
+  document.querySelector('.sg-pill').classList.add('active');
+  currentPage=1;applyFilters();
+}
+function sortBy(field) {
+  currentSort=currentSort.field===field?{field,dir:currentSort.dir==='desc'?'asc':'desc'}:{field,dir:'desc'};
+  sortFunds();currentPage=1;renderTable();
+}
+function sortFunds() {
+  const {field,dir}=currentSort,m=dir==='desc'?-1:1;
+  filteredFunds.sort((a,b)=>{
+    let va,vb;
+    if (field==='rent'){va=getRentVal(a);vb=getRentVal(b);}
+    else if (field==='nome'){return m*a.nome.localeCompare(b.nome);}
+    else{va=a[field];vb=b[field];}
+    if (va==null&&vb==null) return 0;if (va==null) return 1;if (vb==null) return -1;
+    return m*(va-vb);
+  });
+}
+function setPeriod(btn) {
+  document.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  currentPeriodField=btn.dataset.field;
+  const labels={rent_dia:'Dia',rent_mes:'Mês',rent_ano:'Ano',rent_12m:'12M',rent_24m:'24M',rent_36m:'36M'};
+  document.getElementById('thRent').textContent=`Retorno ${labels[currentPeriodField]} ↓`;
+  if (currentSort.field==='rent') sortFunds();
+  renderTable();
+}
+function renderKPIs() {
+  const funds=filteredFunds;
+  const rents=funds.map(f=>getRentVal(f)).filter(v=>v!=null);
+  const avg=rents.length?rents.reduce((s,v)=>s+v,0)/rents.length:null;
+  const sharpes=funds.map(f=>f.sharpe).filter(v=>v!=null);
+  const avgS=sharpes.length?sharpes.reduce((s,v)=>s+v,0)/sharpes.length:null;
+  const recs=funds.filter(f=>f.recomendado).length;
+  const gest=new Set(funds.map(f=>f.gestora)).size;
+  const p=v=>v!=null?`${v>=0?'+':''}${(v*100).toFixed(1)}%`:'—';
+  document.getElementById('kpiGrid').innerHTML=[
+    {l:'Fundos no filtro',v:funds.length,s:`de ${allFunds.length} total`,c:'var(--accent)'},
+    {l:'Retorno médio',v:`<span class="${avg>=0?'pos':'neg'}">${p(avg)}</span>`,s:'período selecionado',c:'var(--green)'},
+    {l:'Sharpe médio',v:avgS!=null?avgS.toFixed(2):'—',s:`${sharpes.length} fundos`,c:'var(--yellow)'},
+    {l:'Recomendados',v:recs,s:'no filtro atual',c:'var(--teal)'},
+    {l:'Gestoras',v:gest,s:'no filtro atual',c:'var(--purple)'},
+  ].map(k=>`<div class="kpi-card" style="--kpi-color:${k.c}">
+    <div class="kpi-label">${k.l}</div>
+    <div class="kpi-value">${k.v}</div>
+    <div class="kpi-sub">${k.s}</div>
+  </div>`).join('');
+}
+function renderTable() {
+  const total=filteredFunds.length,pages=Math.max(1,Math.ceil(total/PAGE_SIZE));
+  if (currentPage>pages) currentPage=pages;
+  const start=(currentPage-1)*PAGE_SIZE,page=filteredFunds.slice(start,start+PAGE_SIZE);
+  document.getElementById('badgeTotal').textContent=`${total} fundos`;
+  const recs=filteredFunds.filter(f=>f.recomendado).length;
+  const rb=document.getElementById('badgeRec');
+  if (recs>0){rb.textContent=`${recs} recomendados`;rb.style.display='';}else rb.style.display='none';
+  document.getElementById('fundTableBody').innerHTML=page.map((f,i)=>{
+    const liq=f.cotizacao_resgate&&f.liquidacao_resgate?`${f.cotizacao_resgate}/${f.liquidacao_resgate}`:'—';
+    return `<tr>
+      <td class="num neu" style="font-size:11px;">${start+i+1}</td>
+      <td><div class="fund-name">${f.nome}</div><div class="fund-gestora">${f.gestora}</div>
+        ${f.recomendado?'<span style="font-size:9px;color:var(--green);font-family:var(--font-m);">✦ Rec</span>':''}</td>
+      <td class="num">${fmtPct(getRentVal(f))}</td>
+      <td class="num">${fmtNum(f.sharpe)}</td>
+      <td class="num">${f.volatilidade!=null?fmtPct(f.volatilidade):'<span class="neu">—</span>'}</td>
+      <td class="num">${fmtPct(f.drawdown_max)}</td>
+      <td class="num">${fmtMoney(f.pl)}</td>
+      <td style="font-size:11px;">${fmtAplic(f.aplicacao_minima)}</td>
+      <td style="font-size:11px;font-family:var(--font-m);color:var(--text2);">${liq}</td>
+      <td style="font-size:11px;font-family:var(--font-m);">${f.tipo_investidor||'Geral'}</td>
+      <td>${f.captacao_aberta?'<span class="cap-aberta">Aberta</span>':'<span class="cap-fechada">Fechada</span>'}</td>
+      <td>${classBadge(f.class_xp)}</td>
+      <td>${f.recomendado
+        ?`<button class="btn-rec active" onclick="requestRec('${f.cnpj}')">✦ Rec</button>`
+        :`<button class="btn-rec" onclick="requestRec('${f.cnpj}')">+ Rec</button>`}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('pageInfo').textContent=`${start+1}–${Math.min(start+PAGE_SIZE,total)} de ${total}`;
+  let btns='';
+  btns+=`<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage<=1?'disabled':''}>←</button>`;
+  pageRange(currentPage,pages).forEach(p=>{
+    if (p==='...') btns+=`<span style="padding:4px 6px;color:var(--text3);">…</span>`;
+    else btns+=`<button class="page-btn ${p===currentPage?'active':''}" onclick="goPage(${p})">${p}</button>`;
+  });
+  btns+=`<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage>=pages?'disabled':''}>→</button>`;
+  document.getElementById('pageBtns').innerHTML=btns;
+}
+function goPage(p) {
+  const t=Math.ceil(filteredFunds.length/PAGE_SIZE);
+  if (p<1||p>t) return;currentPage=p;renderTable();window.scrollTo({top:0,behavior:'smooth'});
+}
+function pageRange(cur,tot) {
+  if (tot<=7) return Array.from({length:tot},(_,i)=>i+1);
+  if (cur<=4) return [1,2,3,4,5,'...',tot];
+  if (cur>=tot-3) return [1,'...',tot-4,tot-3,tot-2,tot-1,tot];
+  return [1,'...',cur-1,cur,cur+1,'...',tot];
+}
+function exportCSV() {
+  const h=['Nome','Gestora','Classe XP','Ret 12M','Ret 24M','Sharpe','Vol','Max DD','PL','Aplic Min','Tipo Inv','Captação'];
+  const rows=filteredFunds.map(f=>[`"${f.nome}"`,`"${f.gestora}"`,`"${f.class_xp}"`,
+    f.rent_12m!=null?(f.rent_12m*100).toFixed(2):'',f.rent_24m!=null?(f.rent_24m*100).toFixed(2):'',
+    f.sharpe!=null?f.sharpe.toFixed(4):'',f.volatilidade!=null?(f.volatilidade*100).toFixed(2):'',
+    f.drawdown_max!=null?(f.drawdown_max*100).toFixed(2):'',f.pl!=null?f.pl.toFixed(0):'',
+    f.aplicacao_minima||'',f.tipo_investidor||'',f.captacao_aberta?'Aberta':'Fechada']);
+  const csv=[h.join(','),...rows.map(r=>r.join(','))].join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv'}));
+  a.download=`alpha-desk-${new Date().toISOString().slice(0,10)}.csv`;a.click();
+}
+
+// ══════════════════════════════════════════════════════════
+// TAB 2: ANÁLISE QUANTITATIVA
+// ══════════════════════════════════════════════════════════
+function initQuant() {
+  // Populate category filter
+  const sel=document.getElementById('qCatSel');
+  [...new Set(allFunds.map(f=>f.class_xp).filter(Boolean))].sort().forEach(c=>{
+    const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);
+  });
+  buildWeightSliders();
+  renderQuantRanking();
+}
+
+function buildWeightSliders() {
+  const total = weights.reduce((s,v)=>s+v,0)||1;
+  document.getElementById('weightGrid').innerHTML=QUANT_METRICS.map((m,i)=>`
+    <div class="weight-item">
+      <label>
+        ${m.label}
+        <span id="wv${i}">${Math.round(weights[i]/total*100)}%</span>
+        ${m.dir==='lower'?'<span style="font-size:9px;color:var(--text3);font-family:var(--font-m);">↓ menor=melhor</span>':''}
+      </label>
+      <input type="range" min="0" max="10" step="1" value="${weights[i]}" oninput="updateWeight(${i},+this.value)">
+    </div>`).join('');
+  const tot = weights.reduce((s,v)=>s+v,0);
+  document.getElementById('weightTotal').textContent = (tot?100:0)+'%';
+}
+
+function updateWeight(i, val) {
+  weights[i]=val;
+  const total=weights.reduce((s,v)=>s+v,0);
+  const pcts=weights.map(w=>total?Math.round(w/total*100):0);
+  weights.forEach((_,j)=>{ const el=document.getElementById(`wv${j}`); if(el) el.textContent=pcts[j]+'%'; });
+  document.getElementById('weightTotal').textContent=pcts.reduce((s,v)=>s+v,0)+'%';
+  quantScoredCache=null;renderQuantRanking();
+}
+
+function resetWeights() {
+  weights=QUANT_METRICS.map(m=>m.defaultWeight);
+  buildWeightSliders();
+  quantScoredCache=null;renderQuantRanking();
+}
+
+function getQuantPool() {
+  const cat = document.getElementById('qCatSel')?.value || '';
+  const q   = (document.getElementById('qSearchInput')?.value || '').toLowerCase();
+  return allFunds.filter(f => {
+    if (cat && f.class_xp !== cat) return false;
+    if (q && !(f.nome + f.gestora).toLowerCase().includes(q)) return false;
+    return true;
+  });
+}
+
+function getMetricKey(m, period) {
+  // fixedKey: always use this field regardless of period selector
+  if (m.fixedKey) return m.fixedKey;
+  // periodFixed: this metric always uses a specific period, ignoring selector
+  if (m.periodFixed) {
+    const map={'12m':'','24m':'_24m','36m':'_36m'};
+    const suf = map[m.periodFixed] || '';
+    return m.key + suf;
+  }
+  // period:true — use the selected period
+  if (m.period) {
+    const map={'12m':'','24m':'_24m','36m':'_36m'};
+    const suf = map[period] || '';
+    return m.key + suf;
+  }
+  return m.key;
+}
+
+function scorePool(pool, period) {
+  const wtotal=weights.reduce((s,v)=>s+v,0)||1;
+  return pool.map(fund=>{
+    const mr=QUANT_METRICS.map((m,i)=>{
+      const key=getMetricKey(m,period);
+      const val=fund[key];
+      const vals=pool.map(f=>f[key]);
+      const pct=calcPercentile(val,vals,m.dir);
+      return {key,val,pct,q:pctToQ(pct),label:m.label,fmt:m.fmt,weight:weights[i]};
+    });
+    const withData=mr.filter(r=>r.pct!=null);
+    const score=withData.length
+      ?Math.round(withData.reduce((s,r)=>s+r.pct*r.weight,0)/withData.reduce((s,r)=>s+r.weight,0))
+      :null;
+    const q1count=mr.filter(r=>r.q===1).length;
+    return {fund,mr,score,q1count};
+  }).sort((a,b)=>(b.score??-1)-(a.score??-1));
+}
+
+function onQuantCatChange() {
+  selectedQuantFund=null;closeScorecard();quantPage=1;
+  const cat=document.getElementById('qCatSel')?.value||'';
+  const pool=getQuantPool();
+  document.getElementById('qRankTitle').textContent=cat?`Ranking — ${cat} (${pool.length})`:'Ranking Geral';
+  document.getElementById('qSubtitle').textContent=cat
+    ?'Comparação dentro da categoria · clique num fundo para o scorecard'
+    :'Ranking por score ponderado · clique num fundo para o scorecard';
+  quantScoredCache=null;renderQuantRanking();
+}
+
+function renderQuantRanking() {
+  const pool=getQuantPool();
+  const period=document.getElementById('qPeriodSel')?.value||'12m';
+  quantScoredCache=scorePool(pool,period);
+  const total=quantScoredCache.length,pages=Math.max(1,Math.ceil(total/QUANT_PAGE_SIZE));
+  if (quantPage>pages) quantPage=1;
+  const start=(quantPage-1)*QUANT_PAGE_SIZE;
+  const page=quantScoredCache.slice(start,start+QUANT_PAGE_SIZE);
+  currentQuantPool = quantScoredCache.map(r=>r.fund);  // for percentile calc in table
+  document.getElementById('qBadgeTotal').textContent=`${total} fundos`;
+  const recs=pool.filter(f=>f.recomendado).length;
+  const rb=document.getElementById('qBadgeRec');
+  if (recs>0){rb.textContent=`${recs} rec`;rb.style.display='';}else rb.style.display='none';
+
+  document.getElementById('quantRankBody').innerHTML=page.map(({fund:f,mr,score,q1count},i)=>{
+    const isSel=selectedQuantFund?.cnpj===f.cnpj;
+    const sc=quartilColor(pctToQ(score));
+    const stars=Array.from({length:8},(_,j)=>`<div class="star ${j<q1count?'on':'off'}"></div>`).join('');
+    return `<tr onclick="selectQuantFund('${f.cnpj}')" style="cursor:pointer;${isSel?'background:rgba(201,169,110,.06);':f.recomendado?'background:rgba(61,214,140,.04);':''}">
+      <td class="neu" style="font-size:11px;font-family:var(--font-m);">${start+i+1}</td>
+      <td><div style="font-size:12px;font-weight:500;">${f.nome}</div>
+          <div style="font-size:10px;font-family:var(--font-m);color:var(--text3);">${f.gestora}</div></td>
+      <td><div style="display:flex;align-items:center;gap:6px;">
+        <span style="font-family:var(--font-m);font-size:15px;font-weight:600;color:${sc};">${score??'—'}</span>
+        <div class="star-row">${stars}</div></div></td>
+      ${TABLE_DISPLAY_COLS.map(col=>{
+        const val=f[col.key];
+        const allVals=currentQuantPool.map(x=>x[col.key]);
+        const pct=calcPercentile(val,allVals,col.dir);
+        const q=pctToQ(pct);
+        const badge=qBadgeHtml({val,pct,q,key:col.key,fmt:col.fmt,label:''});
+        const formatted=formatQuantVal(col.key,val,col.fmt);
+        return `<td><div style="display:flex;align-items:center;gap:5px;">
+          ${badge}
+          <span class="num" style="font-size:11px;">${formatted}</span>
+        </div></td>`;
+      }).join('')}
+      <td>
+        ${f.recomendado
+          ?`<button class="btn-rec active" onclick="event.stopPropagation();toggleRec('${f.cnpj}')">✦ Rec</button>`
+          :`<button class="btn-rec" onclick="event.stopPropagation();requestRec('${f.cnpj}')">+ Rec</button>`}
+      </td>
+      <td>${classBadge(f.class_xp)}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('qPageInfo').textContent=`${start+1}–${Math.min(start+QUANT_PAGE_SIZE,total)} de ${total}`;
+  let btns='';
+  btns+=`<button class="page-btn" onclick="qGoPage(${quantPage-1})" ${quantPage<=1?'disabled':''}>←</button>`;
+  pageRange(quantPage,pages).forEach(p=>{
+    if (p==='...') btns+=`<span style="padding:4px 6px;color:var(--text3);">…</span>`;
+    else btns+=`<button class="page-btn ${p===quantPage?'active':''}" onclick="qGoPage(${p})">${p}</button>`;
+  });
+  btns+=`<button class="page-btn" onclick="qGoPage(${quantPage+1})" ${quantPage>=pages?'disabled':''}>→</button>`;
+  document.getElementById('qPageBtns').innerHTML=btns;
+  if (selectedQuantFund) renderScorecard(selectedQuantFund);
+}
+
+function qGoPage(p) {
+  const t=Math.ceil(getQuantPool().length/QUANT_PAGE_SIZE);
+  if (p<1||p>t) return;quantPage=p;renderQuantRanking();
+}
+
+function selectQuantFund(cnpj) {
+  selectedQuantFund=allFunds.find(f=>f.cnpj===cnpj);
+  renderQuantRanking();
+  renderScorecard(selectedQuantFund);
+  setTimeout(()=>document.getElementById('quantScorecard')?.scrollIntoView({behavior:'smooth',block:'start'}),100);
+}
+
+function closeScorecard() {
+  selectedQuantFund=null;
+  document.getElementById('quantScorecard').style.display='none';
+  renderQuantRanking();
+}
+
+function renderScorecard(fund) {
+  const pool=getQuantPool();
+  const period=document.getElementById('qPeriodSel')?.value||'12m';
+  const entry=(quantScoredCache||scorePool(pool,period)).find(e=>e.fund.cnpj===fund.cnpj);
+  if (!entry) return;
+  const {mr,score,q1count}=entry;
+  const oQ=pctToQ(score),gc=quartilColor(oQ);
+  const cat=document.getElementById('qCatSel')?.value||'';
+  const card=document.getElementById('quantScorecard');
+  card.style.display='block';
+  document.getElementById('quantScorecardInner').innerHTML=`
+    <div class="score-card">
+      <div class="score-header">
+        <div>
+          <div style="font-family:var(--font-d);font-size:20px;">${fund.nome}</div>
+          <div style="font-size:12px;font-family:var(--font-m);color:var(--text3);">${fund.gestora} · ${fund.class_xp||'—'} · ${fund.tipo_investidor||'Geral'}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div style="text-align:center;">
+            <div class="grade-circle" style="color:${gc};border-color:${gc}40;background:${gc}12;">${score??'—'}</div>
+            <div style="font-size:10px;font-family:var(--font-m);color:var(--text3);margin-top:3px;">Percentil</div>
+          </div>
+          <div>
+            <div style="font-size:26px;font-family:var(--font-m);font-weight:700;color:${gc};">Q${oQ||'—'}</div>
+            <div style="font-size:10px;font-family:var(--font-m);color:var(--text3);">${q1count}/8 em Q1</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:11px;font-family:var(--font-m);color:var(--text3);margin-bottom:14px;">
+        Contra <strong style="color:var(--text2);">${pool.length} fundos</strong>
+        ${cat?`da categoria <strong style="color:var(--text2);">${fund.class_xp}</strong>`:'(universo completo)'}
+        · Período: <strong style="color:var(--text2);">${period}</strong>
+      </div>
+      <div class="quartil-grid">
+        ${mr.map(r=>{
+          const color=quartilColor(r.q)||'#5a6478';
+          const bp=r.pct??0;
+          return `<div class="quartil-card" style="border-color:${r.q===1?color+'40':'var(--border)'};">
+            <div class="quartil-card-label">${r.label}</div>
+            <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px;">
+              <div class="quartil-card-value" style="color:${color}">${formatQuantVal(r.key,r.val,r.fmt)}</div>
+              ${r.q?`<span class="q-badge q${r.q}">Q${r.q}</span>`:'<span style="font-size:10px;color:var(--text3)">sem dado</span>'}
+            </div>
+            <div class="quartil-bar-track">
+              <div class="quartil-bar-fill" style="width:${bp}%;background:${color};"></div>
+              <div class="quartil-marker" style="left:${bp}%;background:${color};"></div>
+            </div>
+            <div class="quartil-labels"><span>P0</span><span>Q4</span><span>Q3</span><span>Q2</span><span>Q1</span></div>
+            <div class="quartil-rank">${r.pct!=null?`Percentil <strong>${r.pct}</strong>`:'Dado não disponível'}</div>
+          </div>`;
+        }).join('')}
+      </div>
+      ${q1count>=6?`<div style="margin-top:14px;background:rgba(61,214,140,.08);border:1px solid rgba(61,214,140,.3);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:10px;">
+        <span style="font-size:20px;">✦</span>
+        <div><div style="font-size:13px;font-weight:600;color:var(--green);">Forte candidato a recomendado</div>
+        <div style="font-size:11px;font-family:var(--font-m);color:var(--text3);">${q1count}/8 métricas em Q1</div></div></div>`
+      :q1count>=3?`<div style="margin-top:14px;background:rgba(201,169,110,.06);border:1px solid rgba(201,169,110,.3);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:10px;">
+        <span style="font-size:20px;">◈</span>
+        <div><div style="font-size:13px;font-weight:600;color:var(--accent2);">Candidato com ressalvas</div>
+        <div style="font-size:11px;font-family:var(--font-m);color:var(--text3);">${q1count}/8 métricas em Q1</div></div></div>`:''}
+    </div>`;
+}
+
+function exportQuantCSV() {
+  const pool=getQuantPool(),period=document.getElementById('qPeriodSel')?.value||'12m';
+  const scored=quantScoredCache||scorePool(pool,period);
+  const h=['Rank','Nome','Gestora','Classe XP','Score',...QUANT_METRICS.map(m=>m.label+' Q'),...QUANT_METRICS.map(m=>m.label),'Recomendado'];
+  const rows=scored.map(({fund:f,mr,score},i)=>[
+    i+1,`"${f.nome}"`,`"${f.gestora}"`,`"${f.class_xp}"`,score??'',
+    ...mr.map(r=>r.q??''),
+    ...mr.map((r,i2)=>{const v=r.val;if(v==null)return'';const fm=QUANT_METRICS[i2]?.fmt;
+      if(fm==='pct'||fm==='pct1')return(v*100).toFixed(2);if(fm==='num3')return v.toFixed(4);
+      if(fm==='money')return v.toFixed(0);if(fm==='anos')return v.toFixed(1);return v.toFixed(2);}),
+    f.recomendado?'Sim':'Não'
+  ]);
+  const csv=[h.join(','),...rows.map(r=>r.join(','))].join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv'}));
+  a.download=`quant-${new Date().toISOString().slice(0,10)}.csv`;a.click();
+}
+
+// ══════════════════════════════════════════════════════════
+// PASSWORD / REC TOGGLE
+// ══════════════════════════════════════════════════════════
+function requestRec(cnpj) {
+  pwPendingCNPJ=cnpj; pwPendingAction='rec';
+  if (authUnlocked) { doToggleRec(cnpj); return; }
+  document.getElementById('pwInput').value='';
+  document.getElementById('pwError').textContent='';
+  document.getElementById('pwModal').style.display='flex';
+  setTimeout(()=>document.getElementById('pwInput').focus(),100);
+}
+function toggleRec(cnpj) {
+  pwPendingCNPJ=cnpj; pwPendingAction='rec';
+  if (authUnlocked) { doToggleRec(cnpj); return; }
+  document.getElementById('pwInput').value='';
+  document.getElementById('pwError').textContent='';
+  document.getElementById('pwModal').style.display='flex';
+  setTimeout(()=>document.getElementById('pwInput').focus(),100);
+}
+let pwPendingAction = null; // 'rec' | 'pesos'
+
+function checkPassword() {
+  const pw=document.getElementById('pwInput').value;
+  if (pw===PW) {
+    authUnlocked=true;
+    closePwModal();
+    if (pwPendingAction==='pesos') {
+      savePesos(pw);
+    } else if (pwPendingCNPJ) {
+      doToggleRec(pwPendingCNPJ);
+    }
+  } else {
+    document.getElementById('pwError').textContent='Senha incorreta';
+    document.getElementById('pwInput').value='';
+    document.getElementById('pwInput').focus();
+  }
+}
+
+function requestSavePesos() {
+  if (authUnlocked) { savePesos(PW); return; }
+  pwPendingAction='pesos';
+  pwPendingCNPJ=null;
+  document.getElementById('pwInput').value='';
+  document.getElementById('pwError').textContent='';
+  document.getElementById('pwModal').style.display='flex';
+  setTimeout(()=>document.getElementById('pwInput').focus(),100);
+}
+
+async function savePesos(senha) {
+  pwPendingAction=null;
+  try {
+    const r = await fetch('/api/save-pesos', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({senha, pesos: weights})
+    });
+    const data = await r.json();
+    if (r.ok) {
+      showToast('💾 Pesos salvos com sucesso','green');
+    } else {
+      showToast(data.erro||'Erro ao salvar pesos','red');
+    }
+  } catch(e) {
+    showToast('Servidor não encontrado — rode servidor.py','red');
+  }
+}
+function closePwModal() {
+  document.getElementById('pwModal').style.display='none';
+  pwPendingCNPJ=null;
+}
+function doToggleRec(cnpj) {
+  const fund=allFunds.find(f=>f.cnpj===cnpj);
+  if (!fund) return;
+  fund.recomendado=!fund.recomendado;
+  quantScoredCache=null;
+  renderHome();
+  renderQuantRanking();
+  renderKPIs();renderTable();
+  initGestoras();
+  saveRecomendados();
+}
+
+async function saveRecomendados() {
+  const cnpjs = allFunds.filter(f=>f.recomendado).map(f=>f.cnpj);
+  try {
+    const r = await fetch('/api/save-recomendados', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(cnpjs)
+    });
+    if (r.ok) {
+      showToast(`✦ Recomendados salvos (${cnpjs.length} fundos)`,'green');
+    } else {
+      showToast('Erro ao salvar — servidor offline?','red');
+    }
+  } catch(e) {
+    showToast('Servidor não encontrado — rode servidor.py','red');
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// TAB 3: GRÁFICOS
+// ══════════════════════════════════════════════════════════
+function initGraficos() {
+  const catSel=document.getElementById('chartCatFilter');
+  [...new Set(allFunds.map(f=>f.class_xp).filter(Boolean))].sort().forEach(c=>{
+    const o=document.createElement('option');o.value=c;o.textContent=c;catSel.appendChild(o);
+  });
+  renderChartFundList();
+}
+
+function renderChartFundList() {
+  const q=(document.getElementById('chartSearch')?.value||'').toLowerCase();
+  const cat=document.getElementById('chartCatFilter')?.value||'';
+  const funds=allFunds.filter(f=>{
+    if (cat&&f.class_xp!==cat) return false;
+    if (q&&!(f.nome+f.gestora).toLowerCase().includes(q)) return false;
+    return true;
+  }).slice(0,100);
+  document.getElementById('chartFundList').innerHTML=funds.map(f=>{
+    const sel=chartSelectedCNPJs.has(f.cnpj);
+    return `<div onclick="toggleChartFund('${f.cnpj}')" style="padding:8px 16px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;align-items:center;gap:10px;transition:background .12s;${sel?'background:rgba(201,169,110,.08)':''}" 
+      onmouseover="this.style.background='rgba(255,255,255,.02)'" onmouseout="this.style.background='${sel?'rgba(201,169,110,.08)':''}'" >
+      <div style="width:16px;height:16px;border-radius:4px;border:1px solid ${sel?'var(--accent)':'var(--border2)'};background:${sel?'var(--accent)':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        ${sel?'<span style="color:#fff;font-size:10px;">✓</span>':''}
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:500;">${f.nome}</div>
+        <div style="font-size:10px;font-family:var(--font-m);color:var(--text3);">${f.gestora} · ${f.class_xp||'—'}</div>
+      </div>
+      ${f.recomendado?'<span style="margin-left:auto;font-size:9px;color:var(--green);font-family:var(--font-m);">✦</span>':''}
+    </div>`;
+  }).join('');
+  document.getElementById('chartSelectedCount').textContent=`${chartSelectedCNPJs.size} selecionados`;
+}
+
+function toggleChartFund(cnpj) {
+  if (chartSelectedCNPJs.has(cnpj)) chartSelectedCNPJs.delete(cnpj);
+  else chartSelectedCNPJs.add(cnpj);
+  renderChartFundList();
+  renderCharts();
+}
+
+function addRecsToChart() {
+  allFunds.filter(f=>f.recomendado).forEach(f=>chartSelectedCNPJs.add(f.cnpj));
+  renderChartFundList();renderCharts();
+}
+
+let showPortfolioRN = false;
+function addPortfolioRN() {
+  showPortfolioRN = !showPortfolioRN;
+  const btn = document.querySelector('[onclick="addPortfolioRN()"]');
+  if (btn) {
+    btn.style.background = showPortfolioRN ? 'rgba(255,255,255,.1)' : '';
+    btn.style.color = showPortfolioRN ? '#fff' : '';
+    btn.textContent = showPortfolioRN ? '✦ Portfólio RN (ativo)' : '✦ Portfólio RN';
+  }
+  renderCharts();
+}
+
+function buildRNPortfolioSeries(months) {
+  // Equal-weight portfolio of recomendados, annual rebalance
+  const recs = allFunds.filter(f => f.recomendado);
+  if (!recs.length) return null;
+
+  // Try daily cotas first, fall back to synthetic series
+  const hasDailyData = Object.keys(cotasSeries).length > 0;
+  let fundSeries = [];
+  let usingSynthetic = false;
+
+  if (hasDailyData) {
+    fundSeries = recs.map(f => {
+      const raw = cotasSeries[f.cnpj];
+      if (!raw || !raw.datas) return null;
+      return { cnpj: f.cnpj, datas: raw.datas.map(d => new Date(d)), valores: raw.valores };
+    }).filter(Boolean);
+  }
+
+  // Fallback to synthetic if no daily data
+  if (!fundSeries.length) {
+    fundSeries = recs.map(f => {
+      const syn = buildSyntheticSeries(f, months);
+      if (!syn) return null;
+      return { cnpj: f.cnpj, datas: syn.datas, valores: syn.valores };
+    }).filter(Boolean);
+    usingSynthetic = true;
+  }
+
+  if (!fundSeries.length) return null;
+
+  // Find common date range
+  const cutoff = new Date();
+  cutoff.setMonth(cutoff.getMonth() - months);
+
+  // Build date index: all dates present in ANY fund series, filtered to window
+  const allDatesSet = new Set();
+  fundSeries.forEach(s => s.datas.forEach(d => {
+    if (d >= cutoff) allDatesSet.add(d.getTime());
+  }));
+  const allDates = [...allDatesSet].sort((a,b)=>a-b).map(t => new Date(t));
+  if (allDates.length < 2) return null;
+
+  // For each fund: build a lookup map time->normalizedValue (base100 at cutoff)
+  const fundMaps = fundSeries.map(s => {
+    // Find index closest to cutoff
+    const startIdx = s.datas.findIndex(d => d >= cutoff);
+    if (startIdx < 0) return null;
+    const base = s.valores[startIdx];
+    if (!base || base <= 0) return null;  // invalid base value
+
+    const map = {};
+    let maxNorm = 0;
+    for (let i = startIdx; i < s.datas.length; i++) {
+      const norm = s.valores[i] / base * 100;
+      map[s.datas[i].getTime()] = norm;
+      if (norm > maxNorm) maxNorm = norm;
+    }
+
+    // Reject funds with abnormal returns (>500% in window = data error)
+    if (maxNorm > 600) {
+      console.warn(`[Portfolio] Fundo ${s.cnpj} rejeitado: retorno normalizado máximo ${maxNorm.toFixed(0)} (provável erro de dados)`);
+      return null;
+    }
+    return map;
+  }).filter(Boolean);
+
+  if (!fundMaps.length) return null;
+
+  // Annual rebalance dates: Jan 1st of each year within window
+  const rebalanceDates = new Set();
+  rebalanceDates.add(allDates[0].getTime()); // always rebalance at start
+  let yr = allDates[0].getFullYear();
+  while (true) {
+    yr++;
+    const jan1 = new Date(yr, 0, 1).getTime();
+    if (jan1 > allDates[allDates.length-1].getTime()) break;
+    rebalanceDates.add(jan1);
+  }
+
+  // Build portfolio value day by day
+  // At each rebalance: set equal weights (1/n) for funds that have data that day
+  let portfolio = [];
+  let portfolioBase = null;
+
+  // Weights per fund at current rebalance period
+  let currentWeights = {}; // cnpj -> weight (fraction)
+
+  const getVal = (map, t) => {
+    if (map[t] != null) return map[t];
+    // Interpolate: find nearest prior date
+    const times = Object.keys(map).map(Number).sort((a,b)=>a-b);
+    const prior = times.filter(x => x <= t);
+    if (!prior.length) return null;
+    return map[prior[prior.length-1]];
+  };
+
+  for (const date of allDates) {
+    const t = date.getTime();
+
+    // Rebalance if this date is a rebalance point
+    if (rebalanceDates.has(t)) {
+      const activeFunds = fundMaps.filter(m => getVal(m, t) != null);
+      const w = activeFunds.length ? 1 / activeFunds.length : 0;
+      currentWeights = {};
+      fundMaps.forEach((m, i) => {
+        if (getVal(m, t) != null) currentWeights[i] = w;
+      });
+    }
+
+    // Compute weighted portfolio value
+    let val = 0, totalW = 0;
+    Object.entries(currentWeights).forEach(([i, w]) => {
+      const v = getVal(fundMaps[i], t);
+      if (v != null) { val += v * w; totalW += w; }
+    });
+    if (!totalW) continue;
+    val = val / totalW;
+
+    portfolio.push({ date, val });
+  }
+
+  if (portfolio.length < 2) return null;
+
+  // Normalize to base 100
+  const base = portfolio[0].val;
+  return {
+    name: 'Portfólio RN',
+    color: '#ffffff',
+    synthetic: usingSynthetic,
+    isPortfolio: true,
+    datas: portfolio.map(p => p.date),
+    valores: portfolio.map(p => p.val / base * 100),
+    nFunds: fundMaps.length,
+    usingSynthetic,
+    rebalanceDates: [...rebalanceDates]
+  };
+}
+function clearChartSelection() {
+  chartSelectedCNPJs.clear();renderChartFundList();renderCharts();
+}
+
+const CHART_COLORS=['#c9a96e','#7aab8a','#f5c842','#f05c6e','#9b72f5','#2dd4c8','#f5894a','#e879f9','#34d399','#fb923c'];
+
+function buildSyntheticSeries(fund, months) {
+  // Reconstrói série aproximada a partir dos retornos acumulados disponíveis
+  // Usa os pontos: hoje, -1M, -12M, -24M, -36M e interpola entre eles
+  const today = new Date();
+  const anchor = (mAgo, rentField) => {
+    const v = fund[rentField];
+    if (v == null) return null;
+    const d = new Date(today);
+    d.setMonth(d.getMonth() - mAgo);
+    return { d, base100: 100 / (1 + v) }; // valor em base100 no passado para chegar em 100 hoje
+  };
+  const pts = [
+    { d: today, base100: 100 },
+    anchor(1,  'rent_mes'),
+    anchor(12, 'rent_12m'),
+    anchor(24, 'rent_24m'),
+    anchor(36, 'rent_36m'),
+  ].filter(p => p != null).sort((a,b) => a.d - b.d);
+
+  if (pts.length < 2) return null;
+
+  // Filter to requested window
+  const cutoff = new Date(today); cutoff.setMonth(cutoff.getMonth() - months);
+  const inWindow = pts.filter(p => p.d >= cutoff);
+  if (!inWindow.length) return null;
+
+  // Add boundary point at cutoff by interpolation if needed
+  if (inWindow[0].d > cutoff && pts.length > inWindow.length) {
+    const before = pts[pts.findIndex(p => p.d >= cutoff) - 1];
+    const after  = inWindow[0];
+    if (before) {
+      const t = (cutoff - before.d) / (after.d - before.d);
+      inWindow.unshift({ d: new Date(cutoff), base100: before.base100 + t * (after.base100 - before.base100) });
+    }
+  }
+
+  // Renormalize so series starts at 100
+  const base = inWindow[0].base100;
+  return { datas: inWindow.map(p=>p.d), valores: inWindow.map(p=>p.base100/base*100) };
+}
+
+function renderCharts() {
+  const selected=[...chartSelectedCNPJs];
+  const empty=document.getElementById('chartsEmpty');
+  const area=document.getElementById('chartsArea');
+  if (!selected.length && !showPortfolioRN) { empty.style.display='';area.style.display='none';return; }
+
+  const mode=document.getElementById('chartModeY').value;
+  const months=parseInt(document.getElementById('chartPeriod').value)||12;
+  const cutoff=new Date();cutoff.setMonth(cutoff.getMonth()-months);
+
+  const hasCotasData = Object.keys(cotasSeries).length > 0;
+
+  // Build series — prefer cotas.json daily data, fallback to synthetic from rent_*
+  const seriesList=[];
+  let usingSynthetic = false;
+  selected.forEach((cnpj,ci)=>{
+    const fund=allFunds.find(f=>f.cnpj===cnpj);
+    if (!fund) return;
+    const raw=cotasSeries[cnpj];
+    if (raw && raw.datas && raw.datas.length) {
+      const pairs=raw.datas.map((d,i)=>({d:new Date(d),v:raw.valores[i]})).filter(p=>p.d>=cutoff);
+      if (pairs.length) {
+        const base=pairs[0].v;
+        seriesList.push({
+          cnpj,name:fund.nome,color:CHART_COLORS[ci%CHART_COLORS.length],synthetic:false,
+          datas:pairs.map(p=>p.d),valores:pairs.map(p=>p.v/base*100)
+        });
+        return;
+      }
+    }
+    // Fallback: synthetic from rent_* fields
+    const syn = buildSyntheticSeries(fund, months);
+    if (syn) {
+      seriesList.push({ cnpj, name:fund.nome, color:CHART_COLORS[ci%CHART_COLORS.length], synthetic:true,
+        datas:syn.datas, valores:syn.valores });
+      usingSynthetic = true;
+    }
+  });
+
+  // Build RN Portfolio index if toggled on
+  if (showPortfolioRN) {
+    const rnSeries = buildRNPortfolioSeries(months);
+    if (rnSeries) seriesList.push(rnSeries);
+    else if (Object.keys(cotasSeries).length === 0) {
+      console.warn('Portfolio RN: cotas.json não disponível');
+    }
+  }
+
+  if (!seriesList.length) {
+    const nCotas = Object.keys(cotasSeries).length;
+    const nRec = allFunds.filter(f=>f.recomendado).length;
+    empty.innerHTML = `<div style="padding:40px;text-align:center;color:var(--text3);font-family:var(--font-m);font-size:13px;">
+      Sem dados históricos disponíveis para os fundos selecionados.<br>
+      <span style="font-size:11px;color:var(--text3);">cotas.json: ${nCotas} séries carregadas · ${selected.length} fundos selecionados · ${nRec} recomendados</span><br>
+      ${nCotas === 0 ? '<span style="font-size:11px;color:var(--yellow);">⚠ Execute o pipeline para gerar o cotas.json com série diária.</span>' : '<span style="font-size:11px;color:var(--yellow);">⚠ Os fundos selecionados não têm série diária disponível.</span>'}
+    </div>`;
+    empty.style.display='';area.style.display='none';return;
+  }
+
+  empty.style.display='none';
+  area.style.display='block';
+  // Force reflow so offsetWidth is correct before SVG render
+  area.offsetHeight;
+
+  // Show notice if using synthetic data
+  const notice = document.getElementById('chartNotice') || (() => {
+    const el = document.createElement('div');
+    el.id = 'chartNotice';
+    area.insertBefore(el, area.firstChild);
+    return el;
+  })();
+  notice.innerHTML = usingSynthetic
+    ? '<div style="background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.2);border-radius:8px;padding:10px 16px;margin-bottom:12px;font-size:11px;font-family:var(--font-m);color:var(--yellow);">⚠ Gráfico aproximado — usando retornos acumulados (dia, mês, 12M, 24M, 36M) como pontos de ancoragem. Execute o pipeline para gerar série diária completa (cotas.json).</div>'
+    : '';
+
+  // Also add CDI series if available and mode=base100
+  let cdiSeries=null;
+  const cdiData=benchmarks.find?.(b=>b.nome==='CDI')||Object.values(benchmarks).find?.(b=>b.nome==='CDI');
+  // benchmarks is an array
+  if (Array.isArray(benchmarks)) {
+    const cdi=benchmarks.find(b=>b.nome==='CDI');
+    if (cdi&&cdi.datas) {
+      const pairs=cdi.datas.map((d,i)=>({d:new Date(d),v:cdi.valores[i]})).filter(p=>new Date(p.d)>=cutoff);
+      if (pairs.length) {
+        const base=pairs[0].v;
+        cdiSeries={name:'CDI',color:'#ffffff44',datas:pairs.map(p=>p.d),valores:pairs.map(p=>p.v/base*100)};
+      }
+    }
+  }
+
+  renderLineChart(seriesList, cdiSeries, mode);
+  renderCorrTable(seriesList);
+}
+
+function renderLineChart(seriesList, cdiSeries, mode) {
+  const wrapper = document.getElementById('lineChartWrapper');
+  // offsetWidth is 0 if tab was never visible — use 900 as safe default
+  const W = (wrapper.offsetWidth > 100 ? wrapper.offsetWidth : 900);
+  const H=340, PL=58, PR=20, PT=14, PB=42;
+  const cW=W-PL-PR, cH=H-PT-PB;
+
+  // Collect all timestamps across all series
+  const allTimes = [...new Set(
+    seriesList.flatMap(s => s.datas.map(d => d.getTime()))
+  )].sort((a,b)=>a-b);
+  if (!allTimes.length) return;
+
+  // Build min/max for Y scale
+  const allVals = seriesList.flatMap(s => s.valores);
+  if (cdiSeries) allVals.push(...cdiSeries.valores);
+  const minV = Math.min(...allVals) * 0.996;
+  const maxV = Math.max(...allVals) * 1.004;
+  const rangeV = maxV - minV || 1;
+  const rangeT = allTimes[allTimes.length-1] - allTimes[0] || 1;
+
+  const scaleX = t => PL + (t - allTimes[0]) / rangeT * cW;
+  const scaleY = v => H - PB - (v - minV) / rangeV * cH;
+
+  // Y grid + labels (5 ticks)
+  let gridLines='', yLabels='';
+  for (let i=0; i<=5; i++) {
+    const v = minV + rangeV * i/5;
+    const y = scaleY(v).toFixed(1);
+    gridLines += `<line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}" stroke="#1e2535" stroke-width="1"/>`;
+    yLabels   += `<text x="${PL-6}" y="${+y+4}" text-anchor="end" fill="#5a6478" font-size="10">${v.toFixed(1)}</text>`;
+  }
+
+  // Base-100 reference line
+  const y100 = scaleY(100).toFixed(1);
+  const refLine = `<line x1="${PL}" y1="${y100}" x2="${W-PR}" y2="${y100}" stroke="#ffffff18" stroke-width="1" stroke-dasharray="5,3"/>`;
+
+  // X axis labels — monthly ticks, skip if too crowded
+  const t0=new Date(allTimes[0]), t1=new Date(allTimes[allTimes.length-1]);
+  let xLabels='', xGrids='';
+  const cur=new Date(t0.getFullYear(), t0.getMonth(), 1);
+  let lastLabelX = -999;
+  while (cur <= t1) {
+    const tx = cur.getTime();
+    if (tx >= allTimes[0]) {
+      const x = scaleX(tx);
+      if (x - lastLabelX > 48) { // min 48px between labels
+        const lbl = cur.toLocaleDateString('pt-BR',{month:'short',year:'2-digit'});
+        xLabels += `<text x="${x.toFixed(1)}" y="${H-PB+14}" text-anchor="middle" fill="#5a6478" font-size="9">${lbl}</text>`;
+        xGrids  += `<line x1="${x.toFixed(1)}" y1="${PT}" x2="${x.toFixed(1)}" y2="${H-PB}" stroke="#1e2535" stroke-width="1"/>`;
+        lastLabelX = x;
+      }
+    }
+    cur.setMonth(cur.getMonth()+1);
+  }
+
+  // Build path for a series
+  const buildPath = s => {
+    const pts = s.datas.map((d,i) => ({
+      x: scaleX(d.getTime()),
+      y: scaleY(s.valores[i])
+    }));
+    const line = pts.map((p,i) => `${i===0?'M':'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+    // Add dots only for sparse series (< 10 points)
+    const dots = pts.length < 10
+      ? pts.map(p=>`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4" fill="${s.color}" stroke="var(--bg)" stroke-width="2"/>`).join('')
+      : '';
+    return { line, dots };
+  };
+
+  // Axes
+  const axes = `<line x1="${PL}" y1="${PT}" x2="${PL}" y2="${H-PB}" stroke="#2e3a52" stroke-width="1"/>
+    <line x1="${PL}" y1="${H-PB}" x2="${W-PR}" y2="${H-PB}" stroke="#2e3a52" stroke-width="1"/>`;
+
+  // CDI line
+  let cdiPath = '';
+  if (cdiSeries && cdiSeries.datas.length) {
+    const p = buildPath(cdiSeries);
+    cdiPath = `<path d="${p.line}" fill="none" stroke="${cdiSeries.color}" stroke-width="1.5" stroke-dasharray="6,3"/>`;
+  }
+
+  // Fund lines
+  const fundPaths = seriesList.map(s => {
+    const p = buildPath(s);
+    const sw = s.isPortfolio ? '3.5' : '2';
+    const opacity = s.isPortfolio ? '1' : '0.85';
+    const dash = s.isPortfolio ? '' : '';
+    return `<path d="${p.line}" fill="none" stroke="${s.color}" stroke-width="${sw}" opacity="${opacity}"/>${p.dots}`;
+  }).join('');
+
+  wrapper.innerHTML = `<svg width="${W}" height="${H}" style="display:block;overflow:visible;">
+    <rect x="${PL}" y="${PT}" width="${cW}" height="${cH}" fill="#090909" rx="2"/>
+    ${gridLines}${xGrids}${refLine}${axes}${yLabels}${xLabels}
+    ${cdiPath}${fundPaths}
+  </svg>`;
+
+  // Chart title
+  document.getElementById('chartTitle').textContent =
+    mode==='base100' ? 'Cota Normalizada (base 100)' : 'Retorno vs CDI (%)';
+
+  // Legend
+  const lgItems = [
+    ...seriesList.map(s => `<div style="display:flex;align-items:center;gap:5px;font-size:11px;font-family:var(--font-m);">
+      <div style="width:18px;height:${s.isPortfolio?'3px':'2.5px'};background:${s.color};border-radius:1px;${s.isPortfolio?'box-shadow:0 0 6px #fff8;':''}"></div>
+      <span style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;${s.isPortfolio?'font-weight:600;color:#fff;':''}">${s.name}</span>
+      ${s.isPortfolio?`<span style="font-size:9px;color:var(--text3);font-family:var(--font-m);">(${s.nFunds} fundos · rebalan. anual)</span>`:''}
+      ${s.synthetic?'<span style="font-size:9px;color:var(--yellow);font-family:var(--font-m);">~</span>':''}
+    </div>`),
+    cdiSeries ? `<div style="display:flex;align-items:center;gap:5px;font-size:11px;font-family:var(--font-m);opacity:.5;">
+      <div style="width:18px;height:1.5px;background:#fff;border-radius:1px;border-bottom:1px dashed #fff;"></div>CDI</div>` : ''
+  ].filter(Boolean);
+  document.getElementById('chartLegend').innerHTML = lgItems.join('');
+}
+
+function renderCorrTable(seriesList) {
+  const wrapper = document.getElementById('corrTableWrapper');
+  if (seriesList.length<2){wrapper.innerHTML='<p style="color:var(--text3);font-family:var(--font-m);font-size:12px;padding:16px;">Selecione 2 ou mais fundos para ver a correlação.</p>';return;}
+  // Check if any series is synthetic (too few points for meaningful correlation)
+  const hasSynthetic = seriesList.some(s=>s.synthetic);
+  const minPoints = Math.min(...seriesList.map(s=>s.valores.length));
+  if (hasSynthetic || minPoints < 20) {
+    wrapper.innerHTML=`<div style="padding:20px;color:var(--yellow);font-family:var(--font-m);font-size:12px;background:rgba(245,200,66,.05);border-radius:8px;">
+      ⚠ Dados insuficientes para calcular correlação (${minPoints} pontos disponíveis).<br>
+      <span style="font-size:11px;color:var(--text3);">Execute o pipeline para gerar o cotas.json com série diária completa.</span></div>`;
+    return;
+  }
+  // Compute returns alinhados por data (interseção) — evita correlacionar datas diferentes
+  const n=seriesList.length;
+
+  // Monta mapa data→retorno para cada série
+  const retMaps = seriesList.map(s => {
+    const m = {};
+    for (let i=1; i<s.datas.length; i++) {
+      const r = (s.valores[i] - s.valores[i-1]) / s.valores[i-1];
+      m[s.datas[i]] = r;
+    }
+    return m;
+  });
+
+  // Correlação de Pearson com alinhamento por data
+  const corr = (mA, mB) => {
+    const dates = Object.keys(mA).filter(d => d in mB);
+    const len = dates.length;
+    if (len < 20) return null;
+    const a = dates.map(d => mA[d]), b = dates.map(d => mB[d]);
+    const ma = a.reduce((s,v)=>s+v,0)/len, mb = b.reduce((s,v)=>s+v,0)/len;
+    let num=0,da=0,db=0;
+    for (let i=0;i<len;i++){const x=a[i]-ma,y=b[i]-mb;num+=x*y;da+=x*x;db+=y*y;}
+    return da&&db?num/Math.sqrt(da*db):null;
+  };
+  const matrix=[];
+  for (let i=0;i<n;i++){matrix.push([]);for (let j=0;j<n;j++) matrix[i].push(i===j?1:corr(retMaps[i],retMaps[j]));}
+  const corrColor=v=>{
+    const t=Math.abs(v);
+    if (v>0){const g=Math.round(61+t*143);return `rgb(${Math.round(61+t*(240-61))},${g},${Math.round(140-t*140)})`;}
+    return `rgb(240,${Math.round(92+(1-t)*100)},110)`;
+  };
+  const names=seriesList.map(s=>s.name.slice(0,18));
+  let html=`<table class="corr-table"><thead><tr><th></th>${names.map(n=>`<th style="max-width:100px;overflow:hidden;text-overflow:ellipsis;">${n}</th>`).join('')}</tr></thead><tbody>`;
+  for (let i=0;i<n;i++){
+    html+=`<tr><th style="text-align:left;max-width:120px;overflow:hidden;text-overflow:ellipsis;">${names[i]}</th>`;
+    for (let j=0;j<n;j++){
+      const v=matrix[i][j];
+      html+=`<td style="background:${corrColor(v)}22;color:${corrColor(v)};font-weight:${i===j?'700':'400'};">${v.toFixed(2)}</td>`;
+    }
+    html+='</tr>';
+  }
+  html+='</tbody></table>';
+  document.getElementById('corrTableWrapper').innerHTML=html;
+}
+
+// ══════════════════════════════════════════════════════════
+// TAB 4: GESTORAS (with avg score)
+// ══════════════════════════════════════════════════════════
+let gestorasInfo = {};  // loaded from gestoras.json
+
+function initGestoras() {
+  gestoraData={};
+  allFunds.forEach(f=>{
+    if (!gestoraData[f.gestora]) gestoraData[f.gestora]={nome:f.gestora,fundos:[],totalPL:0};
+    gestoraData[f.gestora].fundos.push(f);
+    if (f.pl) gestoraData[f.gestora].totalPL+=f.pl;
+  });
+  // Load gestoras.json for cards
+  fetch('./data/gestoras.json').then(r=>r.json()).then(d=>{
+    gestorasInfo = d;
+    renderGestorasList();
+  }).catch(()=>renderGestorasList());
+}
+
+function getGestoraScore(g) {
+  // Use all-universe scores
+  const scored=scorePool(allFunds,'12m');
+  const scores=g.fundos.map(f=>{
+    const e=scored.find(s=>s.fund.cnpj===f.cnpj);return e?.score??null;
+  }).filter(v=>v!=null);
+  return scores.length?Math.round(scores.reduce((s,v)=>s+v,0)/scores.length):null;
+}
+
+function renderGestorasList() {
+  const q=(document.getElementById('gestorasSearch')?.value||'').toLowerCase();
+  const gestoras=Object.values(gestoraData)
+    .filter(g=>!q||g.nome.toLowerCase().includes(q))
+    .map(g=>({...g,avgScore:getGestoraScore(g)}))
+    .sort((a,b)=>(b.avgScore??-1)-(a.avgScore??-1));
+
+  document.getElementById('gestorasHeaderEl').innerHTML=`
+    <div style="font-family:var(--font-d);font-size:22px;margin-bottom:2px;">Gestoras</div>
+    <div style="font-size:12px;color:var(--text3);font-family:var(--font-m);">Ordenadas por score médio dos fundos · clique para ver perfil</div>`;
+  document.getElementById('gestoraBackBtn').style.display='none';
+  document.getElementById('gestorasSearch').style.display='';
+  document.getElementById('gestoraDetail').style.display='none';
+  document.getElementById('gestorasContent').style.display='';
+
+  const COLORS=['#c9a96e','#8878b8','#f5c842','#f05c6e','#2dd4c8','#3dd68c','#f5894a'];
+  const fmtPL=v=>v>=1000?`R$ ${(v/1000).toFixed(1)}B`:v>0?`R$ ${v.toFixed(0)}M`:'—';
+
+  document.getElementById('gestorasContent').innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;">
+      ${gestoras.map((g,i)=>{
+        const color=COLORS[i%COLORS.length];
+        const rents=g.fundos.map(f=>f.rent_12m).filter(v=>v!=null);
+        const avgRent=rents.length?rents.reduce((s,v)=>s+v,0)/rents.length:null;
+        const abertas=g.fundos.filter(f=>f.captacao_aberta).length;
+        const sc=g.avgScore;
+        const scColor=quartilColor(pctToQ(sc));
+        return `<div onclick="openGestora('${g.nome.replace(/'/g,"\\'")}')" class="gestora-card"
+          onmouseover="this.style.borderColor='${color}55'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="display:flex;align-items:center;gap:11px;margin-bottom:12px;">
+            <div style="width:38px;height:38px;border-radius:9px;background:linear-gradient(135deg,${color},${color}88);
+                display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:17px;color:#fff;flex-shrink:0;">
+              ${g.nome.charAt(0).toUpperCase()}
+            </div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${g.nome}</div>
+              <div style="font-size:10px;font-family:var(--font-m);color:var(--text3);">${g.fundos.length} fundo${g.fundos.length>1?'s':''} · ${abertas} aberto${abertas!==1?'s':''}${gestorasInfo[g.nome]?.fundacao?' · desde '+gestorasInfo[g.nome].fundacao:''}</div>
+            </div>
+            ${sc!=null?`<div style="text-align:center;flex-shrink:0;">
+              <div style="font-family:var(--font-m);font-size:18px;font-weight:700;color:${scColor};">${sc}</div>
+              <div style="font-size:9px;font-family:var(--font-m);color:var(--text3);">score</div>
+            </div>`:''}
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
+            <div style="background:var(--surface);border-radius:6px;padding:7px 9px;">
+              <div style="font-size:9px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">PL Total</div>
+              <div style="font-size:13px;font-family:var(--font-m);font-weight:500;">${fmtPL(g.totalPL)}</div>
+            </div>
+            <div style="background:var(--surface);border-radius:6px;padding:7px 9px;">
+              <div style="font-size:9px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">Ret 12M médio</div>
+              <div style="font-size:13px;font-family:var(--font-m);font-weight:500;${avgRent>=0?'color:var(--green)':'color:var(--red)'};">
+                ${avgRent!=null?(avgRent>=0?'+':'')+(avgRent*100).toFixed(1)+'%':'—'}
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:3px;">
+            ${[...new Set(g.fundos.map(f=>f.class_xp))].filter(Boolean).slice(0,3).map(c=>
+              `<span class="badge" style="font-size:9px;">${c.replace(' Vol','').replace('Internacional ','Intl ')}</span>`
+            ).join('')}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+function openGestora(nome) {
+  const g=gestoraData[nome];if (!g) return;
+  const COLORS=['#c9a96e','#8878b8','#f5c842','#f05c6e','#2dd4c8','#3dd68c','#f5894a'];
+  const color=COLORS[Object.keys(gestoraData).indexOf(nome)%COLORS.length];
+  document.getElementById('gestoraDetail').style.display='block';
+  document.getElementById('gestorasContent').style.display='none';
+  document.getElementById('gestoraBackBtn').style.display='block';
+  document.getElementById('gestorasSearch').style.display='none';
+  document.getElementById('gestorasHeaderEl').innerHTML=`
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,${color},${color}88);
+          display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:19px;color:#fff;">
+        ${nome.charAt(0).toUpperCase()}</div>
+      <div><div style="font-family:var(--font-d);font-size:22px;">${nome}</div>
+           <div style="font-size:12px;color:var(--text3);font-family:var(--font-m);">${g.fundos.length} fundo${g.fundos.length>1?'s':''} na plataforma XP</div></div>
+    </div>`;
+
+  const rents=g.fundos.map(f=>f.rent_12m).filter(v=>v!=null);
+  const avgRent=rents.length?rents.reduce((s,v)=>s+v,0)/rents.length:null;
+  const abertas=g.fundos.filter(f=>f.captacao_aberta).length;
+  const fmtPL=v=>v>=1000?`R$ ${(v/1000).toFixed(1)}B`:v>0?`R$ ${v.toFixed(0)}M`:'—';
+  const avgScore=getGestoraScore(g);
+  const scColor=quartilColor(pctToQ(avgScore));
+
+  document.getElementById('gestoraDetail').innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px;">
+      ${[
+        {l:'Score médio',v:avgScore!=null?`<span style="color:${scColor};font-size:22px;font-weight:700;">${avgScore}</span>`:'—',c:scColor},
+        {l:'PL Total',v:fmtPL(g.totalPL),c:color},
+        {l:'Ret 12M médio',v:avgRent!=null?`<span style="${avgRent>=0?'color:var(--green)':'color:var(--red)'}">${avgRent>=0?'+':''}${(avgRent*100).toFixed(1)}%</span>`:'—',c:'#3dd68c'},
+        {l:'Fundos abertos',v:`${abertas}/${g.fundos.length}`,c:'#9b72f5'},
+        {l:'Categorias',v:[...new Set(g.fundos.map(f=>f.class_xp).filter(Boolean))].length,c:'#2dd4c8'},
+      ].map(k=>`<div class="kpi-card" style="--kpi-color:${k.c}">
+        <div class="kpi-label">${k.l}</div>
+        <div class="kpi-value">${k.v}</div>
+      </div>`).join('')}
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+      <div id="gSobreBox" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div style="font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.8px;">Sobre a gestora</div>
+          <button id="btnEditGestora" onclick="openGestoraEditor(currentGestora)" style="background:none;border:1px solid var(--border2);border-radius:6px;padding:4px 10px;color:var(--text3);font-family:var(--font-m);font-size:10px;cursor:pointer;">✏ Editar</button>
+        </div>
+        <div style="font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;">Sobre a gestora</div>
+        <div id="gSobreContent" style="font-size:13px;color:var(--text2);line-height:1.7;">
+          Carregando...
+        </div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px;">
+        <div style="font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;">Aparições públicas</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7;">
+          Adicione podcasts, entrevistas e vídeos no <code style="color:var(--accent2);">data/conteudo.json</code> (campo "gestora").
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:14px;overflow:hidden;">
+      <div class="table-header-bar">
+        <div class="table-title">Cartas & Podcasts</div>
+        <span class="badge" id="gContentBadge">—</span>
+      </div>
+      <div id="gContentList" style="padding:14px;">
+        <div style="text-align:center;padding:24px;color:var(--text3);font-family:var(--font-m);font-size:12px;">Nenhum conteúdo cadastrado ainda.</div>
+      </div>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+      <div class="table-header-bar">
+        <div class="table-title">Fundos na plataforma XP</div>
+        <span class="badge blue">${g.fundos.length} fundos</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;">
+          <thead><tr>
+            ${['Fundo','Ret 12M','PL','Sharpe','Captação','Tipo Inv','Classe XP'].map(h=>
+              `<th style="padding:8px 12px;text-align:left;font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid var(--border);">${h}</th>`
+            ).join('')}
+          </tr></thead>
+          <tbody>
+            ${g.fundos.sort((a,b)=>(b.rent_12m??-99)-(a.rent_12m??-99)).map(f=>`
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="padding:9px 12px;"><div style="font-size:12px;font-weight:500;">${f.nome}</div>
+                ${f.recomendado?'<span style="font-size:9px;color:var(--green);font-family:var(--font-m);">✦ Rec</span>':''}</td>
+              <td style="padding:9px 12px;font-family:var(--font-m);font-size:12px;">${fmtPct(f.rent_12m)}</td>
+              <td style="padding:9px 12px;font-family:var(--font-m);font-size:12px;">${f.pl?(f.pl>=1000?'R$'+(f.pl/1000).toFixed(1)+'B':'R$'+f.pl.toFixed(0)+'M'):'—'}</td>
+              <td style="padding:9px 12px;font-family:var(--font-m);font-size:12px;">${f.sharpe!=null?f.sharpe.toFixed(2):'—'}</td>
+              <td style="padding:9px 12px;">${f.captacao_aberta?'<span style="color:var(--green)">Aberta</span>':'<span style="color:var(--red)">Fechada</span>'}</td>
+              <td style="padding:9px 12px;font-size:11px;font-family:var(--font-m);color:var(--text2);">${f.tipo_investidor||'Geral'}</td>
+              <td style="padding:9px 12px;">${classBadge(f.class_xp)}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+  loadGestoraContent(nome);
+}
+
+function loadGestoraContent(nome) {
+  // Load gestoras.json for rich profile data
+  fetch('./data/gestoras.json').then(r=>r.json()).then(gdata=>{
+    const info = gdata[nome] || {};
+    const sobreEl = document.getElementById('gSobreContent');
+    if (sobreEl) {
+      if (info.descricao) {
+        sobreEl.innerHTML = `
+          <div style="margin-bottom:12px;">${info.descricao}</div>
+          ${info.filosofia ? `<div style="background:var(--surface);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:10px 14px;font-size:12px;font-style:italic;color:var(--text2);">"${info.filosofia}"</div>` : ''}
+          <div style="margin-top:12px;display:flex;gap:16px;flex-wrap:wrap;">
+            ${info.fundacao ? `<div style="font-size:11px;font-family:var(--font-m);color:var(--text3);">📅 Fundada em <span style="color:var(--text2);">${info.fundacao}</span></div>` : ''}
+            ${info.gestor_principal ? `<div style="font-size:11px;font-family:var(--font-m);color:var(--text3);">👤 <span style="color:var(--text2);">${info.gestor_principal}</span></div>` : ''}
+            ${info.sede ? `<div style="font-size:11px;font-family:var(--font-m);color:var(--text3);">📍 <span style="color:var(--text2);">${info.sede}</span></div>` : ''}
+          </div>`;
+      } else {
+        sobreEl.innerHTML = `<span style="color:var(--text3);font-family:var(--font-m);font-size:12px;">
+          Adicione informações em <code>data/gestoras.json</code> para "${nome}".</span>`;
+      }
+    }
+  }).catch(()=>{
+    const sobreEl = document.getElementById('gSobreContent');
+    if (sobreEl) sobreEl.innerHTML = '<span style="color:var(--text3);font-size:12px;">gestoras.json não encontrado.</span>';
+  });
+
+  // Load conteudo.json for cartas/podcasts
+  fetch('./data/conteudo.json').then(r=>r.json()).then(data=>{
+    const itens=(data.itens||[]).filter(i=>i.gestora?.toLowerCase().includes(nome.toLowerCase()));
+    const badge=document.getElementById('gContentBadge');
+    if (badge) badge.textContent=`${itens.length} itens`;
+    const list=document.getElementById('gContentList');
+    if (!list||!itens.length) return;
+    const icons={carta:'📄',podcast:'🎙',relatorio:'📊'};
+    list.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;">
+      ${itens.map(i=>`<a href="${i.url||'#'}" target="_blank" style="text-decoration:none;">
+        <div style="background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:13px;transition:border-color .15s;"
+             onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)'">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px;">
+            <span style="font-size:16px;">${icons[i.tipo]||'📌'}</span>
+            <span class="badge ${i.tipo==='podcast'?'purple':i.tipo==='relatorio'?'teal':''}" style="font-size:9px;">${i.tipo||'outro'}</span>
+            <span style="font-size:10px;font-family:var(--font-m);color:var(--text3);margin-left:auto;">${i.data||''}</span>
+          </div>
+          <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px;">${i.titulo||''}</div>
+          <div style="font-size:11px;color:var(--text3);">${i.descricao||''}</div>
+        </div></a>`).join('')}
+    </div>`;
+  }).catch(()=>{});
+}
+
+function closeGestora() {
+  document.getElementById('gestoraDetail').style.display='none';
+  document.getElementById('gestorasContent').style.display='';
+  document.getElementById('gestoraBackBtn').style.display='none';
+  document.getElementById('gestorasSearch').style.display='';
+  renderGestorasList();
+}
+
+// ══════════════════════════════════════════════════════════
+// TAB SWITCHING
+// ══════════════════════════════════════════════════════════
+function switchTab(name, el) {
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  const tabEl = document.getElementById('tab-'+name);
+  if (tabEl) tabEl.classList.add('active');
+  if (el) el.classList.add('active');
+  // Refresh home when switching to it
+  if (name === 'home') renderHome();
+}
+
+// ══════════════════════════════════════════════════════════
+// HOME: CHART + CORRELATION + FUND DETAIL
+// ══════════════════════════════════════════════════════════
+let homeChartMonths = 36;
+
+function setHomeChartPeriod(btn) {
+  document.querySelectorAll('#homeChartPeriodSel .period-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  homeChartMonths = parseInt(btn.dataset.m);
+  renderHomeChart();
+  renderHomeCorrTable();
+}
+
+// Build benchmark series normalized to base 100 from cutoff
+function getBenchmarkSeries(key, months) {
+  if (!benchmarks || typeof benchmarks !== 'object') return null;
+  const b = benchmarks[key];
+  if (!b) return null;
+
+  // Always reconstruct from daily returns — avoids issues with pre-computed
+  // acumulado starting from a different base year (e.g. IMA-B from 2003)
+  const src = b.retornos_diarios;
+  if (!src) return null;
+
+  const cutoff = new Date(); cutoff.setMonth(cutoff.getMonth() - months);
+
+  // Get daily returns within window, sorted
+  const pairs = Object.entries(src)
+    .map(([d,v]) => ({ d: new Date(d), v: parseFloat(v) }))
+    .filter(p => p.d >= cutoff && !isNaN(p.v))
+    .filter(p => Math.abs(p.v) < 0.15)  // sanity: reject single-day returns > 15%
+    .sort((a,b2) => a.d - b2.d);
+  if (pairs.length < 2) return null;
+
+  // Build cumulative from base 100 using daily returns
+  const valores = [100];
+  for (let i = 1; i < pairs.length; i++) {
+    valores.push(valores[i-1] * (1 + pairs[i].v));
+  }
+
+  // Final sanity check: reject if series explodes (max > 5x starting value)
+  const maxVal = Math.max(...valores);
+  if (maxVal > 500) {
+    console.warn(`[Benchmark] ${key}: série rejeitada (max=${maxVal.toFixed(0)}, provável erro de dados)`);
+    return null;
+  }
+
+  return { datas: pairs.map(p => p.d), valores };
+}
+
+// Build IPCA+5% series accumulating daily returns
+function getIpca5Series(months) {
+  return getBenchmarkSeries('IPCA+5%', months);
+}
+
+function renderHomeChart() {
+  const wrapper = document.getElementById('homeChartWrapper');
+  if (!wrapper) return;
+  const recs = allFunds.filter(f => f.recomendado);
+  if (!recs.length) { wrapper.innerHTML=''; return; }
+  const months = homeChartMonths;
+
+  // Portfolio series
+  const portSeries = buildRNPortfolioSeries(months);
+
+  // Benchmark series
+  const BENCH_COLORS = {
+    'CDI':     '#7aab8a',
+    'IPCA+5%': '#c9a96e',
+    'IHFA':    '#8878b8',
+    'IMA-B':   '#5a9898',
+  };
+  const benchSeriesList = Object.entries(BENCH_COLORS).map(([key, color]) => {
+    const s = getBenchmarkSeries(key, months);
+    return s ? { ...s, name: key, color, isBench: true } : null;
+  }).filter(Boolean);
+
+  const allSeries = [
+    ...(portSeries ? [{ ...portSeries, name:'Portfólio RN', color:'#ffffff', isPortfolio:true }] : []),
+    ...benchSeriesList
+  ];
+
+  if (!allSeries.length) {
+    wrapper.innerHTML = '<div style="padding:24px;color:var(--text3);font-family:var(--font-m);font-size:12px;text-align:center;">Sem dados históricos — rode gerar_cotas.py e o pipeline completo.</div>';
+    document.getElementById('homeChartLegend').innerHTML = '';
+    return;
+  }
+
+  // Use the same SVG renderer as graficos tab
+  renderLineChartInto('homeChartWrapper', allSeries, null, 'base100');
+
+  // Legend
+  document.getElementById('homeChartLegend').innerHTML = allSeries.map(s =>
+    `<div style="display:flex;align-items:center;gap:5px;font-size:11px;font-family:var(--font-m);">
+      <div style="width:18px;height:${s.isPortfolio?'3px':'2px'};background:${s.color};border-radius:1px;"></div>
+      <span style="${s.isPortfolio?'font-weight:600;':''}">${s.name}</span>
+      ${s.synthetic?'<span style="font-size:9px;color:var(--yellow);">~</span>':''}
+    </div>`
+  ).join('');
+}
+
+// Factored-out SVG renderer (shared by home and graficos tabs)
+function renderLineChartInto(wrapperId, seriesList, cdiSeries, mode) {
+  const wrapper = document.getElementById(wrapperId);
+  if (!wrapper || !seriesList.length) return;
+  wrapper.offsetHeight; // force reflow
+  const W = wrapper.offsetWidth > 100 ? wrapper.offsetWidth : 860;
+  const H=300, PL=55, PR=16, PT=12, PB=36;
+  const cW=W-PL-PR, cH=H-PT-PB;
+
+  const allTimes = [...new Set(seriesList.flatMap(s=>s.datas.map(d=>d.getTime())))].sort((a,b)=>a-b);
+  if (!allTimes.length) return;
+  const allVals = seriesList.flatMap(s=>s.valores);
+  const minV = Math.min(...allVals)*0.996, maxV = Math.max(...allVals)*1.004;
+  const rangeV = maxV-minV||1, rangeT = allTimes[allTimes.length-1]-allTimes[0]||1;
+  const scaleX = t => PL + (t-allTimes[0])/rangeT*cW;
+  const scaleY = v => H-PB-(v-minV)/rangeV*cH;
+
+  // Grid
+  let grid='', yLab='';
+  for (let i=0;i<=4;i++) {
+    const v=minV+rangeV*i/4, y=scaleY(v).toFixed(1);
+    grid += `<line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}" stroke="#1e2535" stroke-width="1"/>`;
+    yLab += `<text x="${PL-5}" y="${+y+4}" text-anchor="end" fill="#5a6478" font-size="10">${v.toFixed(1)}</text>`;
+  }
+  // Base 100 line
+  const y100 = scaleY(100).toFixed(1);
+  const ref = `<line x1="${PL}" y1="${y100}" x2="${W-PR}" y2="${y100}" stroke="#ffffff18" stroke-width="1" stroke-dasharray="4,3"/>`;
+
+  // X labels
+  let xLab=''; let lastX=-999;
+  const t0=new Date(allTimes[0]), t1=new Date(allTimes[allTimes.length-1]);
+  const cur=new Date(t0.getFullYear(),t0.getMonth(),1);
+  while(cur<=t1){
+    const tx=cur.getTime();
+    if(tx>=allTimes[0]){
+      const x=scaleX(tx);
+      if(x-lastX>56){
+        const lbl=cur.toLocaleDateString('pt-BR',{month:'short',year:'2-digit'});
+        xLab+=`<text x="${x.toFixed(1)}" y="${H-PB+14}" text-anchor="middle" fill="#5a6478" font-size="9">${lbl}</text>`;
+        lastX=x;
+      }
+    }
+    cur.setMonth(cur.getMonth()+1);
+  }
+
+  // Paths
+  const makePath = s => {
+    const pts = s.datas.map((d,i)=>({x:scaleX(d.getTime()),y:scaleY(s.valores[i])}));
+    const line = pts.map((p,i)=>`${i===0?'M':'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+    const dots = pts.length<10 ? pts.map(p=>`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4" fill="${s.color}" stroke="var(--bg)" stroke-width="2"/>`).join('') : '';
+    return {line,dots};
+  };
+
+  const axes = `<line x1="${PL}" y1="${PT}" x2="${PL}" y2="${H-PB}" stroke="#2e3a52" stroke-width="1"/>
+    <line x1="${PL}" y1="${H-PB}" x2="${W-PR}" y2="${H-PB}" stroke="#2e3a52" stroke-width="1"/>`;
+
+  const paths = seriesList.map(s=>{
+    const p=makePath(s);
+    const sw = s.isPortfolio?'3':'1.8';
+    const dash = s.isBench ? 'stroke-dasharray="5,3"' : '';
+    return `<path d="${p.line}" fill="none" stroke="${s.color}" stroke-width="${sw}" ${dash} opacity="0.9"/>${p.dots}`;
+  }).join('');
+
+  wrapper.innerHTML = `<svg width="${W}" height="${H}" style="display:block;overflow:visible;">
+    <rect x="${PL}" y="${PT}" width="${cW}" height="${cH}" fill="#090909" rx="2"/>
+    ${grid}${ref}${axes}${yLab}${xLab}${paths}
+  </svg>`;
+}
+
+// Correlation matrix for portfolio funds
+function renderHomeCorrTable() {
+  const recs = allFunds.filter(f=>f.recomendado);
+  const months = homeChartMonths;
+  const cutoff = new Date(); cutoff.setMonth(cutoff.getMonth()-months);
+
+  // Build daily returns series for each fund
+  const series = recs.map(f=>{
+    const raw = cotasSeries[f.cnpj];
+    if (!raw||!raw.datas) return null;
+    const pairs = raw.datas.map((d,i)=>({d:new Date(d),ds:d,v:raw.valores[i]}))
+      .filter(p=>p.d>=cutoff).sort((a,b)=>a.d-b.d);
+    if (pairs.length<20) return null;
+    // Mapa data→retorno para alinhamento correto
+    const retMap = {};
+    for (let i=1;i<pairs.length;i++) {
+      retMap[pairs[i].ds] = (pairs[i].v - pairs[i-1].v) / pairs[i-1].v;
+    }
+    return {cnpj:f.cnpj, name:f.nome.slice(0,20)+'…', retMap};
+  }).filter(Boolean);
+
+  // Correlation vs benchmarks
+  const benchEl = document.getElementById('homeCorrBench');
+  const corrEl  = document.getElementById('homeCorrTable');
+
+  if (series.length < 2) {
+    if (corrEl) corrEl.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:8px;">Mín. 2 fundos com série diária necessários.</div>';
+    if (benchEl) benchEl.innerHTML = '<div style="color:var(--text3);font-size:12px;">Dados insuficientes.</div>';
+    return;
+  }
+
+  // Pearson correlation com alinhamento por data
+  function pearson(mA, mB) {
+    const dates = Object.keys(mA).filter(d => d in mB);
+    const n = dates.length;
+    if (n<5) return null;
+    const ax=dates.map(d=>mA[d]), bx=dates.map(d=>mB[d]);
+    const ma=ax.reduce((s,v)=>s+v,0)/n, mb=bx.reduce((s,v)=>s+v,0)/n;
+    let num=0,da=0,db=0;
+    for(let i=0;i<n;i++){const ai=ax[i]-ma,bi=bx[i]-mb;num+=ai*bi;da+=ai*ai;db+=bi*bi;}
+    return da&&db?num/Math.sqrt(da*db):null;
+  }
+
+  function corrColor(v) {
+    if (v===null) return 'var(--text3)';
+    const abs=Math.abs(v);
+    if (abs>0.7) return v>0?'#f87171':'#3dd68c';
+    if (abs>0.4) return v>0?'#f5c842':'#7c6af7';
+    return 'var(--text2)';
+  }
+
+  // Fund vs fund matrix
+  const n=series.length;
+  let rows='';
+  // Header
+  rows+=`<table style="width:100%;border-collapse:collapse;font-size:10px;font-family:var(--font-m);">`;
+  rows+=`<thead><tr><th style="text-align:left;padding:4px 6px;color:var(--text3);">Fundo</th>`;
+  series.forEach(s=>rows+=`<th style="padding:4px 6px;color:var(--text3);max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.name}</th>`);
+  rows+='</tr></thead><tbody>';
+  series.forEach((s1,i)=>{
+    rows+=`<tr><td style="padding:4px 6px;color:var(--text2);font-size:10px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s1.name}</td>`;
+    series.forEach((s2,j)=>{
+      if(i===j){rows+=`<td style="text-align:center;padding:4px 6px;background:rgba(255,255,255,.05);">—</td>`;return;}
+      const r=pearson(s1.retMap,s2.retMap);
+      const col=corrColor(r);
+      rows+=`<td style="text-align:center;padding:4px 6px;color:${col};font-weight:600;">${r!==null?r.toFixed(2):'—'}</td>`;
+    });
+    rows+='</tr>';
+  });
+  rows+='</tbody></table>';
+  corrEl.innerHTML = rows;
+
+  // Portfolio vs benchmarks
+  const portSeries = buildRNPortfolioSeries(months);
+  if (!portSeries || portSeries.valores.length < 5) {
+    benchEl.innerHTML = '<div style="color:var(--text3);font-size:12px;">Série do portfólio insuficiente.</div>';
+    return;
+  }
+  const portRets = portSeries.valores.map((v,i)=>i===0?0:(v-portSeries.valores[i-1])/portSeries.valores[i-1]).slice(1);
+
+  const benchKeys = ['CDI','IPCA+5%','IHFA','IMA-B'];
+  let benchRows = '<table style="width:100%;border-collapse:collapse;font-size:12px;font-family:var(--font-m);">';
+  benchRows += '<thead><tr><th style="text-align:left;padding:6px 8px;color:var(--text3);">Índice</th><th style="text-align:right;padding:6px 8px;color:var(--text3);">Corr. Portfólio</th></tr></thead><tbody>';
+  benchKeys.forEach(key=>{
+    const bs = getBenchmarkSeries(key, months);
+    if (!bs) { benchRows+=`<tr><td style="padding:6px 8px;">${key}</td><td style="text-align:right;color:var(--text3);">sem dados</td></tr>`; return; }
+    const bRets = bs.valores.map((v,i)=>i===0?0:(v-bs.valores[i-1])/bs.valores[i-1]).slice(1);
+    const r = pearson(portRets, bRets);
+    const col = corrColor(r);
+    benchRows+=`<tr>
+      <td style="padding:6px 8px;color:var(--text2);">${key}</td>
+      <td style="text-align:right;padding:6px 8px;font-weight:600;color:${col};">${r!==null?r.toFixed(3):'—'}</td>
+    </tr>`;
+  });
+  benchRows += '</tbody></table>';
+  benchEl.innerHTML = benchRows;
+}
+
+// Fund detail modal (item 2)
+function openHomeFundDetail(cnpj) {
+  const f = allFunds.find(x=>x.cnpj===cnpj);
+  if (!f) return;
+
+  document.getElementById('hfmName').textContent = f.nome;
+  document.getElementById('hfmGestora').textContent = f.gestora + (f.class_xp ? ' · '+f.class_xp : '');
+
+  // Rentabilidades
+  const rents = [
+    {l:'Dia',  v:f.rent_dia},  {l:'Mês',  v:f.rent_mes},
+    {l:'Ano',  v:f.rent_ano},  {l:'12M',  v:f.rent_12m},
+    {l:'24M',  v:f.rent_24m},  {l:'36M',  v:f.rent_36m},
+  ];
+  document.getElementById('hfmRents').innerHTML = rents.map(r=>`
+    <div style="background:var(--surface);border-radius:8px;padding:10px 12px;">
+      <div style="font-size:10px;color:var(--text3);font-family:var(--font-m);">${r.l}</div>
+      <div style="font-size:18px;font-weight:700;color:${r.v>=0?'var(--green)':'var(--red)'};">${r.v!=null?(r.v*100).toFixed(2)+'%':'—'}</div>
+    </div>`).join('');
+
+  // Quant metrics with quartiles (vs full pool)
+  const pool = allFunds;
+  const quantCols = [
+    {l:'Sharpe 12M',  k:'sharpe',           dir:'higher', fmt:'num3'},
+    {l:'Sharpe 24M',  k:'sharpe_24m',        dir:'higher', fmt:'num3'},
+    {l:'Sharpe 36M',  k:'sharpe_36m',        dir:'higher', fmt:'num3'},
+    {l:'Sortino 36M', k:'sortino_36m',       dir:'higher', fmt:'num3'},
+    {l:'Vol 36M',     k:'volatilidade_36m',  dir:'lower',  fmt:'pct'},
+    {l:'DD 36M',      k:'drawdown_max_36m',  dir:'lower',  fmt:'pct'},
+    {l:'Consist 36M', k:'consistencia_36m',  dir:'higher', fmt:'pct1'},
+    {l:'Corr CDI 36M',k:'corr_cdi_36m',      dir:'lower',  fmt:'num3'},
+    {l:'Var PL 12M',  k:'variacao_pl_12m',   dir:'higher', fmt:'pct1'},
+    {l:'PL (R$M)',    k:'pl',                dir:'higher', fmt:'money'},
+    {l:'Longevidade', k:'longevidade_anos',  dir:'higher', fmt:'anos'},
+  ];
+  document.getElementById('hfmQuant').innerHTML = quantCols.map(col=>{
+    const val = f[col.k];
+    const allVals = pool.map(x=>x[col.k]);
+    const pct = calcPercentile(val, allVals, col.dir);
+    const q = pctToQ(pct);
+    const qColors = {1:'var(--green)',2:'var(--yellow)',3:'#f97316',4:'var(--red)'};
+    const qLabels = {1:'Q1 — Top 25%',2:'Q2',3:'Q3',4:'Q4 — Bottom 25%'};
+    const fmtVal = v => {
+      if (v==null) return '—';
+      if (col.fmt==='num3') return v.toFixed(3);
+      if (col.fmt==='pct')  return (v*100).toFixed(2)+'%';
+      if (col.fmt==='pct1') return (v*100).toFixed(1)+'%';
+      if (col.fmt==='money') return 'R$'+v.toFixed(0)+'M';
+      if (col.fmt==='anos') return v.toFixed(1)+'a';
+      return v;
+    };
+    return `<div style="background:var(--surface);border-radius:8px;padding:10px 12px;border-left:3px solid ${q?qColors[q]:'var(--border)'};">
+      <div style="font-size:10px;color:var(--text3);font-family:var(--font-m);margin-bottom:4px;">${col.l}</div>
+      <div style="font-size:15px;font-weight:700;">${fmtVal(val)}</div>
+      ${q?`<div style="font-size:10px;color:${qColors[q]};font-family:var(--font-m);margin-top:2px;">${qLabels[q]}</div>`:''}
+    </div>`;
+  }).join('');
+
+  // Info geral
+  document.getElementById('hfmInfo').innerHTML = [
+    {l:'Captação',   v: f.captacao_aberta?'Aberta':'Fechada'},
+    {l:'Tipo Inv.',  v: f.tipo_investidor||'—'},
+    {l:'Aplic. Mín.',v: f.aplicacao_minima?'R$ '+f.aplicacao_minima.toLocaleString('pt-BR'):'—'},
+    {l:'Taxa Adm.',  v: f.taxa_adm!=null?f.taxa_adm.toFixed(2)+'%':'—'},
+    {l:'Taxa Perf.', v: f.taxa_perf||'—'},
+    {l:'Liquidação', v: f.liquidacao_resgate||'—'},
+  ].map(x=>`<div style="background:var(--surface);border-radius:6px;padding:8px 10px;">
+    <div style="font-size:10px;color:var(--text3);">${x.l}</div>
+    <div style="font-size:12px;font-weight:500;margin-top:2px;">${x.v}</div>
+  </div>`).join('');
+
+  const modal = document.getElementById('homeFundModal');
+  modal.style.display = 'flex';
+  document.addEventListener('keydown', closeOnEsc);
+}
+
+function closeHomeFundModal() {
+  document.getElementById('homeFundModal').style.display='none';
+  document.removeEventListener('keydown', closeOnEsc);
+}
+function closeOnEsc(e) { if(e.key==='Escape') closeHomeFundModal(); }
+
+
+// ══════════════════════════════════════════════════════════
+// GESTORA EDITOR
+// ══════════════════════════════════════════════════════════
+let gesEditorNome = '';
+let gesEditorCartas = [];
+let gesEditorPodcasts = [];
+
+function openGestoraEditor(nome) {
+  if (!authUnlocked) {
+    const pwd = prompt('Senha para editar gestoras:');
+    if (pwd !== SENHA_ADMIN) { showToast('Senha incorreta', 'red'); return; }
+    authUnlocked = true;
+  }
+  gesEditorNome = nome;
+  document.getElementById('gesEditorTitle').textContent = 'Editar — ' + nome;
+
+  const info = gestorasInfo[nome] || {};
+  document.getElementById('gesEdFundacao').value  = info.fundacao || '';
+  document.getElementById('gesEdGestor').value    = info.gestor_principal || '';
+  document.getElementById('gesEdSede').value      = info.sede || '';
+  document.getElementById('gesEdDesc').value      = info.descricao || '';
+  document.getElementById('gesEdFilosofia').value = info.filosofia || '';
+
+  // Load existing links from conteudo.json
+  gesEditorCartas   = (info.cartas   || []).map(x=>({...x}));
+  gesEditorPodcasts = (info.podcasts || []).map(x=>({...x}));
+  renderGesLinks();
+
+  document.getElementById('gestoraEditorModal').style.display = 'flex';
+}
+
+function closeGestoraEditor() {
+  document.getElementById('gestoraEditorModal').style.display = 'none';
+}
+
+function renderGesLinks() {
+  const renderList = (arr, type) => arr.map((item,i) => `
+    <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:6px;align-items:center;">
+      <input type="text" value="${item.titulo||''}" placeholder="Título"
+        oninput="gesEditorUpdate('${type}',${i},'titulo',this.value)"
+        style="background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:6px 8px;color:var(--text1);font-family:var(--font-m);font-size:12px;">
+      <input type="text" value="${item.url||''}" placeholder="URL"
+        oninput="gesEditorUpdate('${type}',${i},'url',this.value)"
+        style="background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:6px 8px;color:var(--text1);font-family:var(--font-m);font-size:12px;">
+      <button onclick="removeGesLink('${type}',${i})"
+        style="background:none;border:1px solid var(--border2);border-radius:6px;padding:5px 8px;color:var(--red);cursor:pointer;">✕</button>
+    </div>`).join('');
+
+  document.getElementById('gesEdCartas').innerHTML   = renderList(gesEditorCartas,   'cartas');
+  document.getElementById('gesEdPodcasts').innerHTML = renderList(gesEditorPodcasts, 'podcasts');
+}
+
+function addGesLink(type) {
+  if (type==='cartas')   gesEditorCartas.push({titulo:'',url:''});
+  else                   gesEditorPodcasts.push({titulo:'',url:''});
+  renderGesLinks();
+}
+
+function removeGesLink(type, i) {
+  if (type==='cartas') gesEditorCartas.splice(i,1);
+  else                 gesEditorPodcasts.splice(i,1);
+  renderGesLinks();
+}
+
+function gesEditorUpdate(type, i, field, val) {
+  if (type==='cartas') gesEditorCartas[i][field] = val;
+  else                 gesEditorPodcasts[i][field] = val;
+}
+
+async function saveGestoraEditor() {
+  const nome = gesEditorNome;
+  // Build updated gestoras info
+  if (!gestorasInfo[nome]) gestorasInfo[nome] = {};
+  gestorasInfo[nome].fundacao         = parseInt(document.getElementById('gesEdFundacao').value)||null;
+  gestorasInfo[nome].gestor_principal = document.getElementById('gesEdGestor').value;
+  gestorasInfo[nome].sede             = document.getElementById('gesEdSede').value;
+  gestorasInfo[nome].descricao        = document.getElementById('gesEdDesc').value;
+  gestorasInfo[nome].filosofia        = document.getElementById('gesEdFilosofia').value;
+  gestorasInfo[nome].cartas           = gesEditorCartas.filter(x=>x.titulo||x.url);
+  gestorasInfo[nome].podcasts         = gesEditorPodcasts.filter(x=>x.titulo||x.url);
+
+  try {
+    const res = await fetch('/api/save-gestoras', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ gestoras: gestorasInfo })
+    });
+    if (res.ok) {
+      showToast('✓ Gestora salva', 'green');
+      closeGestoraEditor();
+      // Refresh display
+      if (currentGestora === nome) loadGestoraContent(nome);
+      initGestoras();
+    } else {
+      showToast('Erro ao salvar', 'red');
+    }
+  } catch(e) {
+    showToast('Servidor não respondeu', 'red');
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════════════════
+let _toastTimer = null;
+function showToast(msg, type='green') {
+  const el = document.getElementById('toastEl');
+  el.textContent = msg;
+  el.className = `toast ${type} show`;
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => { el.classList.remove('show'); }, 3000);
+}
+
+// ══════════════════════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════════════════════
+loadData();
+</script>
+</body>
+</html>

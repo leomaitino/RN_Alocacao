@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: alphadesk
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn servidor:api --host 0.0.0.0 --port $PORT
+    disk:
+      name: alphadesk-data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: DATA_DIR
+        value: /data
+      - key: PYTHON_VERSION
+        value: "3.11.0"

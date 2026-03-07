@@ -1,0 +1,27 @@
+{
+  "ultima_atualizacao": "2026-03-07T20:17:42.352780",
+  "total_fundos": 150,
+  "fundos_captacao_aberta": 131,
+  "recomendados": 13,
+  "aprovados": 0,
+  "benchmarks_disponiveis": [
+    "CDI",
+    "IHFA",
+    "IMA-B",
+    "IPCA+3.5%",
+    "IPCA+5%",
+    "IPCA+6%"
+  ],
+  "classes_xp": [
+    "Internacional Macro Hedgeado",
+    "Internacional Multimercado Hedgeado",
+    "Internacional Multimercado Não Hedgeado",
+    "Long Short Direcional",
+    "Long Short Neutro",
+    "Macro Alta Vol",
+    "Macro Baixa Vol",
+    "Macro Média Vol",
+    "Multiestratégia",
+    "Quantitativo"
+  ]
+}

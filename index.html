@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard de Alocação — RN Investimentos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Inter:wght@300;400;500;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #090909;
+    --surface:  #111111;
+    --border:   #1f1f1f;
+    --border2:  #2a2a2a;
+    --text1:    #f0ece4;
+    --text2:    #8a8278;
+    --text3:    #4a4740;
+    --cream:    #e8e0d0;
+    --gold:     #c9a96e;
+    --font-s:   'Playfair Display', Georgia, serif;
+    --font-n:   'Inter', system-ui, sans-serif;
+    --font-m:   'DM Mono', monospace;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text1); font-family:var(--font-n); min-height:100vh; -webkit-font-smoothing:antialiased; }
+  body::before { content:''; display:block; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); opacity:.4; }
+  a { text-decoration:none; color:inherit; }
+
+  header {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:26px 48px; border-bottom:1px solid var(--border);
+  }
+  .logo { display:flex; align-items:center; gap:14px; }
+  .logo-rn { font-family:var(--font-s); font-size:21px; font-weight:500; letter-spacing:.3px; color:var(--cream); }
+  .logo-div { width:1px; height:18px; background:var(--border2); }
+  .logo-sub { font-family:var(--font-m); font-size:10px; color:var(--text3); letter-spacing:2px; text-transform:uppercase; }
+  .hdr-date { font-family:var(--font-m); font-size:11px; color:var(--text3); }
+
+  .title-block {
+    padding:52px 48px 44px; border-bottom:1px solid var(--border);
+    display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:16px;
+  }
+  .page-title { font-family:var(--font-s); font-size:40px; font-weight:400; color:var(--cream); letter-spacing:-.3px; }
+  .page-sub { font-family:var(--font-m); font-size:11px; color:var(--text3); padding-bottom:4px; }
+
+  .content { padding:44px 48px; }
+
+  .sec-label {
+    font-family:var(--font-m); font-size:10px; color:var(--text3);
+    letter-spacing:2.5px; text-transform:uppercase; margin-bottom:18px;
+    display:flex; align-items:center; gap:12px;
+  }
+  .sec-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  /* ── Product grid ── */
+  .product-grid {
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(250px,1fr));
+    gap:1px; background:var(--border); border:1px solid var(--border);
+  }
+  .pcard {
+    background:var(--bg); padding:30px 26px;
+    display:block; position:relative; overflow:hidden;
+    transition:background .15s;
+  }
+  .pcard.live { cursor:pointer; }
+  .pcard.soon { pointer-events:none; opacity:.38; }
+  .pcard.live:hover { background:var(--surface); }
+  .pcard.live::after {
+    content:''; position:absolute; bottom:0; left:26px; right:26px;
+    height:1px; background:var(--gold); opacity:.5;
+    transform:scaleX(0); transform-origin:left; transition:transform .28s ease;
+  }
+  .pcard.live:hover::after { transform:scaleX(1); }
+  .pcard-num { font-family:var(--font-m); font-size:10px; color:var(--text3); margin-bottom:18px; letter-spacing:1px; }
+  .pcard-name { font-family:var(--font-s); font-size:19px; font-weight:500; color:var(--cream); margin-bottom:8px; line-height:1.2; transition:color .15s; }
+  .pcard.live:hover .pcard-name { color:#fff; }
+  .pcard-desc { font-size:12px; color:var(--text2); font-weight:300; line-height:1.65; margin-bottom:20px; min-height:48px; }
+  .pcard-foot { display:flex; align-items:center; justify-content:space-between; }
+  .pstatus { font-family:var(--font-m); font-size:10px; letter-spacing:1px; text-transform:uppercase; }
+  .pstatus.live { color:var(--gold); }
+  .pstatus.soon { color:var(--text3); }
+  .parrow { font-size:14px; color:var(--text3); transition:color .15s, transform .15s; }
+  .pcard.live:hover .parrow { color:var(--cream); transform:translateX(3px); }
+  .pcard-stats {
+    margin-top:16px; padding-top:14px; border-top:1px solid var(--border);
+    display:flex; gap:20px;
+  }
+  .pstat-val { font-family:var(--font-m); font-size:12px; color:var(--cream); }
+  .pstat-lbl { font-size:10px; color:var(--text3); margin-top:1px; }
+
+  /* ── Tools ── */
+  .tools-grid {
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(250px,1fr));
+    gap:1px; background:var(--border); border:1px solid var(--border);
+    margin-top:28px; margin-bottom:52px;
+  }
+  .tcard {
+    background:var(--bg); padding:26px; cursor:default; /* placeholder — not linked yet */
+    transition:background .15s;
+  }
+  .tcard-icon { font-size:20px; margin-bottom:14px; display:block; color:var(--text2); }
+  .tcard-name { font-family:var(--font-s); font-size:17px; color:var(--cream); margin-bottom:6px; }
+  .tcard-desc { font-size:12px; color:var(--text2); font-weight:300; line-height:1.6; }
+
+  /* ── Status bar ── */
+  .status-bar {
+    display:flex; gap:28px; padding:18px 48px; flex-wrap:wrap;
+    border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+    background:var(--surface);
+  }
+  .sitem { display:flex; align-items:center; gap:7px; font-family:var(--font-m); font-size:11px; color:var(--text3); }
+  .sdot { width:5px; height:5px; border-radius:50%; background:var(--text3); flex-shrink:0; }
+  .sdot.ok { background:var(--gold); box-shadow:0 0 5px rgba(201,169,110,.35); }
+  .sdot.err { background:#b05050; }
+  .sval { color:var(--text2); }
+
+  footer {
+    padding:20px 48px; display:flex; align-items:center;
+    justify-content:space-between; flex-wrap:wrap; gap:8px;
+  }
+  .ftext { font-family:var(--font-m); font-size:10px; color:var(--text3); letter-spacing:.3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <span class="logo-rn">RN Investimentos</span>
+    <div class="logo-div"></div>
+    <span class="logo-sub">Alpha Desk</span>
+  </div>
+  <div class="hdr-date" id="hdrDate"></div>
+</header>
+
+<div class="title-block">
+  <h1 class="page-title">Dashboard de Alocação</h1>
+  <div class="page-sub" id="pageDate"></div>
+</div>
+
+<div class="content">
+
+  <div class="sec-label">Produtos</div>
+
+  <div class="product-grid">
+
+    <a href="./dashboard.html" class="pcard live">
+      <div class="pcard-num">01</div>
+      <div class="pcard-name">Multimercados</div>
+      <div class="pcard-desc">Ranking quantitativo, carteira recomendada e histórico de cotas de 150 fundos.</div>
+      <div class="pcard-foot">
+        <span class="pstatus live">Disponível</span>
+        <span class="parrow">→</span>
+      </div>
+      <div class="pcard-stats">
+        <div><div class="pstat-val" id="mmFundos">—</div><div class="pstat-lbl">fundos</div></div>
+        <div><div class="pstat-val" id="mmRecs">—</div><div class="pstat-lbl">recomendados</div></div>
+        <div><div class="pstat-val" id="mmUpd">—</div><div class="pstat-lbl">atualização</div></div>
+      </div>
+    </a>
+
+    <a href="./comparador/carteiras.html" class="pcard live">
+      <div class="pcard-num">02</div>
+      <div class="pcard-name">Comparador</div>
+      <div class="pcard-desc">Compare fundos lado a lado — retorno, risco, correlação e drawdown em qualquer janela.</div>
+      <div class="pcard-foot">
+        <span class="pstatus live">Disponível</span>
+        <span class="parrow">→</span>
+      </div>
+    </a>
+
+    <div class="pcard soon">
+      <div class="pcard-num">03</div>
+      <div class="pcard-name">Fundos de Ações</div>
+      <div class="pcard-desc">Ranking fundamentalista, múltiplos, momentum e análise de fluxo.</div>
+      <div class="pcard-foot"><span class="pstatus soon">Em construção</span><span class="parrow">→</span></div>
+    </div>
+
+    <div class="pcard soon">
+      <div class="pcard-num">04</div>
+      <div class="pcard-name">Fundos Alternativos</div>
+      <div class="pcard-desc">Estratégias descorrelacionadas, crédito estruturado e ativos reais.</div>
+      <div class="pcard-foot"><span class="pstatus soon">Em construção</span><span class="parrow">→</span></div>
+    </div>
+
+    <div class="pcard soon">
+      <div class="pcard-num">05</div>
+      <div class="pcard-name">Fundos de Renda Fixa</div>
+      <div class="pcard-desc">Duration, carrego, sensibilidade e risco de taxa.</div>
+      <div class="pcard-foot"><span class="pstatus soon">Em construção</span><span class="parrow">→</span></div>
+    </div>
+
+    <div class="pcard soon">
+      <div class="pcard-num">06</div>
+      <div class="pcard-name">Crédito Privado</div>
+      <div class="pcard-desc">Debêntures, CRAs, CRIs com rating, spread e duration.</div>
+      <div class="pcard-foot"><span class="pstatus soon">Em construção</span><span class="parrow">→</span></div>
+    </div>
+
+    <div class="pcard soon">
+      <div class="pcard-num">07</div>
+      <div class="pcard-name">Fundos Listados</div>
+      <div class="pcard-desc">FIIs e FI-Infra com DY, P/VP, liquidez e análise de portfólio.</div>
+      <div class="pcard-foot"><span class="pstatus soon">Em construção</span><span class="parrow">→</span></div>
+    </div>
+
+    <div class="pcard soon">
+      <div class="pcard-num">08</div>
+      <div class="pcard-name">ETFs</div>
+      <div class="pcard-desc">Exposição, tracking error, custo e comparativo de índices.</div>
+      <div class="pcard-foot"><span class="pstatus soon">Em construção</span><span class="parrow">→</span></div>
+    </div>
+
+  </div>
+
+  <div class="sec-label" style="margin-top:40px;">Ferramentas</div>
+
+  <div class="tools-grid">
+    <div class="tcard">
+      <span class="tcard-icon">◎</span>
+      <div class="tcard-name">Alocação Sugerida</div>
+      <div class="tcard-desc">Visão consolidada das alocações recomendadas por perfil e objetivo.</div>
+    </div>
+    <div class="tcard">
+      <span class="tcard-icon">◻</span>
+      <div class="tcard-name">Políticas de Investimento</div>
+      <div class="tcard-desc">Diretrizes, mandatos e parâmetros de risco da RN Investimentos.</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="status-bar">
+  <div class="sitem"><div class="sdot" id="sDotSrv"></div><span>Servidor</span><span class="sval" id="sValSrv">—</span></div>
+  <div class="sitem"><div class="sdot" id="sDotCot"></div><span>Cotas</span><span class="sval" id="sValCot">—</span></div>
+  <div class="sitem"><div class="sdot" id="sDotBch"></div><span>Benchmarks</span><span class="sval" id="sValBch">—</span></div>
+  <div class="sitem"><div class="sdot"></div><span>Última atualização</span><span class="sval" id="sValUpd">—</span></div>
+</div>
+
+<footer>
+  <div class="ftext">RN Investimentos · Plataforma interna · Uso restrito</div>
+  <div class="ftext" id="fTime"></div>
+</footer>
+
+<script>
+const now = new Date();
+document.getElementById('hdrDate').textContent =
+  now.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+document.getElementById('pageDate').textContent =
+  now.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});
+document.getElementById('fTime').textContent =
+  now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+
+async function load() {
+  try {
+    const f = await (await fetch('./data/fundos.json?v='+Date.now())).json();
+    document.getElementById('mmFundos').textContent = f.length;
+    document.getElementById('mmRecs').textContent   = f.filter(x=>x.recomendado).length;
+  } catch(e){}
+  try {
+    const m = await (await fetch('./data/meta.json?v='+Date.now())).json();
+    const d = m.ultima_atualizacao?.slice(0,10)||'—';
+    document.getElementById('mmUpd').textContent  = d;
+    document.getElementById('sValUpd').textContent = d;
+  } catch(e){}
+  try {
+    const c = await (await fetch('./data/cotas.json?v='+Date.now())).json();
+    const n = Object.keys(c).length;
+    document.getElementById('sValCot').textContent = n+' séries';
+    document.getElementById('sDotCot').classList.add(n>0?'ok':'err');
+  } catch(e){}
+  try {
+    const b = await (await fetch('./data/benchmarks.json?v='+Date.now())).json();
+    const n = Object.keys(b).length;
+    document.getElementById('sValBch').textContent = n+' índices';
+    document.getElementById('sDotBch').classList.add(n>0?'ok':'err');
+  } catch(e){}
+  try {
+    await fetch('/api/load-estado');
+    document.getElementById('sValSrv').textContent = 'online';
+    document.getElementById('sDotSrv').classList.add('ok');
+  } catch(e){
+    document.getElementById('sValSrv').textContent = 'offline';
+    document.getElementById('sDotSrv').classList.add('err');
+  }
+}
+load();
+</script>
+</body>
+</html>
