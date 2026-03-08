@@ -662,25 +662,22 @@ let authUnlocked = false;
 // ══════════════════════════════════════════════════════════
 // QUANT METRICS CONFIG
 // ══════════════════════════════════════════════════════════
-// ── 11 métricas: Sharpe 12/24/36M + Sortino/DD/Vol/Consist/CorrCDI (36M) + VarPL (12M) + PL + Longevidade
-// Pesos padrão: Sharpe 36M=3, 24M=2, 12M=1 | resto=1
+// ── 8 métricas: Sharpe/Sortino/DD/Vol/Consist/CorrCDI (36M) + VarPL (12M) + PL
+// Pesos: Sharpe 36M=4, Drawdown=3, Sortino=2, Consistência=2, VarPL=2, Vol=1, CorrCDI=1, PL=1
 const QUANT_METRICS = [
-  // Sharpe — 3 janelas, pesos crescentes para refletir consistência de longo prazo
-  { key:'sharpe',     label:'Sharpe 12M',      dir:'higher', period:true,  periodFixed:'12m', fmt:'num3', defaultWeight:1 },
-  { key:'sharpe',     label:'Sharpe 24M',      dir:'higher', period:true,  periodFixed:'24m', fmt:'num3', defaultWeight:2 },
-  { key:'sharpe',     label:'Sharpe 36M',      dir:'higher', period:true,  periodFixed:'36m', fmt:'num3', defaultWeight:3 },
+  // Sharpe — apenas 36M
+  { key:'sharpe',      label:'Sharpe 36M',      dir:'higher', period:true,  periodFixed:'36m', fmt:'num3', defaultWeight:4 },
   // Risco — todos em 36M fixo
-  { key:'sortino',    label:'Sortino 36M',     dir:'higher', period:false, fixedKey:'sortino_36m',         fmt:'num3', defaultWeight:1 },
-  { key:'drawdown_max',label:'Drawdown 36M',   dir:'lower',  period:false, fixedKey:'drawdown_max_36m',    fmt:'pct',  defaultWeight:1 },
-  { key:'volatilidade',label:'Volatilidade 36M',dir:'lower', period:false, fixedKey:'volatilidade_36m',    fmt:'pct',  defaultWeight:1 },
-  { key:'consistencia',label:'Consistência 36M',dir:'higher',period:false, fixedKey:'consistencia_36m',    fmt:'pct1', defaultWeight:1 },
+  { key:'sortino',     label:'Sortino 36M',      dir:'higher', period:false, fixedKey:'sortino_36m',         fmt:'num3', defaultWeight:2 },
+  { key:'drawdown_max',label:'Drawdown 36M',     dir:'lower',  period:false, fixedKey:'drawdown_max_36m',    fmt:'pct',  defaultWeight:3 },
+  { key:'volatilidade',label:'Volatilidade 36M', dir:'lower',  period:false, fixedKey:'volatilidade_36m',    fmt:'pct',  defaultWeight:1 },
+  { key:'consistencia',label:'Consistência 36M', dir:'higher', period:false, fixedKey:'consistencia_36m',    fmt:'pct1', defaultWeight:2 },
   // Correlação CDI 36M — lower is better (menor correlação = mais alfa real)
-  { key:'corr_cdi_36m',label:'Corr. CDI 36M',  dir:'lower',  period:false, fixedKey:'corr_cdi_36m',        fmt:'num3', defaultWeight:1 },
+  { key:'corr_cdi_36m',label:'Corr. CDI 36M',   dir:'lower',  period:false, fixedKey:'corr_cdi_36m',        fmt:'num3', defaultWeight:1 },
   // Dinâmica de captação
-  { key:'variacao_pl_12m',label:'Var. PL 12M', dir:'higher', period:false, fmt:'pct1', defaultWeight:1 },
+  { key:'variacao_pl_12m',label:'Var. PL 12M',  dir:'higher', period:false, fmt:'pct1', defaultWeight:2 },
   // Estrutural
-  { key:'pl',               label:'PL (R$M)',   dir:'higher', period:false, fmt:'money', defaultWeight:1 },
-  { key:'longevidade_anos', label:'Longevidade',dir:'higher', period:false, fmt:'anos',  defaultWeight:1 },
+  { key:'pl',          label:'PL (R$M)',          dir:'higher', period:false, fmt:'money', defaultWeight:1 },
 ];
 
 let weights = QUANT_METRICS.map(m => m.defaultWeight);
