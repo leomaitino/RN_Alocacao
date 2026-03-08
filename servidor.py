@@ -14,7 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse, HTMLResponse
 from pydantic import BaseModel
-from typing import Any
+from typing import Any, List
 
 # ── Paths ──────────────────────────────────────────────────────────────────────
 BASE_DIR = Path(os.path.dirname(os.path.abspath(__file__)))
@@ -51,7 +51,8 @@ class RecomendadosPayload(BaseModel):
     aprovados: list = []
 
 class PesosPayload(BaseModel):
-    pesos: dict
+    senha: str = ""
+    pesos: List[float]  # FIX: lista, não dict
 
 class GestorasPayload(BaseModel):
     gestoras: dict
@@ -59,7 +60,13 @@ class GestorasPayload(BaseModel):
 # ── API ────────────────────────────────────────────────────────────────────────
 @api.get("/api/load-estado")
 def load_estado():
-    return JSONResponse(content=ler_json("estado.json", {}))
+    estado = ler_json("estado.json", {})
+    # Também tenta carregar pesos do pesos.json legado se estado não tiver
+    if "pesos" not in estado:
+        pesos_legado = ler_json("pesos.json", None)
+        if isinstance(pesos_legado, list):
+            estado["pesos"] = pesos_legado
+    return JSONResponse(content=estado)
 
 @api.post("/api/save-recomendados")
 def save_recomendados(payload: RecomendadosPayload):
@@ -72,9 +79,11 @@ def save_recomendados(payload: RecomendadosPayload):
 @api.post("/api/save-pesos")
 def save_pesos(payload: PesosPayload):
     estado = ler_json("estado.json", {})
-    estado["pesos"] = payload.pesos
+    estado["pesos"] = payload.pesos  # lista agora
     estado["pesos_atualizados"] = datetime.now().isoformat()
     salvar_json("estado.json", estado)
+    # Também salva pesos.json para compatibilidade
+    salvar_json("pesos.json", payload.pesos)
     return {"ok": True}
 
 @api.post("/api/save-gestoras")
@@ -87,7 +96,8 @@ def save_gestoras(payload: GestorasPayload):
 def serve_data(filename: str):
     allowed = {
         "fundos.json", "benchmarks.json", "cotas.json",
-        "meta.json", "gestoras.json", "recomendados.json", "conteudo.json"
+        "meta.json", "gestoras.json", "recomendados.json", "conteudo.json",
+        "estado.json", "pesos.json"
     }
     if filename not in allowed:
         raise HTTPException(404, "Arquivo não encontrado")
@@ -105,7 +115,7 @@ def root():
 def dashboard():
     return FileResponse(str(BASE_DIR / "dashboard.html"))
 
-# ── Comparador: serve carteiras.html e assets da pasta ────────────────────────
+# ── Comparador ─────────────────────────────────────────────────────────────────
 @api.get("/comparador", include_in_schema=False)
 @api.get("/comparador/", include_in_schema=False)
 @api.get("/comparador/carteiras.html", include_in_schema=False)
@@ -115,8 +125,6 @@ def comparador_html():
         raise HTTPException(404, f"carteiras.html não encontrado em {path}")
     return FileResponse(str(path), media_type="text/html")
 
-# Monta os assets estáticos do comparador (CSS, JS, JSONs internos)
-# IMPORTANTE: deve vir DEPOIS das rotas específicas acima
 comparador_dir = BASE_DIR / "comparador"
 if comparador_dir.exists():
     api.mount("/comparador", StaticFiles(directory=str(comparador_dir)), name="comparador")
@@ -127,11 +135,13 @@ def startup():
     print(f"✅ AlphaDesk iniciado")
     print(f"   BASE_DIR: {BASE_DIR}")
     print(f"   DATA_DIR: {DATA_DIR}")
+    estado = ler_json("estado.json", {})
+    pesos = estado.get("pesos", ler_json("pesos.json", []))
+    print(f"   pesos carregados: {pesos}")
     comp = BASE_DIR / "comparador"
     print(f"   comparador/: {'✓ existe' if comp.exists() else '✗ NÃO ENCONTRADO'}")
     if comp.exists():
-        files = list(comp.iterdir())
-        print(f"   arquivos: {[f.name for f in files]}")
+        print(f"   arquivos: {[f.name for f in comp.iterdir()]}")
 
 if __name__ == "__main__":
     import uvicorn
