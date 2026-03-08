@@ -1,7 +1,7 @@
 """
 AlphaDesk — Servidor
-FastAPI servindo os HTMLs estáticos + rotas /api/* para salvar JSONs no disco persistente.
-Deploy no Render.com com disco montado em /data.
+FastAPI servindo os HTMLs estáticos + rotas /api/* para salvar JSONs.
+Deploy no Render.com (plano free, sem disco externo).
 """
 
 import os
@@ -12,14 +12,12 @@ from datetime import datetime
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, HTMLResponse
 from pydantic import BaseModel
 from typing import Any
 
 # ── Paths ──────────────────────────────────────────────────────────────────────
 BASE_DIR = Path(os.path.dirname(os.path.abspath(__file__)))
-
-# DATA_DIR: pasta data/ dentro do projeto
 DATA_DIR = BASE_DIR / "data"
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -58,13 +56,11 @@ class PesosPayload(BaseModel):
 class GestorasPayload(BaseModel):
     gestoras: dict
 
-# ── API: leitura de estado ─────────────────────────────────────────────────────
+# ── API ────────────────────────────────────────────────────────────────────────
 @api.get("/api/load-estado")
 def load_estado():
-    estado = ler_json("estado.json", {})
-    return JSONResponse(content=estado)
+    return JSONResponse(content=ler_json("estado.json", {}))
 
-# ── API: salvar recomendados ───────────────────────────────────────────────────
 @api.post("/api/save-recomendados")
 def save_recomendados(payload: RecomendadosPayload):
     dados = ler_json("recomendados.json", {"recomendados": [], "aprovados": []})
@@ -73,7 +69,6 @@ def save_recomendados(payload: RecomendadosPayload):
     salvar_json("recomendados.json", dados)
     return {"ok": True, "total": len(payload.recomendados)}
 
-# ── API: salvar pesos ──────────────────────────────────────────────────────────
 @api.post("/api/save-pesos")
 def save_pesos(payload: PesosPayload):
     estado = ler_json("estado.json", {})
@@ -82,13 +77,12 @@ def save_pesos(payload: PesosPayload):
     salvar_json("estado.json", estado)
     return {"ok": True}
 
-# ── API: salvar gestoras ───────────────────────────────────────────────────────
 @api.post("/api/save-gestoras")
 def save_gestoras(payload: GestorasPayload):
     salvar_json("gestoras.json", payload.gestoras)
     return {"ok": True, "total": len(payload.gestoras)}
 
-# ── Servir JSONs da pasta /data ────────────────────────────────────────────────
+# ── Servir JSONs ───────────────────────────────────────────────────────────────
 @api.get("/data/{filename}")
 def serve_data(filename: str):
     allowed = {
@@ -100,31 +94,44 @@ def serve_data(filename: str):
     path = DATA_DIR / filename
     if not path.exists():
         raise HTTPException(404, f"{filename} não encontrado")
-    return FileResponse(path, media_type="application/json")
+    return FileResponse(str(path), media_type="application/json")
 
-# ── Servir HTMLs ───────────────────────────────────────────────────────────────
+# ── Servir HTMLs principais ────────────────────────────────────────────────────
 @api.get("/", include_in_schema=False)
 def root():
-    return FileResponse(BASE_DIR / "index.html")
+    return FileResponse(str(BASE_DIR / "index.html"))
 
 @api.get("/dashboard.html", include_in_schema=False)
 def dashboard():
-    return FileResponse(BASE_DIR / "dashboard.html")
+    return FileResponse(str(BASE_DIR / "dashboard.html"))
 
+# ── Comparador: serve carteiras.html e assets da pasta ────────────────────────
+@api.get("/comparador", include_in_schema=False)
+@api.get("/comparador/", include_in_schema=False)
 @api.get("/comparador/carteiras.html", include_in_schema=False)
-def comparador():
-    return FileResponse(BASE_DIR / "comparador" / "carteiras.html")
+def comparador_html():
+    path = BASE_DIR / "comparador" / "carteiras.html"
+    if not path.exists():
+        raise HTTPException(404, f"carteiras.html não encontrado em {path}")
+    return FileResponse(str(path), media_type="text/html")
 
+# Monta os assets estáticos do comparador (CSS, JS, JSONs internos)
+# IMPORTANTE: deve vir DEPOIS das rotas específicas acima
 comparador_dir = BASE_DIR / "comparador"
 if comparador_dir.exists():
-    api.mount("/comparador", StaticFiles(directory=str(comparador_dir), html=True), name="comparador")
+    api.mount("/comparador", StaticFiles(directory=str(comparador_dir)), name="comparador")
 
 # ── Startup ────────────────────────────────────────────────────────────────────
 @api.on_event("startup")
 def startup():
-    print(f"✅ AlphaDesk iniciado — dados em: {DATA_DIR}")
-    jsons = list(DATA_DIR.glob("*.json"))
-    print(f"   {len(jsons)} JSONs encontrados: {[j.name for j in jsons]}")
+    print(f"✅ AlphaDesk iniciado")
+    print(f"   BASE_DIR: {BASE_DIR}")
+    print(f"   DATA_DIR: {DATA_DIR}")
+    comp = BASE_DIR / "comparador"
+    print(f"   comparador/: {'✓ existe' if comp.exists() else '✗ NÃO ENCONTRADO'}")
+    if comp.exists():
+        files = list(comp.iterdir())
+        print(f"   arquivos: {[f.name for f in files]}")
 
 if __name__ == "__main__":
     import uvicorn
