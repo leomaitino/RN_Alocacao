@@ -319,7 +319,7 @@
     "variacao_pl_12m": 2.207982,
     "pl_12m_atras": 77.44,
     "longevidade_anos": 4.9,
-    "recomendado": true,
+    "recomendado": false,
     "aprovado": false,
     "grupo_vol": "Alta"
   },
@@ -1021,7 +1021,7 @@
     "variacao_pl_12m": -0.143912,
     "pl_12m_atras": 132.55,
     "longevidade_anos": 4.91,
-    "recomendado": true,
+    "recomendado": false,
     "aprovado": false,
     "grupo_vol": "Média"
   },
@@ -1885,7 +1885,7 @@
     "variacao_pl_12m": 2.69345,
     "pl_12m_atras": 31.18,
     "longevidade_anos": 1.33,
-    "recomendado": true,
+    "recomendado": false,
     "aprovado": false,
     "grupo_vol": "Baixa"
   },
@@ -2047,7 +2047,7 @@
     "variacao_pl_12m": 0.24831,
     "pl_12m_atras": 1143.42,
     "longevidade_anos": 4.91,
-    "recomendado": true,
+    "recomendado": false,
     "aprovado": false,
     "grupo_vol": "Baixa"
   },
@@ -2317,7 +2317,7 @@
     "variacao_pl_12m": 1.863714,
     "pl_12m_atras": 134.94,
     "longevidade_anos": 3.29,
-    "recomendado": true,
+    "recomendado": false,
     "aprovado": false,
     "grupo_vol": "Baixa"
   },
@@ -3235,7 +3235,7 @@
     "variacao_pl_12m": 0.740442,
     "pl_12m_atras": 865.55,
     "longevidade_anos": 4.9,
-    "recomendado": true,
+    "recomendado": false,
     "aprovado": false,
     "grupo_vol": "Alta"
   },
@@ -3289,7 +3289,7 @@
     "variacao_pl_12m": -0.148577,
     "pl_12m_atras": 612.13,
     "longevidade_anos": 4.9,
-    "recomendado": false,
+    "recomendado": true,
     "aprovado": false,
     "grupo_vol": "Alta"
   },
@@ -3613,7 +3613,7 @@
     "variacao_pl_12m": -0.219496,
     "pl_12m_atras": 1109.45,
     "longevidade_anos": 4.91,
-    "recomendado": false,
+    "recomendado": true,
     "aprovado": false,
     "grupo_vol": "Alta"
   },
@@ -3991,7 +3991,7 @@
     "variacao_pl_12m": -0.309321,
     "pl_12m_atras": 852.58,
     "longevidade_anos": 4.91,
-    "recomendado": false,
+    "recomendado": true,
     "aprovado": false,
     "grupo_vol": "Alta"
   },
@@ -4261,7 +4261,7 @@
     "variacao_pl_12m": -0.21198,
     "pl_12m_atras": 382.23,
     "longevidade_anos": 4.91,
-    "recomendado": false,
+    "recomendado": true,
     "aprovado": false,
     "grupo_vol": "Alta"
   },
@@ -4315,7 +4315,7 @@
     "variacao_pl_12m": -0.028619,
     "pl_12m_atras": 598.56,
     "longevidade_anos": 4.91,
-    "recomendado": true,
+    "recomendado": false,
     "aprovado": false,
     "grupo_vol": "Alta"
   },
@@ -5557,7 +5557,7 @@
     "variacao_pl_12m": 0.194687,
     "pl_12m_atras": 853.92,
     "longevidade_anos": 4.91,
-    "recomendado": true,
+    "recomendado": false,
     "aprovado": false,
     "grupo_vol": "Média"
   },
@@ -6043,7 +6043,7 @@
     "variacao_pl_12m": -0.215119,
     "pl_12m_atras": 396.04,
     "longevidade_anos": 4.91,
-    "recomendado": false,
+    "recomendado": true,
     "aprovado": false,
     "grupo_vol": "Média"
   },
@@ -6367,7 +6367,7 @@
     "variacao_pl_12m": -0.384411,
     "pl_12m_atras": 38.29,
     "longevidade_anos": 4.91,
-    "recomendado": false,
+    "recomendado": true,
     "aprovado": false,
     "grupo_vol": "Média"
   },
@@ -6529,7 +6529,7 @@
     "variacao_pl_12m": 1.256416,
     "pl_12m_atras": 55.31,
     "longevidade_anos": 2.42,
-    "recomendado": true,
+    "recomendado": false,
     "aprovado": false,
     "grupo_vol": "Média"
   },
@@ -6583,7 +6583,7 @@
     "variacao_pl_12m": 0.303109,
     "pl_12m_atras": 2115.24,
     "longevidade_anos": 4.9,
-    "recomendado": true,
+    "recomendado": false,
     "aprovado": false,
     "grupo_vol": "Média"
   },
@@ -6745,7 +6745,7 @@
     "variacao_pl_12m": 0.150351,
     "pl_12m_atras": 158.63,
     "longevidade_anos": 3.86,
-    "recomendado": true,
+    "recomendado": false,
     "aprovado": false,
     "grupo_vol": "Média"
   },
@@ -7771,7 +7771,7 @@
     "variacao_pl_12m": 0.867207,
     "pl_12m_atras": 399.08,
     "longevidade_anos": 2.42,
-    "recomendado": true,
+    "recomendado": false,
     "aprovado": false,
     "grupo_vol": "Baixa"
   },
