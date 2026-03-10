@@ -710,7 +710,7 @@ async function loadData() {
     benchmarks = await br.json();
     const meta = await mr.json();
 
-    // RESET: limpa todos os recomendados do fundos.json antes de aplicar estado
+    // Zera todos os recomendados — fonte da verdade é sempre o estado.json
     allFunds.forEach(f => { f.recomendado = false; });
 
     // Apply saved estado (recomendados + pesos)
@@ -721,7 +721,8 @@ async function loadData() {
         const recSet = new Set(estado.recomendados);
         allFunds.forEach(f => { if (recSet.has(f.cnpj)) f.recomendado = true; });
         console.log(`Recomendados restaurados: ${estado.recomendados.length}`);
-        setTimeout(()=>{ renderHome(); showToast(`✦ ${estado.recomendados.length} recomendados restaurados`, 'green'); }, 800);
+        renderHome();
+        showToast(`✦ ${estado.recomendados.length} recomendados restaurados`, 'green');
       }
       // Restore pesos
       if (estado.pesos?.length === weights.length) {
@@ -2674,4 +2675,22 @@ async function saveGestoraEditor() {
   }
 }
 
-// ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════════════════
+let _toastTimer = null;
+function showToast(msg, type='green') {
+  const el = document.getElementById('toastEl');
+  el.textContent = msg;
+  el.className = `toast ${type} show`;
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => { el.classList.remove('show'); }, 3000);
+}
+
+// ══════════════════════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════════════════════
+loadData();
+</script>
+</body>
+</html>
