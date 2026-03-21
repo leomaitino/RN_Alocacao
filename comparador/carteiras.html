@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comparador de Carteiras — RN Investimentos</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Inter:wght@300;400;500;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #090909;
+  --surface: #111111;
+  --surface2:#161616;
+  --border:  #1f1f1f;
+  --border2: #2a2a2a;
+  --text1:   #f0ece4;
+  --text2:   #8a8278;
+  --text3:   #4a4740;
+  --cream:   #e8e0d0;
+  --gold:    #c9a96e;
+  --gold2:   #a8864f;
+  --green:   #7aab8a;
+  --red:     #b06060;
+  --teal:    #5a9898;
+  --purple:  #8878b8;
+  --font-s:  'Playfair Display', Georgia, serif;
+  --font-n:  'Inter', system-ui, sans-serif;
+  --font-m:  'DM Mono', monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text1);font-family:var(--font-n);font-size:13px;min-height:100vh;}
+body::before{content:'';position:fixed;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);z-index:100;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+/* HEADER */
+.header{padding:18px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg);}
+.logo{font-family:var(--font-s);font-size:18px;color:var(--cream);display:flex;align-items:center;gap:10px;}
+.logo-dot{width:1px;height:16px;background:var(--border2);}
+.logo-sub{font-family:var(--font-m);font-size:10px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;}
+.header-right{font-family:var(--font-m);font-size:11px;color:var(--text3);display:flex;gap:20px;align-items:center;}
+.stat-item span{color:var(--text2);}
+
+/* TABS */
+.tabs-bar{border-bottom:1px solid var(--border);display:flex;padding:0 32px;background:var(--bg);}
+.tab{padding:11px 16px;font-size:11px;font-family:var(--font-m);color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;}
+.tab:hover{color:var(--text2);}
+.tab.active{color:var(--cream);border-bottom-color:var(--gold);}
+
+/* MAIN */
+.main{padding:24px 32px;max-width:1600px;margin:0 auto;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* SECTION LABELS */
+.sec-label{font-family:var(--font-m);font-size:10px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:20px;}
+.card-title{font-size:12px;font-weight:600;margin-bottom:4px;}
+.card-sub{font-size:11px;color:var(--text3);font-family:var(--font-m);}
+
+/* CARTEIRA BUILDER */
+.carteiras-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+.carteira-card{background:var(--surface);border:1px solid var(--border);border-radius:3px;overflow:hidden;}
+.carteira-header{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.carteira-label{font-family:var(--font-m);font-size:11px;font-weight:600;letter-spacing:.5px;}
+.carteira-total{font-family:var(--font-m);font-size:11px;}
+.ativos-list{padding:10px 12px;}
+.ativo-row{display:grid;grid-template-columns:1fr 90px 28px;gap:8px;align-items:center;margin-bottom:8px;}
+.ativo-select{background:var(--surface2);border:1px solid var(--border2);border-radius:4px;color:var(--text1);font-size:12px;font-family:var(--font-n);padding:5px 8px;width:100%;}
+.ativo-select:focus{outline:none;border-color:var(--gold);}
+.pct-input{background:var(--surface2);border:1px solid var(--border2);border-radius:4px;color:var(--text1);font-size:12px;font-family:var(--font-m);padding:5px 8px;width:100%;text-align:right;}
+.pct-input:focus{outline:none;border-color:var(--gold);}
+.btn-remove{background:none;border:1px solid var(--border2);border-radius:4px;color:var(--text3);cursor:pointer;font-size:13px;padding:3px 7px;transition:all .15s;}
+.btn-remove:hover{border-color:var(--red);color:var(--red);}
+.btn-add{background:none;border:1px dashed var(--border2);border-radius:4px;color:var(--text3);cursor:pointer;font-size:11px;font-family:var(--font-m);padding:6px 12px;width:100%;margin-top:4px;transition:all .15s;}
+.btn-add:hover{border-color:var(--gold);color:var(--gold);}
+
+/* CONTROLS */
+.controls-bar{background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:14px 18px;display:flex;gap:20px;align-items:flex-end;flex-wrap:wrap;margin-bottom:20px;}
+.ctrl-group{display:flex;flex-direction:column;gap:5px;}
+.ctrl-label{font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.8px;}
+.ctrl-select{background:var(--surface2);border:1px solid var(--border2);border-radius:4px;color:var(--text1);font-size:12px;font-family:var(--font-n);padding:6px 10px;min-width:130px;}
+.ctrl-select:focus{outline:none;border-color:var(--gold);}
+.period-btns{display:flex;gap:3px;background:var(--surface2);border-radius:5px;padding:3px;border:1px solid var(--border);}
+.period-btn{padding:4px 10px;border-radius:3px;font-size:11px;font-family:var(--font-m);cursor:pointer;color:var(--text3);border:none;background:transparent;transition:all .15s;}
+.period-btn.active{background:var(--gold);color:var(--bg);font-weight:600;}
+.btn-calc{background:var(--gold);color:var(--bg);border:none;border-radius:4px;padding:8px 20px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-m);letter-spacing:.5px;transition:opacity .15s;}
+.btn-calc:hover{opacity:.85;}
+
+/* METRICS GRID */
+.metrics-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px;}
+.metric-card{background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:14px 16px;position:relative;overflow:hidden;}
+.metric-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--mc,var(--gold));opacity:.7;}
+.metric-label{font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;}
+.metric-values{display:flex;flex-direction:column;gap:4px;}
+.metric-val{font-family:var(--font-m);font-size:15px;font-weight:600;}
+.metric-val.c1{color:var(--gold);}
+.metric-val.c2{color:var(--teal);}
+.metric-sub{font-size:10px;color:var(--text3);font-family:var(--font-m);}
+
+/* CHARTS */
+.chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:18px;margin-bottom:16px;}
+.chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;}
+.chart-title{font-size:13px;font-weight:600;}
+.legend{display:flex;gap:14px;flex-wrap:wrap;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;font-family:var(--font-m);}
+.legend-dot{width:20px;height:2.5px;border-radius:2px;}
+
+/* CORRELATION TABLE */
+.corr-table{border-collapse:collapse;width:100%;font-family:var(--font-m);font-size:11px;}
+.corr-table th{padding:7px 10px;text-align:left;font-size:10px;color:var(--text3);border-bottom:1px solid var(--border);background:var(--surface2);}
+.corr-table td{padding:7px 10px;border-bottom:1px solid var(--border);text-align:center;font-weight:600;}
+.corr-table tr:last-child td{border-bottom:none;}
+
+/* ROLLING WINDOWS */
+.rolling-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px;}
+
+/* ALLOC TABLE */
+.alloc-table{border-collapse:collapse;width:100%;font-size:12px;}
+.alloc-table th{padding:8px 12px;text-align:left;font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border);background:var(--surface2);}
+.alloc-table td{padding:8px 12px;border-bottom:1px solid var(--border);font-family:var(--font-m);}
+.alloc-table tr:last-child td{border-bottom:none;}
+
+/* CREDITO PRIVADO NOTICE */
+.notice{background:rgba(201,169,110,.06);border:1px solid rgba(201,169,110,.2);border-radius:3px;padding:10px 14px;font-size:11px;font-family:var(--font-m);color:var(--text2);display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:60px 20px;color:var(--text3);font-family:var(--font-m);font-size:13px;}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;z-index:999;background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:10px 16px;font-family:var(--font-m);font-size:12px;display:flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,.4);transform:translateY(60px);opacity:0;transition:all .25s;pointer-events:none;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.green{border-left:3px solid var(--green);color:var(--green);}
+.toast.red{border-left:3px solid var(--red);color:var(--red);}
+
+@media(max-width:800px){
+  .carteiras-grid{grid-template-columns:1fr;}
+  .metrics-grid{grid-template-columns:repeat(2,1fr);}
+  .rolling-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">
+    <span>RN Investimentos</span>
+    <div class="logo-dot"></div>
+    <span class="logo-sub">Comparador</span>
+  </div>
+  <div class="header-right">
+    <div class="stat-item">Índices: <span id="stAtivos">—</span></div>
+    <div class="stat-item">Dados até: <span id="stData">—</span></div>
+    <a href="../" style="font-family:var(--font-m);font-size:10px;color:var(--text3);text-decoration:none;letter-spacing:.5px;">← VOLTAR</a>
+  </div>
+</header>
+
+<nav class="tabs-bar">
+  <div class="tab active" onclick="switchTab('comparador',this)">Comparador</div>
+  <div class="tab" onclick="switchTab('correlacao',this)">Correlação</div>
+</nav>
+
+<!-- ═══ TAB: COMPARADOR ═══════════════════════════════════════════════════════ -->
+<div id="tab-comparador" class="tab-panel active">
+<div class="main">
+
+  <div class="carteiras-grid" id="carteirasGrid">
+    <!-- Carteira 1 -->
+    <div class="carteira-card">
+      <div class="carteira-header">
+        <span class="carteira-label" style="color:var(--gold);">◆ Carteira 1</span>
+        <span class="carteira-total" id="total1">Total: <b>0%</b></span>
+      </div>
+      <div class="ativos-list" id="ativos1"></div>
+      <div style="padding:0 12px 12px;">
+        <button class="btn-add" onclick="addAtivo(1)">+ Adicionar índice</button>
+      </div>
+    </div>
+    <!-- Carteira 2 -->
+    <div class="carteira-card">
+      <div class="carteira-header">
+        <span class="carteira-label" style="color:var(--teal);">◆ Carteira 2</span>
+        <span class="carteira-total" id="total2">Total: <b>0%</b></span>
+      </div>
+      <div class="ativos-list" id="ativos2"></div>
+      <div style="padding:0 12px 12px;">
+        <button class="btn-add" onclick="addAtivo(2)">+ Adicionar índice</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls-bar">
+    <div class="ctrl-group">
+      <div class="ctrl-label">Janela</div>
+      <div class="period-btns" id="windowBtns">
+        <button class="period-btn" data-months="12" onclick="setWindow(this)">12M</button>
+        <button class="period-btn active" data-months="36" onclick="setWindow(this)">36M</button>
+        <button class="period-btn" data-months="60" onclick="setWindow(this)">5A</button>
+        <button class="period-btn" data-months="120" onclick="setWindow(this)">10A</button>
+        <button class="period-btn" data-months="0" onclick="setWindow(this)">Máximo</button>
+      </div>
+    </div>
+    <div class="ctrl-group">
+      <div class="ctrl-label">Rebalanceamento</div>
+      <select class="ctrl-select" id="rebalSel" onchange="rebalMode=this.value">
+        <option value="none">Sem rebalanceamento</option>
+        <option value="monthly">Mensal</option>
+        <option value="quarterly">Trimestral</option>
+        <option value="annual">Anual</option>
+      </select>
+    </div>
+    <button class="btn-calc" onclick="calcular()">▶ Calcular</button>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="metricsArea" style="display:none;">
+
+    <!-- MAIN CHART -->
+    <div class="chart-wrap">
+      <div class="chart-header">
+        <div class="chart-title">Retorno Acumulado (base 100)</div>
+        <div class="legend" id="mainLegend"></div>
+      </div>
+      <div id="mainChartWrapper" style="width:100%;"></div>
+    </div>
+
+    <!-- DRAWDOWN CHART -->
+    <div class="chart-wrap">
+      <div class="chart-header">
+        <div class="chart-title">Drawdown</div>
+        <div class="legend" id="ddLegend"></div>
+      </div>
+      <div id="ddChartWrapper" style="width:100%;"></div>
+    </div>
+
+    <!-- METRICS TABLE (estilo antigo) -->
+    <div class="chart-wrap">
+      <div class="chart-header"><div class="chart-title">Métricas Comparativas</div></div>
+      <div style="overflow-x:auto;">
+        <table class="alloc-table" id="metricsGrid">
+          <thead><tr>
+            <th>Métrica</th>
+            <th style="text-align:right;color:#c9a96e;">Carteira 1</th>
+            <th style="text-align:right;color:#5a9898;">Carteira 2</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ALLOC TABLE -->
+    <div class="chart-wrap">
+      <div class="chart-header"><div class="chart-title">Composição das Carteiras</div></div>
+      <div style="overflow-x:auto;"><table class="alloc-table" id="allocTable"></table></div>
+    </div>
+    <!-- JANELAS MÓVEIS -->
+    <div id="rollingSection">
+      <div class="chart-wrap">
+        <div class="chart-header">
+          <div class="chart-title">Retorno Anualizado — Rolling 12M</div>
+          <div class="legend"><div class="legend-item"><div class="legend-dot" style="background:#c9a96e"></div>Carteira 1</div><div class="legend-item"><div class="legend-dot" style="background:#5a9898"></div>Carteira 2</div></div>
+        </div>
+        <div id="rolling12mWrapper"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+        <div class="chart-wrap">
+          <div class="chart-header"><div class="chart-title">Retorno Anualizado — Rolling 36M</div></div>
+          <div id="rolling36mWrapper"></div>
+        </div>
+        <div class="chart-wrap">
+          <div class="chart-header"><div class="chart-title">Retorno Anualizado — Rolling 60M</div></div>
+          <div id="rolling60mWrapper"></div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div class="chart-wrap">
+          <div class="chart-header">
+            <div class="chart-title">Sharpe Rolling 12M</div>
+            <div style="font-size:10px;font-family:var(--font-m);color:var(--text3);">CDI como taxa livre de risco</div>
+          </div>
+          <div id="rollingSharpeWrapper"></div>
+        </div>
+        <div class="chart-wrap">
+          <div class="chart-header"><div class="chart-title">Drawdown Máximo Rolling 12M</div></div>
+          <div id="rollingDDWrapper"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABELA ESTATÍSTICAS DAS JANELAS -->
+    <div class="chart-wrap">
+      <div class="chart-header">
+        <div class="chart-title">Estatísticas das Janelas Móveis de 12M</div>
+        <div style="font-size:10px;font-family:var(--font-m);color:var(--text3);">Calculadas sobre todas as janelas de 12 meses disponíveis no período</div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="alloc-table" id="rollingStatsTable">
+          <thead><tr>
+            <th>Métrica</th>
+            <th style="text-align:right;color:#c9a96e;">Carteira 1</th>
+            <th style="text-align:right;color:#5a9898;">Carteira 2</th>
+          </tr></thead>
+          <tbody id="rollingStatsTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="emptyState" class="empty-state">Monte as carteiras acima e clique em Calcular</div>
+</div>
+</div>
+
+<!-- ═══ TAB: CORRELAÇÃO ══════════════════════════════════════════════════════ -->
+<div id="tab-correlacao" class="tab-panel">
+<div class="main">
+  <div class="sec-label">Matriz de Correlação entre Índices</div>
+
+  <div class="controls-bar" style="margin-bottom:20px;">
+    <div class="ctrl-group">
+      <div class="ctrl-label">Janela</div>
+      <div class="period-btns" id="corrWindowBtns">
+        <button class="period-btn" data-months="12" onclick="setCorrWindow(this)">12M</button>
+        <button class="period-btn active" data-months="36" onclick="setCorrWindow(this)">36M</button>
+        <button class="period-btn" data-months="60" onclick="setCorrWindow(this)">5A</button>
+        <button class="period-btn" data-months="0" onclick="setCorrWindow(this)">Máximo</button>
+      </div>
+    </div>
+    <div class="ctrl-group">
+      <div class="ctrl-label">Grupo de índices</div>
+      <select class="ctrl-select" id="corrGroupSel" onchange="renderCorrMatrix()">
+        <option value="todos">Todos</option>
+        <option value="renda_fixa">Renda Fixa / Benchmarks</option>
+        <option value="renda_variavel">Renda Variável</option>
+        <option value="credito">Crédito Privado</option>
+      </select>
+    </div>
+    <button class="btn-calc" onclick="renderCorrMatrix()">▶ Atualizar</button>
+  </div>
+
+  <div class="chart-wrap">
+    <div class="chart-header">
+      <div class="chart-title">Correlação de Pearson — Retornos Diários</div>
+      <div style="font-size:10px;font-family:var(--font-m);color:var(--text3);">Verde = descorrelacionado · Vermelho = alta correlação positiva</div>
+    </div>
+    <div id="corrMatrixWrapper" style="overflow-x:auto;"></div>
+  </div>
+</div>
+</div>
+
+
+<div id="toastEl" class="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════════════════════
+let benchmarks = {}, mercado = {}, allData = {};
+let carteiras = [
+  [{ ativo: 'IMA-B', pct: 30 }, { ativo: 'CDI', pct: 30 }, { ativo: 'IBOV', pct: 10 }, { ativo: 'IHFA', pct: 30 }],
+  [{ ativo: 'IMA-B', pct: 45 }, { ativo: 'CDI', pct: 40 }, { ativo: 'IBOV', pct: 15 }]
+];
+let rebalMode   = 'none';
+let windowMonths = 36;
+let corrWindowMonths = 36;
+let rollingHistMonths = 120;
+
+const COLORS_CART = ['#c9a96e', '#5a9898'];
+const CHART_COLORS = ['#c9a96e','#5a9898','#7aab8a','#f5c842','#f05c6e','#8878b8','#b88050','#5a9898','#e879f9','#34d399'];
+const BENCH_EXCLUDE = new Set(['IPCA+3.5%']);
+
+// Groups for correlation tab
+const GROUPS = {
+  todos:         null,
+  renda_fixa:    ['CDI','IMA-B','IPCA+3.5%','IPCA+5%','IPCA+6%','IHFA'],
+  renda_variavel:['IBOV','Small Caps Brasil','IFIX','S&P 500','Nasdaq','Bolsa Mundo','Ouro','Dólar'],
+  credito:       ['CDI','IMA-B','IPCA+5%','IDA-IPCA','IDA-DI','IDEX','IDA-Geral'],
+};
+
+// ══════════════════════════════════════════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════════════════════════════════════════
+async function loadData() {
+  try {
+    const [r1, r2] = await Promise.allSettled([
+      fetch('benchmarks.json').then(r => r.json()),
+      fetch('mercado.json').then(r => r.json()),
+    ]);
+    if (r1.status === 'fulfilled') benchmarks = r1.value;
+    if (r2.status === 'fulfilled') mercado     = r2.value;
+
+    allData = {};
+    for (const [k, v] of Object.entries(benchmarks)) {
+      if (v.retornos_diarios && !BENCH_EXCLUDE.has(k)) allData[k] = v.retornos_diarios;
+    }
+    for (const [k, v] of Object.entries(mercado)) {
+      if (v.retornos_diarios) allData[k] = v.retornos_diarios;
+    }
+
+    const n = Object.keys(allData).length;
+    document.getElementById('stAtivos').textContent = n;
+    const allDates = Object.values(allData).flatMap(rd => Object.keys(rd));
+    const latest = allDates.sort().pop();
+    document.getElementById('stData').textContent = latest || '—';
+
+    // Render initial state — dados já carregados, selects vão popular corretamente
+    renderAtivosList(1);
+    renderAtivosList(2);
+
+    // Render correlation matrix
+    renderCorrMatrix();
+    
+    // Auto-calcular com carteiras padrão
+    calcular();
+
+    showToast(`✓ ${n} índices carregados`, 'green');
+  } catch(e) {
+    showToast('Erro ao carregar dados', 'red');
+    console.error(e);
+  }
+}
+
+function getAtivoOptions() {
+  return Object.keys(allData).sort();
+}
+
+function populateSelect(sel, currentVal) {
+  sel.innerHTML = '<option value="">— selecionar —</option>';
+  for (const k of getAtivoOptions()) {
+    const o = document.createElement('option');
+    o.value = k; o.textContent = k;
+    if (k === currentVal) o.selected = true;
+    sel.appendChild(o);
+  }
+}
+
+function renderAtivosList(n) {
+  const list = carteiras[n-1];
+  const el   = document.getElementById(`ativos${n}`);
+  el.innerHTML = '';
+  list.forEach((row, i) => {
+    const div = document.createElement('div');
+    div.className = 'ativo-row';
+    const sel = document.createElement('select');
+    sel.className = 'ativo-select';
+    populateSelect(sel, row.ativo);
+    sel.onchange = () => { list[i].ativo = sel.value; };
+
+    const inp = document.createElement('input');
+    inp.type = 'number'; inp.min = 0; inp.max = 100; inp.step = 1;
+    inp.className = 'pct-input';
+    inp.value = row.pct;
+    inp.placeholder = '%';
+    inp.oninput = () => { list[i].pct = parseFloat(inp.value)||0; updateTotal(n); };
+
+    const btn = document.createElement('button');
+    btn.className = 'btn-remove'; btn.textContent = '✕';
+    btn.onclick = () => { list.splice(i,1); renderAtivosList(n); updateTotal(n); };
+
+    div.appendChild(sel); div.appendChild(inp); div.appendChild(btn);
+    el.appendChild(div);
+  });
+  updateTotal(n);
+}
+
+function addAtivo(n) {
+  carteiras[n-1].push({ ativo: '', pct: 0 });
+  renderAtivosList(n);
+}
+
+function updateTotal(n) {
+  const total = carteiras[n-1].reduce((s, r) => s + (r.pct||0), 0);
+  const el = document.getElementById(`total${n}`);
+  const color = Math.abs(total - 100) < 0.01 ? 'var(--green)' : total > 100 ? 'var(--red)' : 'var(--gold)';
+  el.innerHTML = `Total: <b style="color:${color}">${total.toFixed(0)}%</b>`;
+}
+
+function setWindow(btn) {
+  document.querySelectorAll('#windowBtns .period-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  windowMonths = parseInt(btn.dataset.months);
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PORTFOLIO BUILD
+// ══════════════════════════════════════════════════════════════════════════════
+function getRetornos(ativo) { return allData[ativo] || null; }
+
+function buildPortfolioSeries(carteira, months) {
+  const ativos = carteira.filter(r => r.ativo && r.pct > 0);
+  if (!ativos.length) return null;
+  const totalPct = ativos.reduce((s, r) => s + r.pct, 0);
+  const weights  = {};
+  for (const r of ativos) weights[r.ativo] = r.pct / totalPct;
+
+  const firstDates = ativos.map(r => {
+    const rd = getRetornos(r.ativo);
+    if (!rd) return null;
+    return Object.keys(rd).sort()[0];
+  }).filter(Boolean);
+  if (!firstDates.length) return null;
+  const commonStart = firstDates.reduce((a, b) => a > b ? a : b);
+
+  const cutoffByWindow = new Date();
+  if (months > 0) cutoffByWindow.setMonth(cutoffByWindow.getMonth() - months);
+  else cutoffByWindow.setFullYear(2000);
+  const cutoff = cutoffByWindow > new Date(commonStart) ? cutoffByWindow : new Date(commonStart);
+
+  const dateSet = new Set();
+  for (const r of ativos) {
+    const rd = getRetornos(r.ativo);
+    if (!rd) continue;
+    for (const d of Object.keys(rd)) { if (new Date(d) >= cutoff) dateSet.add(d); }
+  }
+  const dates = [...dateSet].sort();
+  if (dates.length < 2) return null;
+
+  // Rebalance dates
+  const rebalDates = new Set([dates[0]]);
+  if (rebalMode === 'annual') {
+    let yr = new Date(dates[0]).getFullYear();
+    while (true) {
+      yr++;
+      const closest = dates.find(d => d >= `${yr}-01-01`);
+      if (!closest) break;
+      rebalDates.add(closest);
+    }
+  } else if (rebalMode === 'quarterly') {
+    let cur = new Date(dates[0]);
+    while (true) {
+      cur.setMonth(cur.getMonth() + 3);
+      const target = cur.toISOString().slice(0, 7);
+      const closest = dates.find(d => d.startsWith(target));
+      if (!closest) break;
+      rebalDates.add(closest);
+    }
+  } else if (rebalMode === 'monthly') {
+    let cur = new Date(dates[0]);
+    while (true) {
+      cur.setMonth(cur.getMonth() + 1);
+      const target = cur.toISOString().slice(0, 7);
+      const closest = dates.find(d => d.startsWith(target));
+      if (!closest) break;
+      rebalDates.add(closest);
+    }
+  }
+
+  let holdings = {};
+  for (const r of ativos) holdings[r.ativo] = weights[r.ativo] * 100;
+
+  const portVals = [];
+  let portVal = 100;
+  for (let i = 1; i < dates.length; i++) {
+    const d = dates[i];
+    for (const r of ativos) {
+      const rd = getRetornos(r.ativo);
+      const ret = rd && rd[d] != null ? rd[d] : 0;
+      holdings[r.ativo] *= (1 + ret);
+    }
+    portVal = Object.values(holdings).reduce((s, v) => s + v, 0);
+    if (rebalDates.has(d) && i > 0) {
+      for (const r of ativos) holdings[r.ativo] = weights[r.ativo] * portVal;
+    }
+    portVals.push({ d, v: portVal });
+  }
+  return portVals;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// METRICS
+// ══════════════════════════════════════════════════════════════════════════════
+function calcMetrics(series) {
+  if (!series || series.length < 2) return null;
+  const vals    = series.map(p => p.v);
+  const dates   = series.map(p => new Date(p.d));
+  const retornos = [];
+  for (let i = 1; i < vals.length; i++) retornos.push(vals[i] / vals[i-1] - 1);
+  const n = retornos.length;
+  const diasCorridos = (dates[dates.length-1] - dates[0]) / (1000*60*60*24);
+  const anos = Math.max(diasCorridos / 365.25, 0.01);
+  const retAcum  = vals[vals.length-1] / vals[0] - 1;
+  const retAnual = Math.pow(1 + retAcum, 1/anos) - 1;
+  const mean     = retornos.reduce((s, r) => s + r, 0) / n;
+  const variance = retornos.reduce((s, r) => s + Math.pow(r - mean, 2), 0) / n;
+  const vol      = Math.sqrt(variance * 252);
+
+  let rfDaily = 0.000397;
+  if (allData['CDI']) {
+    const d0 = series[0].d, d1 = series[series.length-1].d;
+    const cdiP = Object.entries(allData['CDI'])
+      .filter(([d]) => d >= d0 && d <= d1)
+      .map(([,v]) => Number(v))
+      .filter(v => !isNaN(v) && v > 0 && v < 0.1);
+    if (cdiP.length) rfDaily = cdiP.reduce((s,v)=>s+v,0)/cdiP.length;
+  }
+  const rfAnual = Math.pow(1 + rfDaily, 252) - 1;
+  const sharpe  = vol > 0.0001 ? (retAnual - rfAnual) / vol : 0;
+
+  const downside = retornos.filter(r => r < 0);
+  const downVar  = downside.length ? downside.reduce((s,r) => s + r*r, 0)/downside.length : 0;
+  const downVol  = Math.sqrt(downVar * 252);
+  const sortino  = downVol > 0.0001 ? (retAnual - rfAnual) / downVol : 0;
+
+  let peak = vals[0], maxDD = 0;
+  const ddSeries = [];
+  for (const v of vals) {
+    if (v > peak) peak = v;
+    const dd = (v - peak) / peak;
+    ddSeries.push(dd);
+    if (dd < maxDD) maxDD = dd;
+  }
+  return { retAcum, retAnual, vol, sharpe, sortino, maxDD, ddSeries, n, anos, rfAnual };
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// CALCULAR
+// ══════════════════════════════════════════════════════════════════════════════
+// Global series cache for rolling tab
+let cachedSeries1 = null, cachedSeries2 = null;
+
+function calcular() {
+  const s1 = buildPortfolioSeries(carteiras[0], windowMonths);
+  const s2 = buildPortfolioSeries(carteiras[1], windowMonths);
+  if (!s1 && !s2) { showToast('Nenhuma carteira com dados válidos', 'red'); return; }
+  cachedSeries1 = s1;
+  cachedSeries2 = s2;
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('metricsArea').style.display = 'block';
+  renderMetricsGrid(s1, s2);
+  renderMainChart(s1, s2);
+  renderDDChart(s1, s2);
+  renderAllocTable();
+  renderRolling();
+}
+
+function renderMetricsGrid(s1, s2) {
+  const m1 = s1 ? calcMetrics(s1) : null;
+  const m2 = s2 ? calcMetrics(s2) : null;
+  const pct = v => v != null ? `${v>=0?'+':''}${(v*100).toFixed(2)}%` : '—';
+  const num = (v, d=2) => v != null ? v.toFixed(d) : '—';
+  const rows = [
+    { label:'Retorno Acumulado',  v1: m1?.retAcum,  v2: m2?.retAcum,  fmt: pct },
+    { label:'Retorno Anualizado', v1: m1?.retAnual, v2: m2?.retAnual, fmt: pct },
+    { label:'Volatilidade a.a.',  v1: m1?.vol,      v2: m2?.vol,      fmt: pct },
+    { label:'Sharpe',             v1: m1?.sharpe,   v2: m2?.sharpe,   fmt: v=>num(v,3) },
+    { label:'Sortino',            v1: m1?.sortino,  v2: m2?.sortino,  fmt: v=>num(v,3) },
+    { label:'Max Drawdown',       v1: m1?.maxDD,    v2: m2?.maxDD,    fmt: pct },
+  ];
+  const tbody = document.querySelector('#metricsGrid tbody');
+  tbody.innerHTML = rows.map(r => `<tr>
+    <td style="color:var(--text2);">${r.label}</td>
+    <td style="text-align:right;color:#c9a96e;font-weight:600;">${r.fmt(r.v1)}</td>
+    <td style="text-align:right;color:#5a9898;font-weight:600;">${r.fmt(r.v2)}</td>
+  </tr>`).join('');
+}
+
+function renderAllocTable() {
+  const rows = [];
+  const max = Math.max(carteiras[0].length, carteiras[1].length);
+  for (let i = 0; i < max; i++) {
+    const r1 = carteiras[0][i];
+    const r2 = carteiras[1][i];
+    rows.push(`<tr>
+      <td style="color:${COLORS_CART[0]}">${r1?.ativo||'—'}</td>
+      <td style="color:${COLORS_CART[0]};text-align:right;">${r1?.pct!=null?r1.pct.toFixed(0)+'%':'—'}</td>
+      <td style="border-left:1px solid var(--border);color:${COLORS_CART[1]}">${r2?.ativo||'—'}</td>
+      <td style="color:${COLORS_CART[1]};text-align:right;">${r2?.pct!=null?r2.pct.toFixed(0)+'%':'—'}</td>
+    </tr>`);
+  }
+  document.getElementById('allocTable').innerHTML = `
+    <thead><tr>
+      <th style="color:${COLORS_CART[0]}">Carteira 1</th><th style="text-align:right;">Peso</th>
+      <th style="border-left:1px solid var(--border);color:${COLORS_CART[1]}">Carteira 2</th><th style="text-align:right;">Peso</th>
+    </tr></thead>
+    <tbody>${rows.join('')}</tbody>`;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// SVG CHARTS
+// ══════════════════════════════════════════════════════════════════════════════
+function drawSVG(wrapperId, seriesList, opts = {}) {
+  const wrapper = document.getElementById(wrapperId);
+  if (!wrapper) return;
+  wrapper.offsetHeight;
+  const W = wrapper.offsetWidth > 100 ? wrapper.offsetWidth : 800;
+  const H = opts.height || 300;
+  const PL = 58, PR = 16, PT = 12, PB = 36;
+  const cW = W-PL-PR, cH = H-PT-PB;
+
+  const allTimes = [...new Set(seriesList.flatMap(s => s.data.map(p => new Date(p.d).getTime())))].sort((a,b)=>a-b);
+  if (!allTimes.length) return;
+  const allVals  = seriesList.flatMap(s => s.data.map(p => p.v));
+  let minV = Math.min(...allVals), maxV = Math.max(...allVals);
+  if (opts.zeroMin) minV = Math.min(0, minV);
+  minV *= 0.997; maxV *= 1.003;
+  const rangeV = maxV - minV || 1;
+  const rangeT = allTimes[allTimes.length-1] - allTimes[0] || 1;
+
+  const sx = t  => PL + (t - allTimes[0]) / rangeT * cW;
+  const sy = v  => H  - PB - (v - minV) / rangeV * cH;
+
+  // Grid
+  let grid = '', yLab = '';
+  for (let i = 0; i <= 4; i++) {
+    const v = minV + rangeV*i/4, y = sy(v).toFixed(1);
+    grid += `<line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}" stroke="#1e2535" stroke-width="1"/>`;
+    const label = opts.pctY ? (v*100).toFixed(1)+'%' : v.toFixed(opts.yDec!=null?opts.yDec:1);
+    yLab += `<text x="${PL-5}" y="${+y+4}" text-anchor="end" fill="#5a6478" font-size="10">${label}</text>`;
+  }
+  // Zero line
+  const y0 = sy(0).toFixed(1);
+  const zeroLine = `<line x1="${PL}" y1="${y0}" x2="${W-PR}" y2="${y0}" stroke="#ffffff18" stroke-width="1" stroke-dasharray="4,3"/>`;
+  // Base 100 line
+  const y100 = sy(100).toFixed(1);
+  const baseLine = opts.base100 ? `<line x1="${PL}" y1="${y100}" x2="${W-PR}" y2="${y100}" stroke="#ffffff18" stroke-width="1" stroke-dasharray="4,3"/>` : '';
+
+  // X labels
+  let xLab = ''; let lastX = -999;
+  const t0d = new Date(allTimes[0]), t1d = new Date(allTimes[allTimes.length-1]);
+  const curX = new Date(t0d.getFullYear(), t0d.getMonth(), 1);
+  while (curX <= t1d) {
+    const tx = curX.getTime();
+    if (tx >= allTimes[0]) {
+      const x = sx(tx);
+      if (x - lastX > 56) {
+        xLab += `<text x="${x.toFixed(1)}" y="${H-PB+14}" text-anchor="middle" fill="#5a6478" font-size="9">${curX.toLocaleDateString('pt-BR',{month:'short',year:'2-digit'})}</text>`;
+        lastX = x;
+      }
+    }
+    curX.setMonth(curX.getMonth()+1);
+  }
+
+  const axes = `<line x1="${PL}" y1="${PT}" x2="${PL}" y2="${H-PB}" stroke="#2e3a52" stroke-width="1"/>
+    <line x1="${PL}" y1="${H-PB}" x2="${W-PR}" y2="${H-PB}" stroke="#2e3a52" stroke-width="1"/>`;
+
+  const paths = seriesList.map(s => {
+    const pts = s.data.map(p => ({ x: sx(new Date(p.d).getTime()), y: sy(p.v) }));
+    const d   = pts.map((p,i) => `${i===0?'M':'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+    const fill = s.fill ? `<path d="${d} L${pts[pts.length-1].x.toFixed(1)},${sy(0).toFixed(1)} L${pts[0].x.toFixed(1)},${sy(0).toFixed(1)} Z" fill="${s.color}" opacity="0.08"/>` : '';
+    return `${fill}<path d="${d}" fill="none" stroke="${s.color}" stroke-width="${s.width||2}" opacity="${s.opacity||0.9}" ${s.dash?'stroke-dasharray="5,3"':''}/>`;
+  }).join('');
+
+  wrapper.innerHTML = `<svg width="${W}" height="${H}" style="display:block;overflow:visible;">
+    <rect x="${PL}" y="${PT}" width="${cW}" height="${cH}" fill="#090909" rx="2"/>
+    ${grid}${baseLine}${zeroLine}${axes}${yLab}${xLab}${paths}
+  </svg>`;
+}
+
+function renderMainChart(s1, s2) {
+  const series = [];
+  if (s1) series.push({ data: [{d:s1[0].d,v:100},...s1], color: COLORS_CART[0], width: 2.5, label: 'Carteira 1' });
+  if (s2) series.push({ data: [{d:s2[0].d,v:100},...s2], color: COLORS_CART[1], width: 2.5, label: 'Carteira 2' });
+  drawSVG('mainChartWrapper', series, { base100: true, height: 320 });
+  document.getElementById('mainLegend').innerHTML = series.map(s =>
+    `<div class="legend-item"><div class="legend-dot" style="background:${s.color}"></div>${s.label}</div>`).join('');
+  document.getElementById('ddLegend').innerHTML = series.map(s =>
+    `<div class="legend-item"><div class="legend-dot" style="background:${s.color}"></div>${s.label}</div>`).join('');
+}
+
+function renderDDChart(s1, s2) {
+  const toDD = series => {
+    if (!series) return null;
+    const vals = [100, ...series.map(p => p.v)];
+    const dates = [series[0].d, ...series.map(p => p.d)];
+    let peak = vals[0];
+    return dates.map((d, i) => {
+      if (vals[i] > peak) peak = vals[i];
+      return { d, v: (vals[i] - peak) / peak };
+    });
+  };
+  const dd1 = toDD(s1), dd2 = toDD(s2);
+  const series = [];
+  if (dd1) series.push({ data: dd1, color: COLORS_CART[0], fill: true, width: 1.5 });
+  if (dd2) series.push({ data: dd2, color: COLORS_CART[1], fill: true, width: 1.5 });
+  drawSVG('ddChartWrapper', series, { pctY: true, zeroMin: true, height: 200 });
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// CORRELATION TAB
+// ══════════════════════════════════════════════════════════════════════════════
+function setCorrWindow(btn) {
+  document.querySelectorAll('#corrWindowBtns .period-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  corrWindowMonths = parseInt(btn.dataset.months);
+  renderCorrMatrix();
+}
+
+function pearson(retA, retB) {
+  const dates = Object.keys(retA).filter(d => d in retB);
+  const n = dates.length;
+  if (n < 20) return null;
+  const a = dates.map(d => retA[d]), b = dates.map(d => retB[d]);
+  const ma = a.reduce((s,v)=>s+v,0)/n, mb = b.reduce((s,v)=>s+v,0)/n;
+  let num=0,da=0,db=0;
+  for (let i=0;i<n;i++){const x=a[i]-ma,y=b[i]-mb;num+=x*y;da+=x*x;db+=y*y;}
+  return da&&db ? num/Math.sqrt(da*db) : null;
+}
+
+function getRetornosNoJanela(key, months) {
+  const rd = allData[key];
+  if (!rd) return null;
+  const cutoff = new Date();
+  if (months > 0) cutoff.setMonth(cutoff.getMonth() - months);
+  else cutoff.setFullYear(2000);
+  const result = {};
+  for (const [d, v] of Object.entries(rd)) {
+    if (new Date(d) >= cutoff) result[d] = v;
+  }
+  return result;
+}
+
+function corrColor(v) {
+  if (v === null) return { bg: '#1a1a1a', text: '#4a4740' };
+  const abs = Math.abs(v);
+  if (v === 1)    return { bg: '#1a1a1a', text: '#8a8278' };
+  if (v > 0.7)    return { bg: 'rgba(176,96,96,.3)',  text: '#e08888' };
+  if (v > 0.4)    return { bg: 'rgba(245,200,66,.12)', text: '#d4a843' };
+  if (v > 0.1)    return { bg: 'rgba(90,152,152,.1)',  text: '#7aab8a' };
+  if (v > -0.1)   return { bg: 'rgba(122,171,138,.1)', text: '#7aab8a' };
+  if (v > -0.4)   return { bg: 'rgba(122,171,138,.2)', text: '#7aab8a' };
+  return              { bg: 'rgba(61,141,92,.3)',    text: '#3d8a5c' };
+}
+
+function renderCorrMatrix() {
+  const group = document.getElementById('corrGroupSel')?.value || 'todos';
+  let keys;
+  if (GROUPS[group]) {
+    keys = GROUPS[group].filter(k => allData[k]);
+  } else {
+    keys = Object.keys(allData).sort();
+  }
+  if (!keys.length) {
+    document.getElementById('corrMatrixWrapper').innerHTML = '<div style="padding:24px;color:var(--text3);font-family:var(--font-m);">Nenhum índice disponível para este grupo.</div>';
+    return;
+  }
+
+  // Build returns maps
+  const retMaps = {};
+  for (const k of keys) {
+    retMaps[k] = getRetornosNoJanela(k, corrWindowMonths);
+  }
+
+  // Build matrix HTML
+  const short = k => k.length > 14 ? k.slice(0,13)+'…' : k;
+  let html = `<table class="corr-table">
+    <thead><tr><th style="min-width:120px;">Índice</th>${keys.map(k=>`<th style="min-width:70px;text-align:center;">${short(k)}</th>`).join('')}</tr></thead>
+    <tbody>`;
+  for (const k1 of keys) {
+    html += `<tr><td style="text-align:left;color:var(--text2);font-weight:500;">${k1}</td>`;
+    for (const k2 of keys) {
+      if (k1 === k2) {
+        html += `<td style="background:#1e1e1e;color:var(--text3);">—</td>`;
+        continue;
+      }
+      const r = retMaps[k1] && retMaps[k2] ? pearson(retMaps[k1], retMaps[k2]) : null;
+      const c = corrColor(r);
+      html += `<td style="background:${c.bg};color:${c.text};">${r !== null ? r.toFixed(2) : '—'}</td>`;
+    }
+    html += '</tr>';
+  }
+  html += '</tbody></table>';
+  document.getElementById('corrMatrixWrapper').innerHTML = html;
+
+  // Render chart for selected indices (max 8)
+  const chartKeys = keys.slice(0, 8);
+  const cutoff = new Date();
+  if (corrWindowMonths > 0) cutoff.setMonth(cutoff.getMonth() - corrWindowMonths);
+  else cutoff.setFullYear(2000);
+
+  const series = chartKeys.map((k, i) => {
+    const rd = allData[k];
+    if (!rd) return null;
+    const dates = Object.keys(rd).filter(d => new Date(d) >= cutoff).sort();
+    if (dates.length < 2) return null;
+    let val = 100;
+    const data = [{ d: dates[0], v: 100 }];
+    for (let j = 1; j < dates.length; j++) {
+      val *= (1 + (rd[dates[j]] || 0));
+      data.push({ d: dates[j], v: val });
+    }
+    return { data, color: CHART_COLORS[i % CHART_COLORS.length], label: k, width: 1.8, dash: i > 4 };
+  }).filter(Boolean);
+
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ROLLING WINDOWS TAB
+// ══════════════════════════════════════════════════════════════════════════════
+function setRollingHist(btn) {
+  document.querySelectorAll('#rollingHistBtns .period-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  rollingHistMonths = parseInt(btn.dataset.months);
+  renderRolling();
+}
+
+function rollingReturn(data, windowDays) {
+  if (!data || data.length < windowDays) return null;
+  const result = [];
+  for (let i = windowDays; i < data.length; i++) {
+    const ret = data[i].v / data[i - windowDays].v - 1;
+    const retAnual = Math.pow(1 + ret, 252 / windowDays) - 1;
+    result.push({ d: data[i].d, v: retAnual });
+  }
+  return result;
+}
+
+function rollingSharpe(data, windowDays) {
+  if (!data || data.length < windowDays + 1) return null;
+  const result = [];
+  for (let i = windowDays; i < data.length; i++) {
+    const slice = data.slice(i - windowDays, i + 1);
+    const rets = [];
+    for (let j = 1; j < slice.length; j++) rets.push(slice[j].v / slice[j-1].v - 1);
+    const mean = rets.reduce((s,v)=>s+v,0)/rets.length;
+    const variance = rets.reduce((s,v)=>s+Math.pow(v-mean,2),0)/rets.length;
+    const vol = Math.sqrt(variance * 252);
+    const retAcum = slice[slice.length-1].v / slice[0].v - 1;
+    const retAnual = Math.pow(1 + retAcum, 252/windowDays) - 1;
+    const rfAnual = Math.pow(1 + 0.000397, 252) - 1;
+    const sharpe = vol > 0.0001 ? (retAnual - rfAnual) / vol : 0;
+    result.push({ d: data[i].d, v: sharpe });
+  }
+  return result;
+}
+
+function rollingMaxDD(data, windowDays) {
+  if (!data || data.length < windowDays) return null;
+  const result = [];
+  for (let i = windowDays; i < data.length; i++) {
+    const slice = data.slice(i - windowDays, i + 1).map(p => p.v);
+    let peak = slice[0], maxDD = 0;
+    for (const v of slice) {
+      if (v > peak) peak = v;
+      const dd = (v - peak) / peak;
+      if (dd < maxDD) maxDD = dd;
+    }
+    result.push({ d: data[i].d, v: maxDD });
+  }
+  return result;
+}
+
+function calcRollingStats(s1, s2, windowDays) {
+  const r1 = rollingReturn(s1, windowDays);
+  const r2 = rollingReturn(s2, windowDays);
+  if (!r1 && !r2) return null;
+
+  // Get CDI rolling returns for comparison
+  let cdiRolling = null;
+  if (allData['CDI']) {
+    const cutoff = new Date();
+    cutoff.setFullYear(2000);
+    const cdiDates = Object.keys(allData['CDI']).sort();
+    let val = 100;
+    const cdiSeries = [{ d: cdiDates[0], v: 100 }];
+    for (let i = 1; i < cdiDates.length; i++) {
+      val *= (1 + (allData['CDI'][cdiDates[i]] || 0));
+      cdiSeries.push({ d: cdiDates[i], v: val });
+    }
+    cdiRolling = rollingReturn(cdiSeries, windowDays);
+  }
+
+  // Build CDI map by date for comparison
+  const cdiMap = {};
+  if (cdiRolling) cdiRolling.forEach(p => { cdiMap[p.d] = p.v; });
+
+  const stats = (arr) => {
+    if (!arr || !arr.length) return null;
+    const vals = arr.map(p => p.v);
+    const n = vals.length;
+    const mean = vals.reduce((s,v)=>s+v,0)/n;
+    const sorted = [...vals].sort((a,b)=>a-b);
+    const median = n % 2 === 0 ? (sorted[n/2-1]+sorted[n/2])/2 : sorted[Math.floor(n/2)];
+    const best = Math.max(...vals);
+    const worst = Math.min(...vals);
+    const pctPos = vals.filter(v=>v>0).length / n;
+    const pctAcimaCDI = arr.filter(p => cdiMap[p.d] != null ? p.v > cdiMap[p.d] : p.v > 0.1).length / n;
+    return { mean, median, best, worst, pctPos, pctAcimaCDI, n, arr };
+  };
+
+  const st1 = stats(r1);
+  const st2 = stats(r2);
+
+  // % vitórias: janelas em que ambas têm dado
+  let wins1 = 0, wins2 = 0, empates = 0, total = 0;
+  if (r1 && r2) {
+    const map1 = {}; r1.forEach(p => map1[p.d] = p.v);
+    const map2 = {}; r2.forEach(p => map2[p.d] = p.v);
+    const commonDates = r1.map(p=>p.d).filter(d => map2[d] != null);
+    total = commonDates.length;
+    commonDates.forEach(d => {
+      if (map1[d] > map2[d]) wins1++;
+      else if (map2[d] > map1[d]) wins2++;
+      else empates++;
+    });
+  }
+
+  return { st1, st2, wins1, wins2, empates, total };
+}
+
+function renderRollingStats(s1, s2) {
+  const tbody = document.getElementById('rollingStatsTbody');
+  if (!tbody) return;
+  const stats = calcRollingStats(s1, s2, 252);
+  if (!stats) { tbody.innerHTML = '<tr><td colspan="3" style="color:var(--text3);">Dados insuficientes.</td></tr>'; return; }
+
+  const { st1, st2, wins1, wins2, empates, total } = stats;
+  const pct  = v => v != null ? `${v>=0?'+':''}${(v*100).toFixed(1)}%` : '—';
+  const ppct = v => v != null ? `${(v*100).toFixed(0)}%` : '—';
+
+  const rows = [
+    { label: 'Retorno médio (janelas 12M)',    v1: st1?.mean,        v2: st2?.mean,        fmt: pct  },
+    { label: 'Retorno mediano (janelas 12M)',  v1: st1?.median,      v2: st2?.median,      fmt: pct  },
+    { label: 'Melhor janela de 12M',           v1: st1?.best,        v2: st2?.best,        fmt: pct  },
+    { label: 'Pior janela de 12M',             v1: st1?.worst,       v2: st2?.worst,       fmt: pct  },
+    { label: '% janelas com retorno positivo', v1: st1?.pctPos,      v2: st2?.pctPos,      fmt: ppct },
+    { label: '% janelas acima do CDI',         v1: st1?.pctAcimaCDI, v2: st2?.pctAcimaCDI, fmt: ppct },
+    { label: '% vitórias vs outra carteira',
+      v1: total ? wins1/total : null,
+      v2: total ? wins2/total : null,
+      fmt: ppct,
+      extra: total ? `(${total} janelas comparadas)` : '' },
+  ];
+
+  tbody.innerHTML = rows.map(r => {
+    // Highlight winner
+    const better1 = r.v1 != null && r.v2 != null && r.v1 > r.v2;
+    const better2 = r.v1 != null && r.v2 != null && r.v2 > r.v1;
+    return `<tr>
+      <td style="color:var(--text2);">${r.label}${r.extra?` <span style="color:var(--text3);font-size:10px;">${r.extra}</span>`:''}  </td>
+      <td style="text-align:right;color:#c9a96e;font-weight:${better1?'700':'400'};">${r.fmt(r.v1)}${better1?' ▲':''}</td>
+      <td style="text-align:right;color:#5a9898;font-weight:${better2?'700':'400'};">${r.fmt(r.v2)}${better2?' ▲':''}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderRolling() {
+  // Build series for both carteiras using rollingHistMonths as window
+  const s1 = buildPortfolioSeries(carteiras[0], rollingHistMonths);
+  const s2 = buildPortfolioSeries(carteiras[1], rollingHistMonths);
+
+  if (!s1 && !s2) {
+    return;
+  }
+
+  const windows = [
+    { days: 252,  id: 'rolling12mWrapper' },
+    { days: 756,  id: 'rolling36mWrapper' },
+    { days: 1260, id: 'rolling60mWrapper' },
+  ];
+  for (const w of windows) {
+    const series = [];
+    if (s1) { const r = rollingReturn(s1, w.days); if (r?.length) series.push({ data: r, color: COLORS_CART[0], fill: true, width: 1.5 }); }
+    if (s2) { const r = rollingReturn(s2, w.days); if (r?.length) series.push({ data: r, color: COLORS_CART[1], fill: false, width: 1.8 }); }
+    if (series.length) {
+      drawSVG(w.id, series, { pctY: true, zeroMin: false, height: 220 });
+    } else {
+      document.getElementById(w.id).innerHTML = `<div style="padding:24px;color:var(--text3);font-family:var(--font-m);font-size:11px;">Dados insuficientes para esta janela.</div>`;
+    }
+  }
+
+  // Rolling Sharpe 12M
+  const shSeries = [];
+  if (s1) { const r = rollingSharpe(s1, 252); if (r?.length) shSeries.push({ data: r, color: COLORS_CART[0], fill: false, width: 1.8 }); }
+  if (s2) { const r = rollingSharpe(s2, 252); if (r?.length) shSeries.push({ data: r, color: COLORS_CART[1], fill: false, width: 1.8, dash: true }); }
+  if (shSeries.length) drawSVG('rollingSharpeWrapper', shSeries, { zeroMin: false, height: 220 });
+
+  // Rolling Max DD 12M
+  const ddSeries = [];
+  if (s1) { const r = rollingMaxDD(s1, 252); if (r?.length) ddSeries.push({ data: r, color: COLORS_CART[0], fill: true, width: 1.5 }); }
+  if (s2) { const r = rollingMaxDD(s2, 252); if (r?.length) ddSeries.push({ data: r, color: COLORS_CART[1], fill: false, width: 1.8 }); }
+  if (ddSeries.length) drawSVG('rollingDDWrapper', ddSeries, { pctY: true, zeroMin: true, height: 200 });
+
+  // Tabela de estatísticas
+  renderRollingStats(s1, s2);
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// CRÉDITO PRIVADO TAB
+// ══════════════════════════════════════════════════════════════════════════════
+function switchTab(name, el) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  el.classList.add('active');
+  if (name === 'correlacao') renderCorrMatrix();
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════════════════════════════════════
+let _tt = null;
+function showToast(msg, type='green') {
+  const el = document.getElementById('toastEl');
+  el.textContent = msg; el.className = `toast ${type} show`;
+  clearTimeout(_tt); _tt = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════════════════════════════════════════
+loadData();
+</script>
+</body>
+</html>
