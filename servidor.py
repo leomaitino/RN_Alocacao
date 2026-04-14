@@ -9,7 +9,7 @@ import json
 from pathlib import Path
 from datetime import datetime
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse, HTMLResponse
@@ -57,6 +57,10 @@ class PesosPayload(BaseModel):
 class GestorasPayload(BaseModel):
     gestoras: dict
 
+class AlocacoesPayload(BaseModel):
+    senha: str = ""
+    alocacoes: dict  # cnpj -> peso (%)
+
 # ── API ────────────────────────────────────────────────────────────────────────
 @api.get("/api/load-estado")
 def load_estado():
@@ -69,12 +73,24 @@ def load_estado():
     return JSONResponse(content=estado)
 
 @api.post("/api/save-recomendados")
-def save_recomendados(payload: RecomendadosPayload):
+async def save_recomendados(request: Request):
+    body = await request.json()
+    # Aceita tanto array puro ["cnpj1",...] quanto objeto {"recomendados":[...]}
+    if isinstance(body, list):
+        recomendados = body
+        aprovados = []
+    else:
+        recomendados = body.get("recomendados", [])
+        aprovados = body.get("aprovados", [])
     dados = ler_json("recomendados.json", {"recomendados": [], "aprovados": []})
-    dados["recomendados"] = payload.recomendados
-    dados["aprovados"]    = payload.aprovados
+    dados["recomendados"] = recomendados
+    dados["aprovados"]    = aprovados
     salvar_json("recomendados.json", dados)
-    return {"ok": True, "total": len(payload.recomendados)}
+    # Também salva no estado.json (fonte da verdade para o dashboard)
+    estado = ler_json("estado.json", {})
+    estado["recomendados"] = recomendados
+    salvar_json("estado.json", estado)
+    return {"ok": True, "total": len(recomendados)}
 
 @api.post("/api/save-pesos")
 def save_pesos(payload: PesosPayload):
@@ -91,13 +107,30 @@ def save_gestoras(payload: GestorasPayload):
     salvar_json("gestoras.json", payload.gestoras)
     return {"ok": True, "total": len(payload.gestoras)}
 
+@api.post("/api/save-alocacoes")
+def save_alocacoes(payload: AlocacoesPayload):
+    estado = ler_json("estado.json", {})
+    # Filtra/coage valores para float
+    alocs = {}
+    for cnpj, peso in (payload.alocacoes or {}).items():
+        try:
+            v = float(peso)
+            if v > 0:
+                alocs[cnpj] = v
+        except Exception:
+            continue
+    estado["alocacoes"] = alocs
+    estado["alocacoes_atualizadas"] = datetime.now().isoformat()
+    salvar_json("estado.json", estado)
+    return {"ok": True, "total": len(alocs)}
+
 # ── Servir JSONs ───────────────────────────────────────────────────────────────
 @api.get("/data/{filename}")
 def serve_data(filename: str):
     allowed = {
         "fundos.json", "benchmarks.json", "cotas.json",
         "meta.json", "gestoras.json", "recomendados.json", "conteudo.json",
-        "estado.json", "pesos.json"
+        "estado.json", "pesos.json", "historico_carteira.json"
     }
     if filename not in allowed:
         raise HTTPException(404, "Arquivo não encontrado")

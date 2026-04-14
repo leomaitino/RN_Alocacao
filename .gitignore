@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Cache CVM (parquets gerados pelo pipeline local)
+data/cache_cvm/
+data/cache_benchmarks/
+
+# Backups manuais
+*.bak
+*.bak_*
+*.backup
+
+# Logs
+*.log
+logs/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+
+# Input / downloads locais (planilha XP bruta)
+input/lista-fundos*.xlsx
+
+# Pastas de trabalho local (nao sobem no deploy)
+Assistente CIO/
+archive/

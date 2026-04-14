@@ -1,0 +1,64 @@
+{
+  "carteiras": [
+    {
+      "id": 1,
+      "nome": "Carteira RN v1",
+      "inicio": "2021-01-04",
+      "fim": "2026-04-14",
+      "pesos": "equal-weight",
+      "status": "encerrada",
+      "fundos": [
+        {"cnpj": "26.262.363/0001-99", "nome": "Truxt LS Advisory FIC FIM"},
+        {"cnpj": "32.240.069/0001-89", "nome": "AZ Quest Advisory Total Return FIC FIF Multimercado"},
+        {"cnpj": "31.403.590/0001-27", "nome": "Verde AM X60 Advisory FIC de FIF Multimercado RL"},
+        {"cnpj": "26.112.046/0001-96", "nome": "JPMorgan Global Income FIC de FIF Multimercado IE Classe A RL"},
+        {"cnpj": "18.772.290/0001-57", "nome": "Solana Long Short FIF em Cotas FIM"},
+        {"cnpj": "26.978.199/0001-10", "nome": "Kapitalo Kappa Advisory FIF em Cotas de FIM"},
+        {"cnpj": "28.747.733/0001-03", "nome": "Bahia AM Maraú Advisory FIF CIC Multimercado RL"},
+        {"cnpj": "24.048.538/0001-34", "nome": "Verde AM Scena Advisory FIC de FIF Multimercado RL"},
+        {"cnpj": "24.078.037/0001-09", "nome": "Adam Macro Advisory FIC FIF Multimercado RL"},
+        {"cnpj": "30.566.221/0001-92", "nome": "Legacy Capital Advisory FIC FIM RL"},
+        {"cnpj": "24.193.691/0001-55", "nome": "SPX Nimitz Gripen Advisory FIC FIM"},
+        {"cnpj": "35.940.266/0001-07", "nome": "Giant Zarathustra Advisory FIC de FIF Multimercado RL"},
+        {"cnpj": "09.412.694/0001-49", "nome": "Kadima Master FIF Multimercado RL - Subclasse II"}
+      ]
+    },
+    {
+      "id": 2,
+      "nome": "Carteira RN v2",
+      "inicio": "2026-04-14",
+      "fim": null,
+      "pesos": "ponderada-volatilidade",
+      "status": "provisoria",
+      "fundos": [
+        {"cnpj": "32.240.069/0001-89", "nome": "AZ Quest Advisory Total Return FIC FIF Multimercado"},
+        {"cnpj": "26.262.363/0001-99", "nome": "Truxt LS Advisory FIC FIM"},
+        {"cnpj": "28.911.549/0001-57", "nome": "Real Investor FIC de FIF Multimercado RL"},
+        {"cnpj": "31.403.590/0001-27", "nome": "Verde AM X60 Advisory FIC de FIF Multimercado RL"},
+        {"cnpj": "33.520.968/0001-06", "nome": "Kapitalo K10 Advisory FIF em Cotas de FIM"},
+        {"cnpj": "36.017.731/0001-97", "nome": "Genoa Capital Radar Advisory CIC Multimercado RL"},
+        {"cnpj": "34.172.497/0001-47", "nome": "ARMOR AXE FIC FIM RL"},
+        {"cnpj": "52.304.477/0001-64", "nome": "AlphaKey LS FIF em Cotas FIM RL"},
+        {"cnpj": "39.354.762/0001-21", "nome": "V8 Speedway Long Short FIF FIF Multimercado"},
+        {"cnpj": "57.660.583/0001-02", "nome": "Norte Equity Hedge FIF em Cotas de FIM RL"}
+      ]
+    }
+  ],
+  "timeline": [
+    {
+      "data": "2021-01-04",
+      "evento": "Início da Carteira RN v1",
+      "descricao": "13 fundos multimercado, equal-weight",
+      "entraram": ["Truxt LS", "AZ Quest Total Return", "Verde AM X60", "JPMorgan Global Income", "Solana Long Short", "Kapitalo Kappa", "Bahia AM Maraú", "Verde AM Scena", "Adam Macro", "Legacy Capital", "SPX Nimitz Gripen", "Giant Zarathustra", "Kadima Master Subclasse II"],
+      "sairam": []
+    },
+    {
+      "data": "2026-04-14",
+      "evento": "Rebalanceamento → Carteira RN v2",
+      "descricao": "Revisão completa baseada na análise quantitativa AlphaDesk. Pesos ponderados pela volatilidade (provisório).",
+      "entraram": ["Real Investor", "Kapitalo K10", "Genoa Capital Radar", "ARMOR AXE", "AlphaKey LS", "V8 Speedway", "Norte Equity Hedge"],
+      "sairam": ["JPMorgan Global Income", "Solana Long Short", "Kapitalo Kappa", "Bahia AM Maraú", "Verde AM Scena", "Adam Macro", "Legacy Capital", "SPX Nimitz Gripen", "Giant Zarathustra", "Kadima Master Subclasse II"],
+      "continuaram": ["Truxt LS Advisory", "AZ Quest Total Return", "Verde AM X60"]
+    }
+  ]
+}

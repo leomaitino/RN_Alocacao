@@ -1,0 +1,191 @@
+╔══════════════════════════════════════════════════════════════════╗
+║              ALPHA DESK — GUIA DE USO E ATUALIZAÇÃO             ║
+╚══════════════════════════════════════════════════════════════════╝
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ESTRUTURA DO PROJETO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+AlphaDesk/
+│
+│── servidor.py                → servidor FastAPI (entry point do Render)
+│── render.yaml                → configuração do Render
+│── requirements.txt           → dependências Python
+│── index.html                 → página inicial com cards dos produtos
+│── dashboard.html             → dashboard multimercados
+│── INSTRUCOES.txt             → este arquivo
+│
+├── scripts/                   → scripts de pipeline e utilitários
+│   ├── pipeline_fundos.py     → atualização mensal do dashboard
+│   ├── baixar_benchmarks.py   → download de benchmarks
+│   ├── baixar_mercado.py      → download de dados de mercado
+│   ├── converter_mercado.py   → conversão de dados de mercado
+│   └── gerar_cotas.py         → geração de séries de cotas
+│
+├── input/                     → planilhas e CSVs de entrada
+│   ├── lista-fundos.xlsx      → planilha exportada da XP
+│   ├── IHFA-HISTORICO.xlsx    → série IHFA da ANBIMA
+│   ├── IMAB-HISTORICO.xlsx    → série IMA-B da ANBIMA
+│   ├── ihfa.csv               → IHFA em CSV
+│   └── imab.csv               → IMA-B em CSV
+│
+├── data/                      → JSONs de dados (servidos pelo dashboard)
+│   ├── fundos.json            → todos os fundos com métricas
+│   ├── benchmarks.json        → CDI, IPCA+X, IHFA (séries históricas)
+│   ├── cotas.json             → séries diárias para gráficos
+│   ├── meta.json              → data da última atualização
+│   ├── estado.json            → fonte de verdade: recomendados + pesos
+│   ├── recomendados.json      → CNPJs recomendados (compatibilidade)
+│   ├── recomendados_estado.json → legado (manter por segurança)
+│   ├── pesos.json             → legado (manter por segurança)
+│   ├── gestoras.json          → descrições das gestoras (editar manual)
+│   ├── conteudo.json          → cartas e podcasts (editar manual)
+│   ├── mercado.json           → IBOV, Dólar, S&P etc.
+│   └── cache_cvm/             → cache dos informes CVM — NÃO deletar
+│
+├── comparador/                → produto Comparador de Carteiras
+│   ├── carteiras.html         → interface do comparador
+│   ├── atualizar_comparador.py → script de atualização
+│   ├── benchmarks.json        → dados de benchmarks do comparador
+│   ├── mercado.json           → dados de mercado do comparador
+│   ├── IHFA-HISTORICO.xlsx    → série IHFA (cópia local)
+│   └── IMAB-HISTORICO.xlsx    → série IMA-B (cópia local)
+│
+└── archive/                   → arquivos antigos / validações
+    ├── dashboard_standalone.html  → versão offline (obsoleta)
+    ├── alpha_desk_score.xlsx      → análise de score (referência)
+    ├── validacao_alpha_desk.xlsx  → validação de métricas
+    ├── benchmarks_series.xlsx     → séries intermediárias
+    └── mercado_series.xlsx        → séries intermediárias
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  USO DIÁRIO (só visualizar, sem atualizar dados)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Abra o PowerShell dentro da pasta AlphaDesk
+
+2. Rode:
+       python servidor.py
+
+3. Abra no navegador:
+       http://localhost:8080/dashboard.html
+
+4. Para encerrar: volte ao PowerShell e aperte Ctrl + C
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ROTINA MENSAL (atualizar dados + abrir dashboard)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PASSO 1 — Baixe a planilha atualizada da XP
+  • Acesse o portal XP e exporte a lista de fundos multimercado
+  • Salve como "lista-fundos.xlsx" na pasta input/
+
+PASSO 2 — Abra o PowerShell dentro da pasta AlphaDesk
+
+PASSO 3 — Rode o pipeline (leva ~2 min por causa do cache):
+       python scripts/pipeline_fundos.py --xp input/lista-fundos.xlsx --ihfa input/ihfa.csv
+
+  O script vai:
+  • Baixar apenas o mês novo da CVM (os outros já estão em cache)
+  • Recalcular todas as métricas (Sharpe, Sortino, Drawdown, etc.)
+  • Gerar/atualizar os arquivos em data/
+  • Gerar o cotas.json com a série diária para os gráficos
+
+  ✓ Quando terminar aparece: "Pipeline concluído com sucesso"
+
+PASSO 4 — Suba o servidor:
+       python servidor.py
+
+PASSO 5 — Abra no navegador:
+       http://localhost:8080/dashboard.html
+
+PASSO 6 — Para encerrar: Ctrl + C no PowerShell
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ROTINA MENSAL — COMPARADOR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Rodar: python comparador/atualizar_comparador.py
+2. Baixar IMA-B e IHFA da ANBIMA manualmente
+3. Rodar: python comparador/atualizar_comparador.py --imab arquivo.xlsx --ihfa arquivo.xlsx
+4. git add comparador/ && git commit -m 'atualização comparador' && git push
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  FUNCIONALIDADES DO DASHBOARD
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ABA RECOMENDADOS
+  • Carteira recomendada com KPIs, gráfico vs benchmarks, correlação e tabela
+
+ABA LISTA COMPLETA
+  • 150 fundos com filtros, ranking, paginação e exportação CSV
+
+ABA ANÁLISE QUANTITATIVA
+  • Ranking por score ponderado (8 métricas: Sharpe, Sortino,
+    Drawdown, Volatilidade, Variação PL, Consistência, PL, Corr. CDI)
+  • Filtrar por categoria XP → compara apenas dentro da categoria
+  • Ajustar pesos dos critérios livremente (sem senha)
+  • Salvar pesos permanentemente → exige senha
+  • Marcar/desmarcar fundo como Recomendado → exige senha
+  • Clicar num fundo → abre scorecard com quartil de cada métrica
+  • Senha para ações: itau4647
+
+ABA GRÁFICOS
+  • Selecionar fundos para comparar (ou clicar "+ Recomendados")
+  • Linha de retorno acumulado (base 100) ou retorno vs CDI
+  • Tabela de correlação entre os fundos selecionados
+  • Filtrar por período: 12M, 24M, 36M, 5 anos
+
+ABA GESTORAS
+  • Cards ordenados por score médio dos fundos
+  • Clicar na gestora → perfil com KPIs, fundos e cartas/podcasts
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ADICIONANDO CONTEÚDO MANUALMENTE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+GESTORAS — editar data/gestoras.json:
+  Adicione um campo "descricao" e "filosofia" por gestora.
+
+CARTAS E PODCASTS — editar data/conteudo.json:
+  Formato de cada item:
+  {
+    "gestora":   "Verde Asset",
+    "tipo":      "carta",          ← carta | podcast | relatorio
+    "titulo":    "Carta Mensal — Janeiro 2026",
+    "data":      "2026-01-31",
+    "url":       "https://...",
+    "descricao": "Resumo do mês e perspectivas para 2026",
+    "duracao_ou_paginas": "8 páginas"
+  }
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  SOLUÇÃO DE PROBLEMAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Dashboard abre mas mostra "Erro ao carregar dados"
+  → Certifique-se de acessar via http://localhost:8080 (não pelo
+    arquivo diretamente)
+  → Verifique se o servidor.py está rodando no PowerShell
+
+Gráfico com poucos pontos e linha tracejada (~)
+  → O arquivo cotas.json ainda não foi gerado com dados reais
+  → Rode o pipeline completo (Passo 3 da rotina mensal)
+
+Pipeline demora muito na primeira vez
+  → Normal — está baixando ~5 anos de histórico da CVM (~60 min)
+  → Nas próximas vezes: ~2 minutos (usa o cache)
+
+Recomendados sumidos após reabrir
+  → Certifique-se de usar o servidor.py (não o http.server antigo)
+  → O arquivo data/estado.json deve existir com os CNPJs
+
+Métricas zeradas para muitos fundos
+  → O pipeline precisa de dados CVM — não use a flag --sem-cvm
