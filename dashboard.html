@@ -1723,7 +1723,7 @@ function buildRNPortfolioSeries(months) {
     fundSeries = recs.map(f => {
       const raw = cotasSeries[f.cnpj];
       if (!raw || !raw.datas) return null;
-      return { cnpj: f.cnpj, datas: raw.datas.map(d => new Date(d)), valores: raw.valores };
+      return { cnpj: f.cnpj, datas: raw.datas.map(d => new Date(d + 'T12:00:00')), valores: raw.valores };
     }).filter(Boolean);
   }
 
@@ -1922,7 +1922,7 @@ function renderCharts() {
     if (!fund) return;
     const raw=cotasSeries[cnpj];
     if (raw && raw.datas && raw.datas.length) {
-      const pairs=raw.datas.map((d,i)=>({d:new Date(d),v:raw.valores[i]})).filter(p=>p.d>=cutoff);
+      const pairs=raw.datas.map((d,i)=>({d:new Date(d+'T12:00:00'),v:raw.valores[i]})).filter(p=>p.d>=cutoff);
       if (pairs.length) {
         const base=pairs[0].v;
         seriesList.push({
@@ -2197,9 +2197,9 @@ function buildHistoricalPortfolioSeries(months) {
     if (!raw || !raw.datas) return;
     const map = {};
     for (let i = 0; i < raw.datas.length; i++) {
-      const t = new Date(raw.datas[i]).getTime();
+      const t = new Date(raw.datas[i] + 'T12:00:00').getTime();
       map[t] = raw.valores[i];
-      if (new Date(raw.datas[i]) >= cutoff) allTimeSet.add(t);
+      if (t >= cutoff.getTime()) allTimeSet.add(t);
     }
     fundLookup[f.cnpj] = map;
   }));
@@ -2220,8 +2220,8 @@ function buildHistoricalPortfolioSeries(months) {
     // Find active carteira for this date
     let activeCart = null;
     for (let i = carteiras.length - 1; i >= 0; i--) {
-      const ci = new Date(carteiras[i].inicio);
-      const cf = carteiras[i].fim ? new Date(carteiras[i].fim) : new Date('2099-12-31');
+      const ci = new Date(carteiras[i].inicio + 'T12:00:00');
+      const cf = carteiras[i].fim ? new Date(carteiras[i].fim + 'T12:00:00') : new Date('2099-12-31T12:00:00');
       if (date >= ci && date <= cf) { activeCart = carteiras[i]; break; }
     }
     if (!activeCart) continue;
@@ -2287,27 +2287,11 @@ function renderHistorico() {
     'IHFA':    '#8878b8',
     'IMA-B':   '#5a9898',
   };
+  const refDatas = portSeries ? portSeries.datas : null;
   const benchSeriesList = Object.entries(BENCH_COLORS).map(([key, color]) => {
-    const s = getBenchmarkSeries(key, months);
+    const s = refDatas ? getBenchmarkAligned(key, months, refDatas) : getBenchmarkSeries(key, months);
     return s ? { ...s, name: key, color, isBench: true } : null;
   }).filter(Boolean);
-
-  // Align benchmarks to portfolio date range
-  if (portSeries && portSeries.datas.length > 1) {
-    const portStart = portSeries.datas[0].getTime();
-    const portEnd   = portSeries.datas[portSeries.datas.length - 1].getTime();
-    benchSeriesList.forEach(b => {
-      const startIdx = b.datas.findIndex(d => d.getTime() >= portStart);
-      const endIdx   = b.datas.findLastIndex(d => d.getTime() <= portEnd);
-      if (startIdx >= 0 && endIdx >= startIdx) {
-        const trimDatas   = b.datas.slice(startIdx, endIdx + 1);
-        const trimValores = b.valores.slice(startIdx, endIdx + 1);
-        const base = trimValores[0] || 1;
-        b.datas   = trimDatas;
-        b.valores = trimValores.map(v => v / base * 100);
-      }
-    });
-  }
 
   const allSeries = [
     ...(portSeries ? [{ ...portSeries, name:'Portfólio RN (Histórico)', color:'#ffffff', isPortfolio:true }] : []),
@@ -2817,41 +2801,74 @@ function setHomeChartPeriod(btn) {
   renderHomeCorrTable();
 }
 
-// Build benchmark series normalized to base 100 from cutoff
-function getBenchmarkSeries(key, months) {
+// Build benchmark cumulative lookup: date_ms -> acumulado (base 100 from cutoff)
+function _buildBenchmarkLookup(key, months) {
   if (!benchmarks || typeof benchmarks !== 'object') return null;
   const b = benchmarks[key];
   if (!b) return null;
-
-  // Always reconstruct from daily returns — avoids issues with pre-computed
-  // acumulado starting from a different base year (e.g. IMA-B from 2003)
   const src = b.retornos_diarios;
   if (!src) return null;
 
   const cutoff = new Date(); cutoff.setMonth(cutoff.getMonth() - months);
 
-  // Get daily returns within window, sorted
   const pairs = Object.entries(src)
-    .map(([d,v]) => ({ d: new Date(d), v: parseFloat(v) }))
+    .map(([d,v]) => ({ d: new Date(d + 'T12:00:00'), v: parseFloat(v) }))
     .filter(p => p.d >= cutoff && !isNaN(p.v))
-    .filter(p => Math.abs(p.v) < 0.15)  // sanity: reject single-day returns > 15%
+    .filter(p => Math.abs(p.v) < 0.15)
     .sort((a,b2) => a.d - b2.d);
   if (pairs.length < 2) return null;
 
-  // Build cumulative from base 100 using daily returns
-  const valores = [100];
+  // Build cumulative
+  const lookup = {};
+  let acum = 100;
+  lookup[pairs[0].d.getTime()] = acum;
   for (let i = 1; i < pairs.length; i++) {
-    valores.push(valores[i-1] * (1 + pairs[i].v));
+    acum = acum * (1 + pairs[i].v);
+    lookup[pairs[i].d.getTime()] = acum;
   }
+  if (acum > 500) return null; // sanity
+  return lookup;
+}
 
-  // Final sanity check: reject if series explodes (max > 5x starting value)
-  const maxVal = Math.max(...valores);
-  if (maxVal > 500) {
-    console.warn(`[Benchmark] ${key}: série rejeitada (max=${maxVal.toFixed(0)}, provável erro de dados)`);
-    return null;
+// Build benchmark series aligned to a reference date array (e.g. portfolio dates).
+// Interpolates using nearest-prior value so the benchmark covers every date in refDatas.
+function getBenchmarkAligned(key, months, refDatas) {
+  const lookup = _buildBenchmarkLookup(key, months);
+  if (!lookup) return null;
+
+  const benchTimes = Object.keys(lookup).map(Number).sort((a,b) => a-b);
+  if (!benchTimes.length) return null;
+
+  // For each reference date, find the nearest prior benchmark value
+  const datas = [];
+  const valores = [];
+  let bIdx = 0;
+  for (const d of refDatas) {
+    const t = d.getTime();
+    // Advance bIdx to the last benchmark time <= t
+    while (bIdx < benchTimes.length - 1 && benchTimes[bIdx + 1] <= t) bIdx++;
+    if (benchTimes[bIdx] <= t) {
+      datas.push(d);
+      valores.push(lookup[benchTimes[bIdx]]);
+    }
   }
+  if (datas.length < 2) return null;
 
-  return { datas: pairs.map(p => p.d), valores };
+  // Renormalize to base 100 at start
+  const base = valores[0] || 1;
+  return { datas, valores: valores.map(v => v / base * 100) };
+}
+
+// Standalone benchmark series (for use when no reference dates available)
+function getBenchmarkSeries(key, months) {
+  const lookup = _buildBenchmarkLookup(key, months);
+  if (!lookup) return null;
+  const entries = Object.entries(lookup).sort((a,b) => a[0]-b[0]);
+  const base = entries[0][1] || 1;
+  return {
+    datas: entries.map(([t]) => new Date(Number(t))),
+    valores: entries.map(([,v]) => v / base * 100)
+  };
 }
 
 // Build IPCA+5% series accumulating daily returns
@@ -2869,35 +2886,18 @@ function renderHomeChart() {
   // Portfolio series
   const portSeries = buildRNPortfolioSeries(months);
 
-  // Benchmark series
+  // Benchmark series aligned to portfolio dates
   const BENCH_COLORS = {
     'CDI':     '#7aab8a',
     'IPCA+5%': '#c9a96e',
     'IHFA':    '#8878b8',
     'IMA-B':   '#5a9898',
   };
+  const refDatas = portSeries ? portSeries.datas : null;
   const benchSeriesList = Object.entries(BENCH_COLORS).map(([key, color]) => {
-    const s = getBenchmarkSeries(key, months);
+    const s = refDatas ? getBenchmarkAligned(key, months, refDatas) : getBenchmarkSeries(key, months);
     return s ? { ...s, name: key, color, isBench: true } : null;
   }).filter(Boolean);
-
-  // Align benchmarks to portfolio date range so curves cover the same visual span
-  if (portSeries && portSeries.datas.length > 1) {
-    const portStart = portSeries.datas[0].getTime();
-    const portEnd   = portSeries.datas[portSeries.datas.length - 1].getTime();
-    benchSeriesList.forEach(b => {
-      const startIdx = b.datas.findIndex(d => d.getTime() >= portStart);
-      const endIdx   = b.datas.findLastIndex(d => d.getTime() <= portEnd);
-      if (startIdx >= 0 && endIdx >= startIdx) {
-        const trimDatas   = b.datas.slice(startIdx, endIdx + 1);
-        const trimValores = b.valores.slice(startIdx, endIdx + 1);
-        // Renormalize to base 100 at trimmed start
-        const base = trimValores[0] || 1;
-        b.datas   = trimDatas;
-        b.valores = trimValores.map(v => v / base * 100);
-      }
-    });
-  }
 
   const allSeries = [
     ...(portSeries ? [{ ...portSeries, name:'Portfólio RN', color:'#ffffff', isPortfolio:true }] : []),
@@ -3002,7 +3002,7 @@ function renderHomeCorrTable() {
   const series = recs.map(f=>{
     const raw = cotasSeries[f.cnpj];
     if (!raw||!raw.datas) return null;
-    const pairs = raw.datas.map((d,i)=>({d:new Date(d),ds:d,v:raw.valores[i]}))
+    const pairs = raw.datas.map((d,i)=>({d:new Date(d+'T12:00:00'),ds:d,v:raw.valores[i]}))
       .filter(p=>p.d>=cutoff).sort((a,b)=>a.d-b.d);
     if (pairs.length<20) return null;
     // Mapa data→retorno para alinhamento correto
