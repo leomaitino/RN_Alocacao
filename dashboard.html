@@ -49,7 +49,7 @@ body::before{content:'';display:block;height:1px;background:linear-gradient(90de
 
 /* TABS */
 .tabs-bar{background:var(--bg);border-bottom:1px solid var(--border);padding:0 32px;display:flex;position:sticky;top:58px;z-index:99;overflow-x:auto;}
-.tab{padding:12px 18px;font-size:12px;font-weight:400;letter-spacing:.3px;font-family:var(--font-m);color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .18s;white-space:nowrap;text-transform:uppercase;}
+.tab{padding:12px 14px;font-size:11px;font-weight:400;letter-spacing:.3px;font-family:var(--font-m);color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .18s;white-space:nowrap;text-transform:uppercase;}
 .tab:hover{color:var(--text2);}
 .tab.active{color:var(--cream);border-bottom-color:var(--gold);font-weight:500;}
 
@@ -2292,6 +2292,23 @@ function renderHistorico() {
     return s ? { ...s, name: key, color, isBench: true } : null;
   }).filter(Boolean);
 
+  // Align benchmarks to portfolio date range
+  if (portSeries && portSeries.datas.length > 1) {
+    const portStart = portSeries.datas[0].getTime();
+    const portEnd   = portSeries.datas[portSeries.datas.length - 1].getTime();
+    benchSeriesList.forEach(b => {
+      const startIdx = b.datas.findIndex(d => d.getTime() >= portStart);
+      const endIdx   = b.datas.findLastIndex(d => d.getTime() <= portEnd);
+      if (startIdx >= 0 && endIdx >= startIdx) {
+        const trimDatas   = b.datas.slice(startIdx, endIdx + 1);
+        const trimValores = b.valores.slice(startIdx, endIdx + 1);
+        const base = trimValores[0] || 1;
+        b.datas   = trimDatas;
+        b.valores = trimValores.map(v => v / base * 100);
+      }
+    });
+  }
+
   const allSeries = [
     ...(portSeries ? [{ ...portSeries, name:'Portfólio RN (Histórico)', color:'#ffffff', isPortfolio:true }] : []),
     ...benchSeriesList
@@ -2863,6 +2880,24 @@ function renderHomeChart() {
     const s = getBenchmarkSeries(key, months);
     return s ? { ...s, name: key, color, isBench: true } : null;
   }).filter(Boolean);
+
+  // Align benchmarks to portfolio date range so curves cover the same visual span
+  if (portSeries && portSeries.datas.length > 1) {
+    const portStart = portSeries.datas[0].getTime();
+    const portEnd   = portSeries.datas[portSeries.datas.length - 1].getTime();
+    benchSeriesList.forEach(b => {
+      const startIdx = b.datas.findIndex(d => d.getTime() >= portStart);
+      const endIdx   = b.datas.findLastIndex(d => d.getTime() <= portEnd);
+      if (startIdx >= 0 && endIdx >= startIdx) {
+        const trimDatas   = b.datas.slice(startIdx, endIdx + 1);
+        const trimValores = b.valores.slice(startIdx, endIdx + 1);
+        // Renormalize to base 100 at trimmed start
+        const base = trimValores[0] || 1;
+        b.datas   = trimDatas;
+        b.valores = trimValores.map(v => v / base * 100);
+      }
+    });
+  }
 
   const allSeries = [
     ...(portSeries ? [{ ...portSeries, name:'Portfólio RN', color:'#ffffff', isPortfolio:true }] : []),
