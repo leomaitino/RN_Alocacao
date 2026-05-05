@@ -949,31 +949,46 @@ def salvar_outputs_rf(df_fundos: pd.DataFrame,
                       fallback_usado: bool):
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # fundos_rf.json — filtra fundos sem volatilidade (sem dados CVM confiáveis)
-    # Liquidez D0 é exceção: vol baixíssima é inerente, não é "falta de dados".
-    # D0 que sobrevive com vol==0 é logado com prefixo [D0_VOL_ZERO] para auditoria.
+    # fundos_rf.json — filtra fundos sem volatilidade (sem dados CVM confiáveis).
+    # Exceções preservadas:
+    #   - Liquidez D0: vol baixíssima é inerente, não falta de dados.
+    #   - FIDCs: registros recentes (2024-2025) sem informe diário CVM ainda
+    #     publicado — ver BACKLOG_RF #3. Recomendamos esses fundos ativamente,
+    #     então precisam estar na lista (front mostra sem score).
+    # Cada fundo carrega flag `sem_dados_cvm: bool` (futuro-proof, para qualquer
+    # subgrupo) — front usa pra decidir se exibe métricas calculadas ou só
+    # rentabilidades da planilha XP.
     fundos_list_full = gerar_fundos_rf_json(df_fundos)
     antes = len(fundos_list_full)
     fundos_list = []
     d0_vol_zero_nomes = []
+    fidc_sem_cvm_nomes = []
     removidos = 0
     for f in fundos_list_full:
         vol = f.get('volatilidade')
-        is_d0 = f.get('subgrupo') == 'Liquidez D0'
+        is_d0   = f.get('subgrupo') == 'Liquidez D0'
+        is_fidc = f.get('subgrupo') == 'FIDCs'
         has_vol = bool(vol) and vol != 0
-        if has_vol or is_d0:
+        f['sem_dados_cvm'] = not has_vol
+        if has_vol or is_d0 or is_fidc:
             fundos_list.append(f)
             if is_d0 and not has_vol:
                 d0_vol_zero_nomes.append(f.get('nome', '?'))
+            if is_fidc and not has_vol:
+                fidc_sem_cvm_nomes.append(f.get('nome', '?'))
         else:
             removidos += 1
     if removidos:
         log.info(f"  Filtro vol: {antes} → {len(fundos_list)} fundos "
-                 f"({removidos} sem dados CVM removidos; D0 preservado)")
+                 f"({removidos} sem dados CVM removidos; D0 e FIDCs preservados)")
     if d0_vol_zero_nomes:
         log.warning(f"  [D0_VOL_ZERO] {len(d0_vol_zero_nomes)} fundo(s) D0 preservados sem dados de vol:")
         for nome in d0_vol_zero_nomes:
             log.warning(f"  [D0_VOL_ZERO]   · {nome}")
+    if fidc_sem_cvm_nomes:
+        log.warning(f"  [FIDC_SEM_CVM] {len(fidc_sem_cvm_nomes)} FIDC(s) preservados sem dados CVM:")
+        for nome in fidc_sem_cvm_nomes:
+            log.warning(f"  [FIDC_SEM_CVM]   · {nome}")
     with open(output_dir / 'fundos_rf.json', 'w', encoding='utf-8') as f:
         json.dump(fundos_list, f, ensure_ascii=False, indent=2, cls=NumpyEncoder)
     log.info(f"  ✓ fundos_rf.json → {len(fundos_list)} fundos")
