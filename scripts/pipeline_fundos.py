@@ -51,6 +51,7 @@ import requests
 _METRICAS_TEMP = {}  # Armazenamento temporário de métricas entre etapas
 
 
+# [SHARED-RF] Importado por scripts/pipeline_fundos_rf.py — não alterar interface.
 class NumpyEncoder(json.JSONEncoder):
     """JSON encoder que converte tipos numpy para tipos nativos Python."""
     def default(self, obj):
@@ -221,6 +222,8 @@ IPCA_SPREADS = {
 
 # ---------------------------------------------------------------------------
 # ETAPA 1 — Leitura e parsing da planilha XP
+# [SHARED-RF] parse_pct, parse_float, tipo_investidor — importadas pelo
+#             scripts/pipeline_fundos_rf.py. Alterar assinatura quebra o RF.
 # ---------------------------------------------------------------------------
 
 def parse_pct(val) -> float | None:
@@ -393,6 +396,8 @@ def _grupo_vol(class_xp: str) -> str:
 
 # ---------------------------------------------------------------------------
 # ETAPA 2 — CVM: cadastro de fundos (data de início)
+# [SHARED-RF] baixar_cadastro_cvm, enriquecer_cadastro — importadas pelo
+#             scripts/pipeline_fundos_rf.py. Alterar assinatura quebra o RF.
 # ---------------------------------------------------------------------------
 
 CVM_CAD_URL = "https://dados.cvm.gov.br/dados/FI/CAD/DADOS/cad_fi.csv"
@@ -476,6 +481,8 @@ def enriquecer_cadastro(df_fundos: pd.DataFrame, df_cad: pd.DataFrame) -> pd.Dat
 
 # ---------------------------------------------------------------------------
 # ETAPA 3 — CVM: informes diários (PL, cotistas, série de cotas)
+# [SHARED-RF] _normalizar_cnpj, baixar_informes_cvm — importadas pelo
+#             scripts/pipeline_fundos_rf.py. Alterar assinatura quebra o RF.
 # ---------------------------------------------------------------------------
 
 CVM_INF_BASE = "https://dados.cvm.gov.br/dados/FI/DOC/INF_DIARIO/DADOS/"
@@ -654,6 +661,10 @@ def baixar_informes_cvm(cnpjs: set[str], n_meses: int = MESES_HISTORICO,
 
 # ---------------------------------------------------------------------------
 # ETAPA 4 — Cálculo de métricas quantitativas
+# [SHARED-RF] calcular_retornos_diarios, calcular_volatilidade, calcular_sharpe,
+#             calcular_sortino, calcular_drawdown_max, calcular_var_95,
+#             calcular_calmar — importadas pelo scripts/pipeline_fundos_rf.py.
+#             Alterar assinatura quebra o RF.
 # ---------------------------------------------------------------------------
 
 def calcular_retorno_acumulado(cotas: pd.Series, janela_dias: int) -> float | None:
@@ -886,6 +897,10 @@ def segunda_passagem_sharpe(df_fundos: pd.DataFrame, serie_cdi: pd.Series, metri
 
 # ---------------------------------------------------------------------------
 # ETAPA 5 — Benchmarks: CDI, IPCA, IHFA
+# [SHARED-RF] baixar_cdi, baixar_ipca, baixar_ihfa, _parsear_csv_ihfa,
+#             construir_ipca_mais_spread, _serie_para_dict, calcular_acumulado
+#             — importadas pelo scripts/pipeline_fundos_rf.py.
+#             Alterar assinatura quebra o RF.
 # ---------------------------------------------------------------------------
 
 # BCB API — série 12 = CDI diário
@@ -1203,6 +1218,8 @@ def aplicar_recomendados(df_fundos: pd.DataFrame, output_dir: Path) -> pd.DataFr
 
 # ---------------------------------------------------------------------------
 # ETAPA 7 — Geração dos outputs
+# [SHARED-RF] _to_serializable — importada pelo scripts/pipeline_fundos_rf.py.
+#             Alterar assinatura quebra o RF.
 # ---------------------------------------------------------------------------
 
 def _to_serializable(val):
