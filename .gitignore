@@ -10,8 +10,9 @@ __pycache__/
 venv/
 env/
 
-# Cache CVM (parquets gerados pelo pipeline local)
+# Cache CVM (parquets gerados pelo pipeline local — reconstruivel)
 data/cache_cvm/
+data/cache_cvm_rf/
 data/cache_benchmarks/
 
 # Backups manuais
