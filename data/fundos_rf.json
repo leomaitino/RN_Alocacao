@@ -55,7 +55,8 @@
     "excesso_36m": null,
     "longevidade_anos": 0.26,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "XP Crédito Estruturado Dominus FIDC RL",
@@ -113,7 +114,8 @@
     "excesso_36m": 0.037853,
     "longevidade_anos": 4.07,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Trend DI II FIC RF Simples RL",
@@ -171,7 +173,8 @@
     "excesso_36m": null,
     "longevidade_anos": 0.33,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Scopo Debêntures Incentivadas FIC INFRA RF CP",
@@ -229,7 +232,8 @@
     "excesso_36m": null,
     "longevidade_anos": 1.32,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "ABSOLUTE OLIMPIA FIC FIM CP RL",
@@ -287,7 +291,8 @@
     "excesso_36m": 0.021845,
     "longevidade_anos": 3.31,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Kinea RF Absoluto FIF RF LP RL - Subclasse I",
@@ -345,7 +350,8 @@
     "excesso_36m": -0.006376,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Safra Grand Vitesse FIRF CP",
@@ -403,7 +409,8 @@
     "excesso_36m": 0.011101,
     "longevidade_anos": 4.85,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "BNP Paribas Rubi FIF RF CP RL",
@@ -461,7 +468,8 @@
     "excesso_36m": 0.011167,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Porto Seguro IMA-B5 FIC FIRF LP",
@@ -519,7 +527,8 @@
     "excesso_36m": -0.002854,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "XP Macro Institucional FIC FIM RL",
@@ -577,7 +586,8 @@
     "excesso_36m": -0.048478,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Western Asset Total Credit Advisory FIC de FIF RF CP",
@@ -635,7 +645,8 @@
     "excesso_36m": 0.016735,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Selection RF High Yield FIC FIM CP LP",
@@ -693,7 +704,8 @@
     "excesso_36m": 0.009657,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Augme 30 Advisory CIC RF CP LP RL",
@@ -751,7 +763,8 @@
     "excesso_36m": 0.015906,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "XP Corporate Light FIRF CP LP",
@@ -809,7 +822,8 @@
     "excesso_36m": 0.010098,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Iridium Titan Advisory FIC em FIF RF CP RL",
@@ -867,7 +881,8 @@
     "excesso_36m": 0.012383,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "BNP Paribas Match FIF RF CP RL",
@@ -925,7 +940,8 @@
     "excesso_36m": 0.003126,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Journey Capital Endurance Incentivado FIF em Infra RF",
@@ -983,7 +999,8 @@
     "excesso_36m": 0.011465,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Inter Premium FIF RF CP LP RL",
@@ -1041,7 +1058,8 @@
     "excesso_36m": 0.008926,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Journey Capital Endurance Plus Advisory FIF em Cotas de Fundos Incentivados em Infra RF",
@@ -1099,7 +1117,8 @@
     "excesso_36m": -0.02164,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Novus Institucional FIC FIM",
@@ -1157,7 +1176,8 @@
     "excesso_36m": -0.023151,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "SulAmérica Crédito Ativo FIRF CP LP",
@@ -1215,7 +1235,8 @@
     "excesso_36m": 0.01941,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "SulAmérica Excellence FIRF CP",
@@ -1273,7 +1294,8 @@
     "excesso_36m": 0.012586,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "XP Corporate Plus FIC FIF Multi CP RL",
@@ -1331,7 +1353,8 @@
     "excesso_36m": 0.007132,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Safra Vitesse Classe de Investimento RF CP RL",
@@ -1389,7 +1412,8 @@
     "excesso_36m": 0.008696,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "BNP Paribas RF FIF RF RL",
@@ -1447,7 +1471,8 @@
     "excesso_36m": -0.007983,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "AZ Quest Altro Advisory FIC de FIF Multimercado CP",
@@ -1505,7 +1530,8 @@
     "excesso_36m": 0.02717,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "XP Debêntures Incentivadas IMAB CP Incentivado Infra RF RL",
@@ -1563,7 +1589,8 @@
     "excesso_36m": 0.001836,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "JGP Corporate FIC de FIF RF CP LP FEEDER II RL",
@@ -1621,7 +1648,8 @@
     "excesso_36m": 0.017356,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "XP Inflação Referenciado IPCA FIRF LP RL",
@@ -1679,7 +1707,8 @@
     "excesso_36m": -0.006986,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "SulAmérica Apollo FIM",
@@ -1737,7 +1766,8 @@
     "excesso_36m": 0.002853,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Safra DI Master FIRF Referenciado DI LP",
@@ -1795,7 +1825,8 @@
     "excesso_36m": 0.001777,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Safra Agilité FIRF CP",
@@ -1853,7 +1884,8 @@
     "excesso_36m": 0.007328,
     "longevidade_anos": 4.89,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "AZ Quest Debêntures Incentivadas CP FIC de FIF Incentivado de Investimento em Infra RF",
@@ -1911,7 +1943,8 @@
     "excesso_36m": 0.040102,
     "longevidade_anos": 4.88,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Inter Conservador FIF RF CP RL",
@@ -1969,7 +2002,8 @@
     "excesso_36m": 0.006292,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "JGP Crédito Advisory FIF Multimercado CP RL",
@@ -2027,7 +2061,8 @@
     "excesso_36m": 0.021609,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "ARX Elbrus Advisory FIC Incentivado FIF em Infra RF RL",
@@ -2085,7 +2120,8 @@
     "excesso_36m": 0.032223,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Asa Income CIC de CIRF CP RL",
@@ -2143,7 +2179,8 @@
     "excesso_36m": 0.006795,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Tivio Institucional 15",
@@ -2201,7 +2238,8 @@
     "excesso_36m": -0.05423,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Iridium Apollo FIF RF CP LP RL",
@@ -2259,7 +2297,8 @@
     "excesso_36m": 0.00845,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Iridium Pioneer Debêntures Incentivadas FI Infra RF RL",
@@ -2317,7 +2356,8 @@
     "excesso_36m": 0.010436,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "BNP Paribas Inflação FIF RF RL",
@@ -2375,7 +2415,8 @@
     "excesso_36m": -0.032184,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Vinci Valorem FIM",
@@ -2433,7 +2474,8 @@
     "excesso_36m": 0.004072,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Valora Absolute FIF RF CP LP RL",
@@ -2491,7 +2533,8 @@
     "excesso_36m": 0.01007,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Plural High Grade FIF RF CP RL",
@@ -2549,7 +2592,8 @@
     "excesso_36m": 0.004275,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "XP Corporate Top CP FIF FIRF LP RL",
@@ -2607,7 +2651,8 @@
     "excesso_36m": 0.00949,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "SulAmérica Inflatie FIRF LP",
@@ -2665,7 +2710,8 @@
     "excesso_36m": -0.035598,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "JGP MAX Advisory FIC de FIF Multimercado RL",
@@ -2723,7 +2769,8 @@
     "excesso_36m": -0.009488,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Valora Guardian Advisory FIDC RL",
@@ -2781,7 +2828,8 @@
     "excesso_36m": 0.024547,
     "longevidade_anos": 3.49,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "SulAmérica Ativo FIF CIRF LP RL",
@@ -2839,7 +2887,8 @@
     "excesso_36m": -0.011912,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "SulAmérica Evolution FI Multimercado",
@@ -2897,7 +2946,8 @@
     "excesso_36m": -0.017429,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "XP Debêntures Incentivadas CDI CP FIF Incentivado de Investimento em Infra RF RL",
@@ -2955,7 +3005,8 @@
     "excesso_36m": 0.02498,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "BTG Pactual Crédito Corporativo I FIF em Cotas de FIRF",
@@ -3013,7 +3064,8 @@
     "excesso_36m": 0.023491,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Sparta Max Advisory FIC de FIF RF CP LP RL",
@@ -3071,7 +3123,8 @@
     "excesso_36m": 0.023242,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Polo Total Credit FIC FIF Multimercado CP RL",
@@ -3129,7 +3182,8 @@
     "excesso_36m": 0.017928,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "XP Crédito Estruturado 360 FIDC RL",
@@ -3187,7 +3241,8 @@
     "excesso_36m": 0.020269,
     "longevidade_anos": 4.07,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Rio Bravo CP FIRF",
@@ -3245,7 +3300,8 @@
     "excesso_36m": -0.005881,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Capitânia Premium 45 FIC de FIF RF CP LP RL",
@@ -3303,7 +3359,8 @@
     "excesso_36m": -0.02073,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Sparta Debêntures Incentivadas FIC FIF-Infra RF RL",
@@ -3361,7 +3418,8 @@
     "excesso_36m": 0.029931,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "MS Global Fixed Income Advisory FIC FIM IE",
@@ -3419,7 +3477,8 @@
     "excesso_36m": -0.03267,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Occam Institucional FIC FIF Multi II RL",
@@ -3477,7 +3536,8 @@
     "excesso_36m": -0.030663,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Safra Debêntures Incentivadas CP FIC FIM",
@@ -3535,7 +3595,8 @@
     "excesso_36m": -0.015074,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "XP Macro Juros Ativo FIC FIRF LP RL",
@@ -3593,7 +3654,8 @@
     "excesso_36m": -0.038716,
     "longevidade_anos": 4.89,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "BTG Pactual Hedge Sigma FIF RF - Subclasse A",
@@ -3651,7 +3713,8 @@
     "excesso_36m": -0.0196,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Mag Renda Fixa FIF CI RL",
@@ -3709,7 +3772,8 @@
     "excesso_36m": 0.001167,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Western Asset RF Ativo FI",
@@ -3767,7 +3831,8 @@
     "excesso_36m": -0.001489,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "SulAmérica INFRA FI INFRA RF",
@@ -3825,7 +3890,8 @@
     "excesso_36m": 0.001397,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Vinci Multiestratégia FIM",
@@ -3883,7 +3949,8 @@
     "excesso_36m": -0.022003,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Vinci Crédito Estruturado Selection Advisory FIDC RL",
@@ -3941,7 +4008,8 @@
     "excesso_36m": 0.023203,
     "longevidade_anos": 3.86,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Journey Capital Endurance Debêntures Incentivadas Juros Reais Advisory FIF em Cotas de FI Infra RL",
@@ -3999,7 +4067,8 @@
     "excesso_36m": 0.013309,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "XP Crédito Estruturado 120 FIC de FIF Multimercado CP RL",
@@ -4057,7 +4126,8 @@
     "excesso_36m": 0.024547,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "AXA WF US HIGH YIELD BONDS ADV FIC CI MULT CP IE RL",
@@ -4115,7 +4185,8 @@
     "excesso_36m": 0.005273,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Selection Debêntures Incentivadas FIC FIM CP",
@@ -4173,7 +4244,8 @@
     "excesso_36m": 0.010894,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Trend Inflação Curta FIRF LP RL",
@@ -4231,7 +4303,8 @@
     "excesso_36m": -0.004131,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Riza Daikon Advisory FIF em Cotas de FIM",
@@ -4289,7 +4362,8 @@
     "excesso_36m": -0.050362,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "XP Bancos FIRF Referenciada DI CP RL",
@@ -4347,7 +4421,8 @@
     "excesso_36m": 0.005708,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Trend Inflação Geral FIRF LP RL",
@@ -4405,7 +4480,8 @@
     "excesso_36m": -0.026182,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "BTG Pactual Tesouro IPCA Curto FIRF REF",
@@ -4463,7 +4539,8 @@
     "excesso_36m": -0.002574,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Plural Yield FIF RF Referenciado DI RL",
@@ -4521,7 +4598,8 @@
     "excesso_36m": -0.001707,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Polo Crédito Corporativo Advisory FIC FIF RF CP LP RL",
@@ -4579,7 +4657,8 @@
     "excesso_36m": 0.015554,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Pátria Moneda Latam Corporate Credit FIC FIM CP Resp Limitada",
@@ -4637,7 +4716,8 @@
     "excesso_36m": 0.021601,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Oaktree Global Credit BRL FIC FIM",
@@ -4695,7 +4775,8 @@
     "excesso_36m": 0.017542,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Pimco Income FIC de FIF Multimercado IE RL",
@@ -4753,7 +4834,8 @@
     "excesso_36m": 0.000617,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Western Asset IMA-B Ativo FIF RF",
@@ -4811,7 +4893,8 @@
     "excesso_36m": -0.037107,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Western Asset IMA-B5 FIF RF",
@@ -4869,7 +4952,8 @@
     "excesso_36m": -0.014369,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Ibiuna Credit FIF CIC Multimercado CP RL",
@@ -4927,7 +5011,8 @@
     "excesso_36m": 0.00856,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Trend Inflação Longa FIF FIRF RL",
@@ -4985,7 +5070,8 @@
     "excesso_36m": -0.044177,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Oaktree Global Credit USD Advisory FIC FIM",
@@ -5043,7 +5129,8 @@
     "excesso_36m": -0.077225,
     "longevidade_anos": 4.89,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Kinea IPCA Dinâmico II FIF RF RL - Subclasse II",
@@ -5101,7 +5188,8 @@
     "excesso_36m": -0.033294,
     "longevidade_anos": 4.89,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "AF Global Bonds CI RF CP RL",
@@ -5159,7 +5247,8 @@
     "excesso_36m": 0.008483,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Pimco Global Financials Credit FIC de FIF Multimercado IE LP RL",
@@ -5217,7 +5306,8 @@
     "excesso_36m": 0.051427,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Capitânia Infra 30 Incentivado Invest Financeiro em Infra RF",
@@ -5275,7 +5365,8 @@
     "excesso_36m": 0.022655,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Arx Vinson Advisory FIC de FIF RF CP RL",
@@ -5333,7 +5424,8 @@
     "excesso_36m": 0.012453,
     "longevidade_anos": 4.77,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "SulAmérica Crédito ESG FIRF CP LP IS",
@@ -5391,7 +5483,8 @@
     "excesso_36m": 0.020553,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Vinland Ativo Advisory FIF CIC RF LP - Resp Limitada",
@@ -5449,7 +5542,8 @@
     "excesso_36m": -0.010352,
     "longevidade_anos": 4.71,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Capitânia Radar 90 FIC de FIF Multimercado CP LP RL",
@@ -5507,7 +5601,8 @@
     "excesso_36m": -0.034288,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Riza Statheros FIC de FIDC",
@@ -5565,7 +5660,8 @@
     "excesso_36m": 0.030103,
     "longevidade_anos": 4.13,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Legacy Capital Credit Master CIM CP RL - Subclasse Legacy Credit Advisory",
@@ -5623,7 +5719,8 @@
     "excesso_36m": 0.031348,
     "longevidade_anos": 4.6,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Riza Lotus Plus Advisory FIF RF",
@@ -5681,7 +5778,8 @@
     "excesso_36m": 0.009558,
     "longevidade_anos": 4.48,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Jive BossaNova High Yield Advisory FIC FIDC",
@@ -5739,7 +5837,8 @@
     "excesso_36m": 0.044807,
     "longevidade_anos": 3.15,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "AF Horizonte FIF Multimercado CP RL",
@@ -5797,7 +5896,8 @@
     "excesso_36m": 0.00745,
     "longevidade_anos": 4.42,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "AZ Quest Supra FIC FIF Multimercado CP",
@@ -5855,7 +5955,8 @@
     "excesso_36m": 0.039162,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Icatu Vanguarda Inflação Longa FIF CIC RF LP RL",
@@ -5913,7 +6014,8 @@
     "excesso_36m": -0.048528,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Augme 180 FIC FIM CP",
@@ -5971,7 +6073,8 @@
     "excesso_36m": 0.018128,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Principal Global High Yield FIF Multimercado",
@@ -6029,7 +6132,8 @@
     "excesso_36m": 0.000127,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Valora Horizon High Yield FIDC",
@@ -6087,7 +6191,8 @@
     "excesso_36m": 0.02517,
     "longevidade_anos": 3.61,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Bradesco Zupo FIF CIC RF CP LP RL",
@@ -6145,7 +6250,8 @@
     "excesso_36m": 0.011533,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Western Asset RF Ativo Max FIF",
@@ -6203,7 +6309,8 @@
     "excesso_36m": -0.034303,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Riza Meyenii 180 Advisory FIF de Cotas de FIM",
@@ -6261,7 +6368,8 @@
     "excesso_36m": -0.02655,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Principal Claritas FIF RF",
@@ -6319,7 +6427,8 @@
     "excesso_36m": 0.012256,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Brave 90 FIC FIDC",
@@ -6377,7 +6486,8 @@
     "excesso_36m": 0.032622,
     "longevidade_anos": 3.43,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Pimco Income Dólar FIC de FIF Multimercado IE RL",
@@ -6435,7 +6545,8 @@
     "excesso_36m": -0.095149,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "BNP Paribas Infra FIF RF Sustentável IS RL",
@@ -6493,7 +6604,8 @@
     "excesso_36m": 0.001168,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "SulAmérica Exclusive FIRF REF DI",
@@ -6551,7 +6663,8 @@
     "excesso_36m": -0.000229,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "ARX Everest Advisory FIC de FIF RF CP RL",
@@ -6609,7 +6722,8 @@
     "excesso_36m": 0.006629,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Sparta Top Inflação FIC FIF RF CP LP - Resp Limitada",
@@ -6667,7 +6781,8 @@
     "excesso_36m": 0.01493,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "AF Invest Geraes 30 FIRF CP",
@@ -6725,7 +6840,8 @@
     "excesso_36m": 0.015419,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Brave 30 FIDC",
@@ -6783,7 +6899,8 @@
     "excesso_36m": 0.015724,
     "longevidade_anos": 4.1,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Safra Polaris Classe de Investimento RF CP RL",
@@ -6841,7 +6958,8 @@
     "excesso_36m": 0.0117,
     "longevidade_anos": 4.89,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Tivio RF Ativo LP FI",
@@ -6899,7 +7017,8 @@
     "excesso_36m": -0.018956,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Icatu Vanguarda Inflação Curta FIF CIC RF LP RL",
@@ -6957,7 +7076,8 @@
     "excesso_36m": -0.011257,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "BV Inflation RF FIC FI",
@@ -7015,7 +7135,8 @@
     "excesso_36m": -0.010927,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Plural Crédito Corporativo II FIC de FIF RF CP LP RL",
@@ -7073,7 +7194,8 @@
     "excesso_36m": 0.01187,
     "longevidade_anos": 4.89,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Mag Inflação Referenciado IMA-B FIRF FIF CIRF LP RL",
@@ -7131,7 +7253,8 @@
     "excesso_36m": -0.031408,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "AZ Quest Termo FIF RF LP",
@@ -7189,7 +7312,8 @@
     "excesso_36m": -0.001705,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Kad IMAB FIC FIF RF LP RL",
@@ -7247,7 +7371,8 @@
     "excesso_36m": -0.010571,
     "longevidade_anos": 4.37,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "AF Invest Geraes FIF RF CP RL",
@@ -7305,7 +7430,8 @@
     "excesso_36m": 0.009619,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Capitânia TOP CP FIC de FIF RF RL",
@@ -7363,7 +7489,8 @@
     "excesso_36m": -0.027102,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "AZ Quest Yield RF Ativo FIF CIC RF LP RL",
@@ -7421,7 +7548,8 @@
     "excesso_36m": -0.011281,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "XP Special Situations FIC FIM CP LP IE",
@@ -7479,7 +7607,8 @@
     "excesso_36m": 0.025206,
     "longevidade_anos": 4.88,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Icatu Vanguarda FIF Incentivado em Infraestrutura RF LP RL",
@@ -7537,7 +7666,8 @@
     "excesso_36m": 0.019102,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "ARX Elbrus Pro Advisory I FIC Incentivado FIF Infra RF RL",
@@ -7595,7 +7725,8 @@
     "excesso_36m": 0.012274,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Porto Seguro Ipê RF FIC FI CP LP",
@@ -7653,7 +7784,8 @@
     "excesso_36m": 0.017027,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Porto Seguro Clássico RF FIC FI LP",
@@ -7711,7 +7843,8 @@
     "excesso_36m": -0.013604,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "JPMorgan Global Bond FIC de FIF Multimercado IE Classe A RL",
@@ -7769,7 +7902,8 @@
     "excesso_36m": -0.023058,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Sparta Premium FIC de FIF RF RL",
@@ -7827,7 +7961,8 @@
     "excesso_36m": -0.005916,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Polo Crédito Estruturado 90 FIF em Cotas de FIM",
@@ -7885,7 +8020,8 @@
     "excesso_36m": 0.01541,
     "longevidade_anos": 4.62,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "XP Termo FIC FIRF LP",
@@ -7943,7 +8079,8 @@
     "excesso_36m": -0.004878,
     "longevidade_anos": 4.77,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Western Asset Multitrading H Multimercado FI",
@@ -8001,7 +8138,8 @@
     "excesso_36m": -0.033185,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Root Capital High Yield Advisory FIC de FIF Multimercado CP RL",
@@ -8059,7 +8197,8 @@
     "excesso_36m": 0.040603,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Kinea Oportunidade FIF RF CP RL - Subclasse I",
@@ -8117,7 +8256,8 @@
     "excesso_36m": 0.019842,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Mapfre FIF RF RL",
@@ -8175,7 +8315,8 @@
     "excesso_36m": 0.002459,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Riza Lotus FIF RF - Referenciada DI CP RL",
@@ -8233,7 +8374,8 @@
     "excesso_36m": 0.012945,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Integral FIRF CP",
@@ -8291,7 +8433,8 @@
     "excesso_36m": 0.013472,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "JGP Debêntures Incentivadas Juros Reais FIF Incentivado em Infra RF RL",
@@ -8349,7 +8492,8 @@
     "excesso_36m": 0.039207,
     "longevidade_anos": 4.77,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "MAG Global Bonds FIC FIM IE",
@@ -8407,7 +8551,8 @@
     "excesso_36m": -0.002631,
     "longevidade_anos": 4.34,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Arx Denali Advisory FIC de FIF RF CP RL",
@@ -8465,7 +8610,8 @@
     "excesso_36m": 0.00565,
     "longevidade_anos": 4.72,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "JGP Crédito Ecossistema 360 Advisory FIC de FIF Multimercado CP RL",
@@ -8523,7 +8669,8 @@
     "excesso_36m": 0.031508,
     "longevidade_anos": 3.95,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Principal Claritas Institucional Feeder II FIF em Cotas de FIM RL",
@@ -8581,7 +8728,8 @@
     "excesso_36m": -0.017215,
     "longevidade_anos": 3.95,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Sparta Debêntures Incentivadas Inflação FIC de Fundos Incentivados de Investimento Financeiro",
@@ -8639,7 +8787,8 @@
     "excesso_36m": 0.030973,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Daycoval Classic 30 FIRF CP",
@@ -8697,7 +8846,8 @@
     "excesso_36m": 0.017034,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Daycoval Debêntures Incentivadas CP FIM",
@@ -8755,7 +8905,8 @@
     "excesso_36m": -0.000975,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Novus Renda Fixa Exclusive FIC FI LP",
@@ -8813,7 +8964,8 @@
     "excesso_36m": -0.034357,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Atena Yield D30 FIC de FIF RF CP RL",
@@ -8871,7 +9023,8 @@
     "excesso_36m": 0.009394,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "BB Asset RF CP LP FIC FIF RL",
@@ -8929,7 +9082,8 @@
     "excesso_36m": -0.000951,
     "longevidade_anos": 3.95,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Sparta Max A60 FIC FIF RF CP LP RL",
@@ -8987,7 +9141,8 @@
     "excesso_36m": 0.021871,
     "longevidade_anos": 4.06,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Schroder High Grade Advisory FIRF CP RL",
@@ -9045,7 +9200,8 @@
     "excesso_36m": -0.006307,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Sparta Debêntures Incentivadas 45 FIC de FIF Infra RF RL",
@@ -9103,7 +9259,8 @@
     "excesso_36m": 0.029821,
     "longevidade_anos": 4.1,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Root Capital Crédito HG Plus FIC de FIF Multimercado CP RL",
@@ -9161,7 +9318,8 @@
     "excesso_36m": 0.016459,
     "longevidade_anos": 4.32,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Riza Meyenii 360 Advisory FIF de Cotas de FIM",
@@ -9219,7 +9377,8 @@
     "excesso_36m": -0.025743,
     "longevidade_anos": 4.48,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "MAG FIRF Referenciado DI Premium CP",
@@ -9277,7 +9436,8 @@
     "excesso_36m": 0.004124,
     "longevidade_anos": 4.32,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Occam Liquidez FIC FIF RF CP RL",
@@ -9335,7 +9495,8 @@
     "excesso_36m": 0.016544,
     "longevidade_anos": 3.85,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Trend DI FIC RF Simples RL",
@@ -9393,7 +9554,8 @@
     "excesso_36m": 0.001657,
     "longevidade_anos": 3.62,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Trend Cash CIC de Classes RF Simples RL",
@@ -9451,7 +9613,8 @@
     "excesso_36m": -0.002271,
     "longevidade_anos": 3.48,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "WHG RF Dinâmico FIC FIM",
@@ -9509,7 +9672,8 @@
     "excesso_36m": -0.018907,
     "longevidade_anos": 4.65,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Compass High Yield 180 Advisory FIF em Cotas de FIM",
@@ -9567,7 +9731,8 @@
     "excesso_36m": 0.03191,
     "longevidade_anos": 3.4,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "XP Referenciado FIF RF Referenciado DI CP RL",
@@ -9625,7 +9790,8 @@
     "excesso_36m": 0.003636,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Atena Tapyr FIF em Cotas FIRF CP RL",
@@ -9683,7 +9849,8 @@
     "excesso_36m": 0.003999,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Mag Cash FIRF LP",
@@ -9741,7 +9908,8 @@
     "excesso_36m": 0.003201,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "SulAmérica Premium FIRF Referenciado DI CP",
@@ -9799,7 +9967,8 @@
     "excesso_36m": 0.007401,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Compass Credit Selection FIC de FIF RF CP LP RL",
@@ -9857,7 +10026,8 @@
     "excesso_36m": 0.013077,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "AZ Quest Valore FIRF CP",
@@ -9915,7 +10085,8 @@
     "excesso_36m": 0.012255,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "SPX Seahawk Advisory FIC FIRF CP LP",
@@ -9973,7 +10144,8 @@
     "excesso_36m": 0.014448,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "SPX Seahawk Plus Advisory FIF CIC Multimercado CP RL",
@@ -10031,7 +10203,8 @@
     "excesso_36m": 0.030098,
     "longevidade_anos": 4.63,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Trend Pós-Fixado FIC FIRF Simples RL",
@@ -10089,7 +10262,8 @@
     "excesso_36m": null,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Compass Yield 30 FIF RF CP LP RL",
@@ -10147,7 +10321,8 @@
     "excesso_36m": 0.019367,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Pátria Crédito Estruturado 365 FIDC",
@@ -10205,7 +10380,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.94,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "MAG Cash 10 FIRF",
@@ -10263,7 +10439,8 @@
     "excesso_36m": 0.007321,
     "longevidade_anos": 3.64,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "XP Bancos FIC RF Referenciada DI CP RL",
@@ -10321,7 +10498,8 @@
     "excesso_36m": 0.002789,
     "longevidade_anos": 3.07,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "BNP Paribas Match Plus 30 Advisory FIF RF CP LP RL",
@@ -10379,7 +10557,8 @@
     "excesso_36m": 0.010313,
     "longevidade_anos": 3.07,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Bocom BBM Corporate Credit II FIF RF CP RL",
@@ -10437,7 +10616,8 @@
     "excesso_36m": 0.015536,
     "longevidade_anos": 3.05,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "MAG FIRF Ativo LP",
@@ -10495,7 +10675,8 @@
     "excesso_36m": 0.000686,
     "longevidade_anos": 3.32,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "BB Asset RF Ativa Plus LP FIC FIF RL",
@@ -10553,7 +10734,8 @@
     "excesso_36m": 0.004466,
     "longevidade_anos": 4.07,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Solis Capital Antares Light FIC de FIDC",
@@ -10611,7 +10793,8 @@
     "excesso_36m": 0.025332,
     "longevidade_anos": 3.89,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Capitania Yield 120 FIC FIDC",
@@ -10669,7 +10852,8 @@
     "excesso_36m": null,
     "longevidade_anos": 1.83,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Itaú Optimus Distribuidores FIF CIC RF LP - Resp Limitada",
@@ -10727,7 +10911,8 @@
     "excesso_36m": -0.01081,
     "longevidade_anos": 4.37,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "M8 Credit Opportunities FIC de FI em FIDC",
@@ -10785,7 +10970,8 @@
     "excesso_36m": 0.042111,
     "longevidade_anos": 3.52,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Sulamérica Retorno Total FI RF LP",
@@ -10843,7 +11029,8 @@
     "excesso_36m": -0.023213,
     "longevidade_anos": 4.25,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Absolute Atenas Advisory FIC FIF RF CP RL",
@@ -10901,7 +11088,8 @@
     "excesso_36m": 0.009619,
     "longevidade_anos": 3.49,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Absolute Creta Advisory FIF FIRF",
@@ -10959,7 +11147,8 @@
     "excesso_36m": 0.015266,
     "longevidade_anos": 3.48,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Bradesco SKY FIC FIRF Referenciada DI RL",
@@ -11017,7 +11206,8 @@
     "excesso_36m": 0.000607,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Absolute Hidra IPCA FIC de FIF RF Investimento em Infra CP",
@@ -11075,7 +11265,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.82,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Bradesco Bancos II FIF CIC RF CP RL",
@@ -11133,7 +11324,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.74,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Tivio Banks RF CP FIF RL",
@@ -11191,7 +11383,8 @@
     "excesso_36m": 0.004706,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Riza Évora Debêntures Incentivadas Juros Ativos FIF em Cotas de FIRF",
@@ -11249,7 +11442,8 @@
     "excesso_36m": 0.027093,
     "longevidade_anos": 3.32,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Persevera Yield FIRF LP",
@@ -11307,7 +11501,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.57,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Capitânia Infra Renda 90 Incentivado Infraestrutura RF CP",
@@ -11365,7 +11560,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.57,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Adam Renda Fixa Ativa Advisory FIC FIF RF LP RL",
@@ -11423,7 +11619,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.57,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Icatu Vanguarda Liquidez FIF CI RF CP LP RL",
@@ -11481,7 +11678,8 @@
     "excesso_36m": 0.011527,
     "longevidade_anos": 3.59,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "MAG High Grade FIF CI RF CP LP RL",
@@ -11539,7 +11737,8 @@
     "excesso_36m": 0.006296,
     "longevidade_anos": 3.02,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "AZ Quest Luce Advisory II FIC FIF RF CP LP",
@@ -11597,7 +11796,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.58,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "V8 Cash Platinum FIF",
@@ -11655,7 +11855,8 @@
     "excesso_36m": 0.01201,
     "longevidade_anos": 4.08,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Augme CI RF Incentivado Infraestrutura RL",
@@ -11713,7 +11914,8 @@
     "excesso_36m": 0.035844,
     "longevidade_anos": 3.15,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Tivo Plus RF Fundo Incentivado de Investimento Financeiro em Infra RL",
@@ -11771,7 +11973,8 @@
     "excesso_36m": 0.013734,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Kinea Apolo FIF MM RL - Subclasse I",
@@ -11829,7 +12032,8 @@
     "excesso_36m": -0.016789,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Plural Debentures Incentivadas Hedge 30 FIC FIF RF CP RL",
@@ -11887,7 +12091,8 @@
     "excesso_36m": 0.017669,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Augme 30 II CIC de CIRF CP LP RL",
@@ -11945,7 +12150,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.58,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "ARX Fuji FIC de FIF RF CP RL",
@@ -12003,7 +12209,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.57,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Itaú Janeiro Distribuidores FIF CIC RF LP - Resp Limitada",
@@ -12061,7 +12268,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.57,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Kinea Dakar FIF CIC RF LP RL - Subclasse I",
@@ -12119,7 +12327,8 @@
     "excesso_36m": -0.007205,
     "longevidade_anos": 3.56,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "V8 Cash FIC FIRF",
@@ -12177,7 +12386,8 @@
     "excesso_36m": -0.000302,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Persevera Trinity FIRF REF DI RL",
@@ -12235,7 +12445,8 @@
     "excesso_36m": 0.002652,
     "longevidade_anos": 3.46,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Mag High Grade Plus 30 FIF RF CP LP RL",
@@ -12293,7 +12504,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.93,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Vinland Incentivado Debêntures Infra Ativo FIF RF CP LP RL - Subclasse I",
@@ -12351,7 +12563,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.77,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Vinland Crédito Multimercado FIC FI CP",
@@ -12409,7 +12622,8 @@
     "excesso_36m": 0.018059,
     "longevidade_anos": 3.49,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Legacy Capital Compound Advisory FIF CIC de Fundo de Incent Invest Deb Incent IPCA RF RL",
@@ -12467,7 +12681,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.04,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "SPX Seahawk Deb Incentivadas Advisory FIF CIC Incentivado RL",
@@ -12525,7 +12740,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.0,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Occam Crédito Corporativo 30 FIC FIF RF CP LP RL",
@@ -12583,7 +12799,8 @@
     "excesso_36m": 0.016477,
     "longevidade_anos": 3.33,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Axa WF US Dynamic High Yield Bonds Classe FIC Classes FIM CP RL",
@@ -12641,7 +12858,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.0,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Occam Infra Ativo 30 FIC FIF RF Investimento Infra CP RL",
@@ -12699,7 +12917,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.08,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Vivace CIC CI RF Infraestrutura Resp Limitada",
@@ -12757,7 +12976,8 @@
     "excesso_36m": null,
     "longevidade_anos": 1.67,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "XP Liquidez FIC RF REF DI CP RL",
@@ -12815,7 +13035,8 @@
     "excesso_36m": null,
     "longevidade_anos": 1.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Vinland Crédito 10 FIC FIRF",
@@ -12873,7 +13094,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.25,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Selection RF Light FIC FIRF CP LP",
@@ -12931,7 +13153,8 @@
     "excesso_36m": 0.007983,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Daycoval Classic Advisory FIC FI Financeiro Renda",
@@ -12989,7 +13212,8 @@
     "excesso_36m": null,
     "longevidade_anos": 1.86,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Itaú Sinfonia All Distribuidores FIF CIC Mult CP Resp Limita",
@@ -13047,7 +13271,8 @@
     "excesso_36m": null,
     "longevidade_anos": 1.88,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Itaú Debêntures Incentivadas FIF CIC em Infra RF CP RL",
@@ -13105,7 +13330,8 @@
     "excesso_36m": -0.004681,
     "longevidade_anos": 3.58,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "M8 Credit Advanced FIC FIDC",
@@ -13163,7 +13389,8 @@
     "excesso_36m": null,
     "longevidade_anos": 1.4,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Porto Seguro FIRF Referenciado DI CP",
@@ -13221,7 +13448,8 @@
     "excesso_36m": 0.012101,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "SulAmérica Premium Plus FIRF Referenciado DI CP",
@@ -13279,7 +13507,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.88,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "XP IMAB5 Debêntures Incentivadas RL",
@@ -13337,7 +13566,8 @@
     "excesso_36m": null,
     "longevidade_anos": 1.69,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Solis Capital Antares Advisory FIC de FIDC",
@@ -13395,7 +13625,8 @@
     "excesso_36m": 0.03273,
     "longevidade_anos": 4.16,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Sulamérica Excellence Plus FIF RF CP RL",
@@ -13453,7 +13684,8 @@
     "excesso_36m": null,
     "longevidade_anos": 1.81,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Western Asset Crédito Bancário Plus FIF RF CP RL",
@@ -13511,7 +13743,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.78,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Safra Extra Bancos Special FIC FIRF CP",
@@ -13569,7 +13802,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.59,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Fundo 24 Horas FIRF RL",
@@ -13627,7 +13861,8 @@
     "excesso_36m": null,
     "longevidade_anos": 1.84,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "XP Crédito Estruturado 15 FIC de FIF RF CP LP RL",
@@ -13685,7 +13920,8 @@
     "excesso_36m": 0.001367,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Arx Infra Renda CDI FI Incentivado Infraestrutura RF CP RL",
@@ -13743,7 +13979,8 @@
     "excesso_36m": null,
     "longevidade_anos": 1.52,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Mapfre Confianza FIF RF Referenciado DI CP RL",
@@ -13801,7 +14038,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.74,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Novus Crédito FIM CP LP",
@@ -13859,7 +14097,8 @@
     "excesso_36m": 0.022283,
     "longevidade_anos": 3.61,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Novus RF Isento FIC FI Infraestrutura CP RL",
@@ -13917,7 +14156,8 @@
     "excesso_36m": null,
     "longevidade_anos": 1.62,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Tríade CIC CLasses FIM CP Resp Limitada",
@@ -13975,7 +14215,8 @@
     "excesso_36m": null,
     "longevidade_anos": 1.98,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Legato Liquidez Classe Investimento RF Referenciada DI RL",
@@ -14033,7 +14274,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.07,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Gama Pearl Diver Global Floating Income BRL FIC FIM IE RL",
@@ -14091,7 +14333,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.28,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "SPX Seahawk Debêntures Incentivadas D45 FIF CIC Infra RF CP LP RL",
@@ -14149,7 +14392,67 @@
     "excesso_36m": null,
     "longevidade_anos": 1.5,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
+  },
+  {
+    "nome": "Verde AM Ipê FIDC RL",
+    "cnpj": "54.851.094/0001-31",
+    "gestora": "Verde Asset Management",
+    "class_cvm": "Classes de Cotas de Fundos FIDC",
+    "class_xp": "Crédito High Yield",
+    "subgrupo": "FIDCs",
+    "benchmark": "CDI",
+    "tem_ranking": true,
+    "captacao_aberta": true,
+    "tipo_investidor": "Qualificado",
+    "aplicacao_minima": 1003.8,
+    "movimentacao_minima": 1003.8,
+    "cotizacao_resgate": "D+358",
+    "periodo_cotizacao": "Dias Úteis",
+    "liquidacao_resgate": "D+2",
+    "periodo_liquidacao": "Dias Úteis",
+    "rent_dia": 0.0005,
+    "rent_mes": 0.0111,
+    "rent_ano": 0.0182,
+    "rent_12m": 0.1366,
+    "rent_24m": 0.2986,
+    "rent_36m": null,
+    "valor_cota": 1.3008271,
+    "data_cota": "30/04/2026",
+    "risco_genio": 13,
+    "taxa_adm": 1.5,
+    "taxa_adm_max": 1.5,
+    "taxa_perf": 20.0,
+    "pl": null,
+    "num_cotistas": null,
+    "data_inicio": null,
+    "sharpe": null,
+    "sharpe_24m": null,
+    "sharpe_36m": null,
+    "sortino": null,
+    "sortino_24m": null,
+    "sortino_36m": null,
+    "volatilidade": null,
+    "volatilidade_24m": null,
+    "volatilidade_36m": null,
+    "drawdown_max": null,
+    "drawdown_max_36m": null,
+    "consistencia": null,
+    "consistencia_36m": null,
+    "var_95": null,
+    "calmar": null,
+    "meses_pos": null,
+    "total_meses": null,
+    "variacao_pl_12m": null,
+    "pl_12m_atras": null,
+    "excesso_12m": null,
+    "excesso_24m": null,
+    "excesso_36m": null,
+    "longevidade_anos": null,
+    "recomendado": false,
+    "aprovado": false,
+    "sem_dados_cvm": true
   },
   {
     "nome": "BOCOM BBM Cash FIF CIC RF CP Ref DI RL",
@@ -14207,7 +14510,8 @@
     "excesso_36m": 0.004633,
     "longevidade_anos": 3.06,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Drys Shelter FIC FIF RF CP LP RL",
@@ -14265,7 +14569,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.57,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Kinea Andes FIF CIC RF CP LP RL - Subclasse I",
@@ -14323,7 +14628,8 @@
     "excesso_36m": 0.011191,
     "longevidade_anos": 4.59,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "V8 Vanquish Termo FIF",
@@ -14381,7 +14687,8 @@
     "excesso_36m": 0.000487,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "VRB Liquidez FIC RF CP Referenciado DI",
@@ -14439,7 +14746,8 @@
     "excesso_36m": null,
     "longevidade_anos": 1.35,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "BOCOM BBM Corporate Credit Plus FIF CIC MULT CP RL",
@@ -14497,7 +14805,8 @@
     "excesso_36m": 0.017516,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "MS Emerging Markets Debt Opportunities CI Mult CP IE RL",
@@ -14555,7 +14864,8 @@
     "excesso_36m": null,
     "longevidade_anos": 1.35,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "JGP Debêntures Incentivadas Juros Reais 60 FI Infra CP RL",
@@ -14613,7 +14923,8 @@
     "excesso_36m": null,
     "longevidade_anos": 1.99,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "XP Juros Ativos CDI Debentures Incentivadas FI em Infra RF CP RL",
@@ -14671,7 +14982,8 @@
     "excesso_36m": null,
     "longevidade_anos": 1.31,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "BOCOM BBM Cash Enhanced FIF CIC RF CP RL",
@@ -14729,7 +15041,8 @@
     "excesso_36m": 0.007742,
     "longevidade_anos": 3.04,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Legacy Capital Compound FIF DEB Infra CDI Ativo RF CP RL",
@@ -14787,7 +15100,67 @@
     "excesso_36m": null,
     "longevidade_anos": 2.67,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
+  },
+  {
+    "nome": "Jive BossaNova 90 FIDC",
+    "cnpj": "58.893.662/0001-18",
+    "gestora": "JIVE HIGH YIELD GESTÃO DE RECURSOS LTDA",
+    "class_cvm": "Classes de Cotas de Fundos FIDC",
+    "class_xp": "Crédito High Yield",
+    "subgrupo": "FIDCs",
+    "benchmark": "CDI",
+    "tem_ranking": true,
+    "captacao_aberta": true,
+    "tipo_investidor": "Geral",
+    "aplicacao_minima": 501.9,
+    "movimentacao_minima": 501.9,
+    "cotizacao_resgate": "D+90",
+    "periodo_cotizacao": "Dias Úteis",
+    "liquidacao_resgate": "D+1",
+    "periodo_liquidacao": "Dias Úteis",
+    "rent_dia": 0.0017,
+    "rent_mes": 0.0132,
+    "rent_ano": 0.0572,
+    "rent_12m": 0.1735,
+    "rent_24m": null,
+    "rent_36m": null,
+    "valor_cota": 122.69035519,
+    "data_cota": "30/04/2026",
+    "risco_genio": 13,
+    "taxa_adm": 1.55,
+    "taxa_adm_max": 1.55,
+    "taxa_perf": 10.0,
+    "pl": null,
+    "num_cotistas": null,
+    "data_inicio": null,
+    "sharpe": null,
+    "sharpe_24m": null,
+    "sharpe_36m": null,
+    "sortino": null,
+    "sortino_24m": null,
+    "sortino_36m": null,
+    "volatilidade": null,
+    "volatilidade_24m": null,
+    "volatilidade_36m": null,
+    "drawdown_max": null,
+    "drawdown_max_36m": null,
+    "consistencia": null,
+    "consistencia_36m": null,
+    "var_95": null,
+    "calmar": null,
+    "meses_pos": null,
+    "total_meses": null,
+    "variacao_pl_12m": null,
+    "pl_12m_atras": null,
+    "excesso_12m": null,
+    "excesso_24m": null,
+    "excesso_36m": null,
+    "longevidade_anos": null,
+    "recomendado": false,
+    "aprovado": false,
+    "sem_dados_cvm": true
   },
   {
     "nome": "Tivio Institucional RF CP FIF RL",
@@ -14845,7 +15218,8 @@
     "excesso_36m": 0.013867,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Western Asset Total Credit Plus FIF",
@@ -14903,7 +15277,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.75,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Giant Cash FIRF LP",
@@ -14961,7 +15336,67 @@
     "excesso_36m": null,
     "longevidade_anos": 1.18,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
+  },
+  {
+    "nome": "Valora Vanguard FIC de FIDC RL",
+    "cnpj": "59.657.690/0001-07",
+    "gestora": "Valora Renda Fixa",
+    "class_cvm": "Classes de Cotas de Fundos FIDC",
+    "class_xp": "Crédito High Yield",
+    "subgrupo": "FIDCs",
+    "benchmark": "CDI",
+    "tem_ranking": true,
+    "captacao_aberta": true,
+    "tipo_investidor": "Geral",
+    "aplicacao_minima": 501.9,
+    "movimentacao_minima": 501.9,
+    "cotizacao_resgate": "D+43",
+    "periodo_cotizacao": "Dias Úteis",
+    "liquidacao_resgate": "D+2",
+    "periodo_liquidacao": "Dias Úteis",
+    "rent_dia": 0.0006,
+    "rent_mes": 0.0117,
+    "rent_ano": 0.0492,
+    "rent_12m": 0.1629,
+    "rent_24m": null,
+    "rent_36m": null,
+    "valor_cota": 1186.85210532,
+    "data_cota": "30/04/2026",
+    "risco_genio": 13,
+    "taxa_adm": 1.0,
+    "taxa_adm_max": 1.4,
+    "taxa_perf": 20.0,
+    "pl": null,
+    "num_cotistas": null,
+    "data_inicio": null,
+    "sharpe": null,
+    "sharpe_24m": null,
+    "sharpe_36m": null,
+    "sortino": null,
+    "sortino_24m": null,
+    "sortino_36m": null,
+    "volatilidade": null,
+    "volatilidade_24m": null,
+    "volatilidade_36m": null,
+    "drawdown_max": null,
+    "drawdown_max_36m": null,
+    "consistencia": null,
+    "consistencia_36m": null,
+    "var_95": null,
+    "calmar": null,
+    "meses_pos": null,
+    "total_meses": null,
+    "variacao_pl_12m": null,
+    "pl_12m_atras": null,
+    "excesso_12m": null,
+    "excesso_24m": null,
+    "excesso_36m": null,
+    "longevidade_anos": null,
+    "recomendado": false,
+    "aprovado": false,
+    "sem_dados_cvm": true
   },
   {
     "nome": "Legacy Capital Credit D15 FIF MM CP RL",
@@ -15019,7 +15454,8 @@
     "excesso_36m": null,
     "longevidade_anos": 1.13,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Absolute Hidra CDI Plus Advisory FIC FI Infra RF CP RL",
@@ -15077,7 +15513,8 @@
     "excesso_36m": null,
     "longevidade_anos": 1.11,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Opportunity Income FIC FIF RF LP RL",
@@ -15135,7 +15572,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.12,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "BOCOM BBM Infra CDI FIF - CI RF Incentivado Infra RL",
@@ -15193,7 +15631,8 @@
     "excesso_36m": null,
     "longevidade_anos": 1.06,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Prinz Liquidez FIRF CP",
@@ -15251,7 +15690,8 @@
     "excesso_36m": null,
     "longevidade_anos": 1.04,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "BTG Pactual Crédito Corporativo Dinâmico Advisory FIF FIC FI",
@@ -15309,7 +15749,8 @@
     "excesso_36m": null,
     "longevidade_anos": 1.05,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Tenax RFA Incentivado FIF CIC Incentivado Investimento DEB I",
@@ -15367,7 +15808,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.17,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Ouro Preto FIC de FIDC",
@@ -15425,7 +15867,8 @@
     "excesso_36m": Infinity,
     "longevidade_anos": 4.26,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "BRB FIRF IMA-S LP RL",
@@ -15483,7 +15926,8 @@
     "excesso_36m": Infinity,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Occam Baixa Volatilidade FIC FIF RF CP RL",
@@ -15541,7 +15985,8 @@
     "excesso_36m": null,
     "longevidade_anos": 0.95,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "BB Asset RF LP High FIC FIF RL",
@@ -15599,7 +16044,8 @@
     "excesso_36m": null,
     "longevidade_anos": 0.96,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "A1 CP High Grade FIF CIC RF CP RL",
@@ -15657,7 +16103,8 @@
     "excesso_36m": null,
     "longevidade_anos": 1.4,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Legacy Capital Credit Horizon Senior Incentivado FIF CIC RF RL",
@@ -15715,7 +16162,8 @@
     "excesso_36m": null,
     "longevidade_anos": 0.96,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Icatu Vanguarda Dinâmico CDI FIF Multimercado RL",
@@ -15773,7 +16221,67 @@
     "excesso_36m": null,
     "longevidade_anos": 1.33,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
+  },
+  {
+    "nome": "Tivio Alt 90 FIDC RL",
+    "cnpj": "61.020.441/0001-40",
+    "gestora": "Tivio Capital",
+    "class_cvm": "Classes de Cotas de Fundos FIDC",
+    "class_xp": "Crédito High Yield",
+    "subgrupo": "FIDCs",
+    "benchmark": "CDI",
+    "tem_ranking": true,
+    "captacao_aberta": false,
+    "tipo_investidor": "Qualificado",
+    "aplicacao_minima": 1003.8,
+    "movimentacao_minima": 1003.8,
+    "cotizacao_resgate": "D+90",
+    "periodo_cotizacao": "Dias Úteis",
+    "liquidacao_resgate": "D+2",
+    "periodo_liquidacao": "Dias Úteis",
+    "rent_dia": 0.0006,
+    "rent_mes": 0.0117,
+    "rent_ano": 0.0506,
+    "rent_12m": null,
+    "rent_24m": null,
+    "rent_36m": null,
+    "valor_cota": 1.15382949,
+    "data_cota": "30/04/2026",
+    "risco_genio": 13,
+    "taxa_adm": 0.65,
+    "taxa_adm_max": 1.25,
+    "taxa_perf": 10.0,
+    "pl": null,
+    "num_cotistas": null,
+    "data_inicio": null,
+    "sharpe": null,
+    "sharpe_24m": null,
+    "sharpe_36m": null,
+    "sortino": null,
+    "sortino_24m": null,
+    "sortino_36m": null,
+    "volatilidade": null,
+    "volatilidade_24m": null,
+    "volatilidade_36m": null,
+    "drawdown_max": null,
+    "drawdown_max_36m": null,
+    "consistencia": null,
+    "consistencia_36m": null,
+    "var_95": null,
+    "calmar": null,
+    "meses_pos": null,
+    "total_meses": null,
+    "variacao_pl_12m": null,
+    "pl_12m_atras": null,
+    "excesso_12m": null,
+    "excesso_24m": null,
+    "excesso_36m": null,
+    "longevidade_anos": null,
+    "recomendado": false,
+    "aprovado": false,
+    "sem_dados_cvm": true
   },
   {
     "nome": "Capitânia Infra Advisory Sênior I RF FI-Infra",
@@ -15831,7 +16339,67 @@
     "excesso_36m": null,
     "longevidade_anos": 0.87,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
+  },
+  {
+    "nome": "Tivio Alt Credito High Yield 180 FIDC RL",
+    "cnpj": "58.038.938/0001-80",
+    "gestora": "Tivio Capital",
+    "class_cvm": "Classes de Cotas de Fundos FIDC",
+    "class_xp": "Crédito High Yield",
+    "subgrupo": "FIDCs",
+    "benchmark": "CDI",
+    "tem_ranking": true,
+    "captacao_aberta": false,
+    "tipo_investidor": "Qualificado",
+    "aplicacao_minima": 1003.8,
+    "movimentacao_minima": 1003.8,
+    "cotizacao_resgate": "D+180",
+    "periodo_cotizacao": "Dias Úteis",
+    "liquidacao_resgate": "D+2",
+    "periodo_liquidacao": "Dias Úteis",
+    "rent_dia": 0.0007,
+    "rent_mes": 0.0126,
+    "rent_ano": 0.0544,
+    "rent_12m": 0.1913,
+    "rent_24m": null,
+    "rent_36m": null,
+    "valor_cota": 1.26267067,
+    "data_cota": "30/04/2026",
+    "risco_genio": 13,
+    "taxa_adm": 1.15,
+    "taxa_adm_max": 1.15,
+    "taxa_perf": 20.0,
+    "pl": null,
+    "num_cotistas": null,
+    "data_inicio": null,
+    "sharpe": null,
+    "sharpe_24m": null,
+    "sharpe_36m": null,
+    "sortino": null,
+    "sortino_24m": null,
+    "sortino_36m": null,
+    "volatilidade": null,
+    "volatilidade_24m": null,
+    "volatilidade_36m": null,
+    "drawdown_max": null,
+    "drawdown_max_36m": null,
+    "consistencia": null,
+    "consistencia_36m": null,
+    "var_95": null,
+    "calmar": null,
+    "meses_pos": null,
+    "total_meses": null,
+    "variacao_pl_12m": null,
+    "pl_12m_atras": null,
+    "excesso_12m": null,
+    "excesso_24m": null,
+    "excesso_36m": null,
+    "longevidade_anos": null,
+    "recomendado": false,
+    "aprovado": false,
+    "sem_dados_cvm": true
   },
   {
     "nome": "Kinea Incentivado RF CP LP FIF RL FI Deb Infra RL - Subclasse I",
@@ -15889,7 +16457,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.27,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "PDIVER - Gama Pearl Diver Crédito Estruturado Global FIM RL",
@@ -15947,7 +16516,8 @@
     "excesso_36m": null,
     "longevidade_anos": 0.74,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Artesanal CP FIDC RL",
@@ -16005,7 +16575,67 @@
     "excesso_36m": 0.03687,
     "longevidade_anos": 3.95,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
+  },
+  {
+    "nome": "Solis Capital Antares Pioneiro FIC FIDC",
+    "cnpj": "55.318.040/0001-78",
+    "gestora": "Solis Investimentos",
+    "class_cvm": "Classes de Cotas de Fundos FIDC",
+    "class_xp": "Crédito High Yield",
+    "subgrupo": "FIDCs",
+    "benchmark": "CDI",
+    "tem_ranking": true,
+    "captacao_aberta": false,
+    "tipo_investidor": "Geral",
+    "aplicacao_minima": 501.9,
+    "movimentacao_minima": 501.9,
+    "cotizacao_resgate": "D+59",
+    "periodo_cotizacao": "Dias Úteis",
+    "liquidacao_resgate": "D+1",
+    "periodo_liquidacao": "Dias Úteis",
+    "rent_dia": 0.0006,
+    "rent_mes": 0.012,
+    "rent_ano": 0.0496,
+    "rent_12m": 0.1626,
+    "rent_24m": null,
+    "rent_36m": null,
+    "valor_cota": 1.3011,
+    "data_cota": "30/04/2026",
+    "risco_genio": 13,
+    "taxa_adm": 1.31,
+    "taxa_adm_max": 1.31,
+    "taxa_perf": 20.0,
+    "pl": null,
+    "num_cotistas": null,
+    "data_inicio": null,
+    "sharpe": null,
+    "sharpe_24m": null,
+    "sharpe_36m": null,
+    "sortino": null,
+    "sortino_24m": null,
+    "sortino_36m": null,
+    "volatilidade": null,
+    "volatilidade_24m": null,
+    "volatilidade_36m": null,
+    "drawdown_max": null,
+    "drawdown_max_36m": null,
+    "consistencia": null,
+    "consistencia_36m": null,
+    "var_95": null,
+    "calmar": null,
+    "meses_pos": null,
+    "total_meses": null,
+    "variacao_pl_12m": null,
+    "pl_12m_atras": null,
+    "excesso_12m": null,
+    "excesso_24m": null,
+    "excesso_36m": null,
+    "longevidade_anos": null,
+    "recomendado": false,
+    "aprovado": false,
+    "sem_dados_cvm": true
   },
   {
     "nome": "Vinci Premium Liquidez FIF CRF RL",
@@ -16063,7 +16693,8 @@
     "excesso_36m": null,
     "longevidade_anos": 0.82,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "PDIVER II - Gama Pearl Diver Crédito Estruturado Global II F",
@@ -16121,7 +16752,8 @@
     "excesso_36m": null,
     "longevidade_anos": 0.65,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Vinland Crédito Estruturado FIDC RL",
@@ -16179,7 +16811,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.41,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Oby Ágil FIRF RL",
@@ -16237,7 +16870,8 @@
     "excesso_36m": 0.004782,
     "longevidade_anos": 4.6,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Sparta Top Advisory FIC FIF RF CP LP RL",
@@ -16295,7 +16929,8 @@
     "excesso_36m": 0.01749,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Sparta Top FIC FIF RF CP LP - Resp Limitada",
@@ -16353,7 +16988,67 @@
     "excesso_36m": 0.018234,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
+  },
+  {
+    "nome": "XP Crédito Estruturado 90 FIDC RL",
+    "cnpj": "61.802.352/0001-55",
+    "gestora": "XP Asset Management",
+    "class_cvm": "Classes de Cotas de Fundos FIDC",
+    "class_xp": "Crédito High Yield",
+    "subgrupo": "FIDCs",
+    "benchmark": "CDI",
+    "tem_ranking": true,
+    "captacao_aberta": true,
+    "tipo_investidor": "Qualificado",
+    "aplicacao_minima": 501.9,
+    "movimentacao_minima": 501.9,
+    "cotizacao_resgate": "D+90",
+    "periodo_cotizacao": "Dias Úteis",
+    "liquidacao_resgate": "D+3",
+    "periodo_liquidacao": "Dias Úteis",
+    "rent_dia": 0.0006,
+    "rent_mes": 0.0131,
+    "rent_ano": 0.0548,
+    "rent_12m": null,
+    "rent_24m": null,
+    "rent_36m": null,
+    "valor_cota": 1125.65215865,
+    "data_cota": "30/04/2026",
+    "risco_genio": 13,
+    "taxa_adm": 1.25,
+    "taxa_adm_max": 1.5,
+    "taxa_perf": 10.0,
+    "pl": null,
+    "num_cotistas": null,
+    "data_inicio": null,
+    "sharpe": null,
+    "sharpe_24m": null,
+    "sharpe_36m": null,
+    "sortino": null,
+    "sortino_24m": null,
+    "sortino_36m": null,
+    "volatilidade": null,
+    "volatilidade_24m": null,
+    "volatilidade_36m": null,
+    "drawdown_max": null,
+    "drawdown_max_36m": null,
+    "consistencia": null,
+    "consistencia_36m": null,
+    "var_95": null,
+    "calmar": null,
+    "meses_pos": null,
+    "total_meses": null,
+    "variacao_pl_12m": null,
+    "pl_12m_atras": null,
+    "excesso_12m": null,
+    "excesso_24m": null,
+    "excesso_36m": null,
+    "longevidade_anos": null,
+    "recomendado": false,
+    "aprovado": false,
+    "sem_dados_cvm": true
   },
   {
     "nome": "Trend Crédito Brasil FIF RF CP RL",
@@ -16411,7 +17106,8 @@
     "excesso_36m": null,
     "longevidade_anos": 0.88,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Occam Infra Sênior I RF FIC FI-Infra",
@@ -16469,7 +17165,8 @@
     "excesso_36m": null,
     "longevidade_anos": 0.68,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Vinland 2 Ativo Debêntures de Infra FI RF",
@@ -16527,7 +17224,8 @@
     "excesso_36m": null,
     "longevidade_anos": 0.72,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Sparta Renda FIF Infra RF RL - Subclasse Condominal",
@@ -16585,7 +17283,67 @@
     "excesso_36m": null,
     "longevidade_anos": 2.08,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
+  },
+  {
+    "nome": "Itaú Crédito Estruturado Advisory Alpes III FIDC RL",
+    "cnpj": "61.885.788/0001-55",
+    "gestora": "Itaú Unibanco Asset",
+    "class_cvm": "Classes de Cotas de Fundos FIDC",
+    "class_xp": "Crédito High Yield",
+    "subgrupo": "FIDCs",
+    "benchmark": "CDI",
+    "tem_ranking": true,
+    "captacao_aberta": false,
+    "tipo_investidor": "Qualificado",
+    "aplicacao_minima": 1000.0,
+    "movimentacao_minima": 1000.0,
+    "cotizacao_resgate": "D+0",
+    "periodo_cotizacao": "Dias Úteis",
+    "liquidacao_resgate": "D+0",
+    "periodo_liquidacao": "Dias Úteis",
+    "rent_dia": 0.0009,
+    "rent_mes": 0.0175,
+    "rent_ano": 0.0576,
+    "rent_12m": null,
+    "rent_24m": null,
+    "rent_36m": null,
+    "valor_cota": 107.0117202,
+    "data_cota": "29/04/2026",
+    "risco_genio": 40,
+    "taxa_adm": 1.8,
+    "taxa_adm_max": 2.0,
+    "taxa_perf": 20.0,
+    "pl": null,
+    "num_cotistas": null,
+    "data_inicio": null,
+    "sharpe": null,
+    "sharpe_24m": null,
+    "sharpe_36m": null,
+    "sortino": null,
+    "sortino_24m": null,
+    "sortino_36m": null,
+    "volatilidade": null,
+    "volatilidade_24m": null,
+    "volatilidade_36m": null,
+    "drawdown_max": null,
+    "drawdown_max_36m": null,
+    "consistencia": null,
+    "consistencia_36m": null,
+    "var_95": null,
+    "calmar": null,
+    "meses_pos": null,
+    "total_meses": null,
+    "variacao_pl_12m": null,
+    "pl_12m_atras": null,
+    "excesso_12m": null,
+    "excesso_24m": null,
+    "excesso_36m": null,
+    "longevidade_anos": null,
+    "recomendado": false,
+    "aprovado": false,
+    "sem_dados_cvm": true
   },
   {
     "nome": "Ibiuna RF Ativo Inst RF RL - Subclasse de Investimento",
@@ -16643,7 +17401,8 @@
     "excesso_36m": null,
     "longevidade_anos": 1.48,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "ARX Hedge FIC Incentivado Financeiro em Infra RF RL",
@@ -16701,7 +17460,8 @@
     "excesso_36m": 0.045002,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Ibiúna Total Credit FIF CIM CP RL - Subclasse Ibiuna Total Credit",
@@ -16759,7 +17519,8 @@
     "excesso_36m": 0.007159,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Riza Évora Hedge Deb Incentivadas FIF-Infra RF RL",
@@ -16817,7 +17578,8 @@
     "excesso_36m": null,
     "longevidade_anos": 0.67,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Brave Iron FIRF CP RL",
@@ -16875,7 +17637,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.02,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Ibiuna Credit Debêntures Incentivadas Máster FI-Infra RF RL",
@@ -16933,7 +17696,8 @@
     "excesso_36m": null,
     "longevidade_anos": 2.03,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "JGP Debêntures CDI Advisory FIC FIF RF FI INFRA RL",
@@ -16991,7 +17755,8 @@
     "excesso_36m": null,
     "longevidade_anos": 0.47,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "Vinland Infra Sênior Advisory Feeder FI-Infra RL",
@@ -17049,7 +17814,67 @@
     "excesso_36m": null,
     "longevidade_anos": 0.42,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
+  },
+  {
+    "nome": "Brave 180 Advisory FIC FIDC",
+    "cnpj": "63.762.704/0001-11",
+    "gestora": "Brave Asset Management",
+    "class_cvm": "Classes de Cotas de Fundos FIDC",
+    "class_xp": "Crédito High Yield",
+    "subgrupo": "FIDCs",
+    "benchmark": "CDI",
+    "tem_ranking": true,
+    "captacao_aberta": true,
+    "tipo_investidor": "Qualificado",
+    "aplicacao_minima": 1003.8,
+    "movimentacao_minima": 1003.8,
+    "cotizacao_resgate": "D+179",
+    "periodo_cotizacao": "Dias Úteis",
+    "liquidacao_resgate": "D+1",
+    "periodo_liquidacao": "Dias Úteis",
+    "rent_dia": null,
+    "rent_mes": null,
+    "rent_ano": null,
+    "rent_12m": null,
+    "rent_24m": null,
+    "rent_36m": null,
+    "valor_cota": 106.45066317,
+    "data_cota": "29/04/2026",
+    "risco_genio": 40,
+    "taxa_adm": 1.3,
+    "taxa_adm_max": 4.3,
+    "taxa_perf": 0.0,
+    "pl": null,
+    "num_cotistas": null,
+    "data_inicio": null,
+    "sharpe": null,
+    "sharpe_24m": null,
+    "sharpe_36m": null,
+    "sortino": null,
+    "sortino_24m": null,
+    "sortino_36m": null,
+    "volatilidade": null,
+    "volatilidade_24m": null,
+    "volatilidade_36m": null,
+    "drawdown_max": null,
+    "drawdown_max_36m": null,
+    "consistencia": null,
+    "consistencia_36m": null,
+    "var_95": null,
+    "calmar": null,
+    "meses_pos": null,
+    "total_meses": null,
+    "variacao_pl_12m": null,
+    "pl_12m_atras": null,
+    "excesso_12m": null,
+    "excesso_24m": null,
+    "excesso_36m": null,
+    "longevidade_anos": null,
+    "recomendado": false,
+    "aprovado": false,
+    "sem_dados_cvm": true
   },
   {
     "nome": "Trend Fixed Income Us Target Duration FIFM IE",
@@ -17107,7 +17932,126 @@
     "excesso_36m": null,
     "longevidade_anos": 0.38,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
+  },
+  {
+    "nome": "Jivemaua Bossanova Credito Securitizado II (Varejo) FIDC RL",
+    "cnpj": "63.912.733/0001-12",
+    "gestora": "JIVE HIGH YIELD GESTÃO DE RECURSOS LTDA",
+    "class_cvm": "Classes de Cotas de Fundos FIDC",
+    "class_xp": "Crédito Estruturado",
+    "subgrupo": "FIDCs",
+    "benchmark": "CDI",
+    "tem_ranking": true,
+    "captacao_aberta": false,
+    "tipo_investidor": "Geral",
+    "aplicacao_minima": 1000.0,
+    "movimentacao_minima": 1000.0,
+    "cotizacao_resgate": "D+0",
+    "periodo_cotizacao": "Dias Úteis",
+    "liquidacao_resgate": "D+0",
+    "periodo_liquidacao": "Dias Úteis",
+    "rent_dia": null,
+    "rent_mes": null,
+    "rent_ano": null,
+    "rent_12m": null,
+    "rent_24m": null,
+    "rent_36m": null,
+    "valor_cota": 100.0,
+    "data_cota": "01/06/2026",
+    "risco_genio": 13,
+    "taxa_adm": 1.25,
+    "taxa_adm_max": 1.25,
+    "taxa_perf": 20.0,
+    "pl": null,
+    "num_cotistas": null,
+    "data_inicio": null,
+    "sharpe": null,
+    "sharpe_24m": null,
+    "sharpe_36m": null,
+    "sortino": null,
+    "sortino_24m": null,
+    "sortino_36m": null,
+    "volatilidade": null,
+    "volatilidade_24m": null,
+    "volatilidade_36m": null,
+    "drawdown_max": null,
+    "drawdown_max_36m": null,
+    "consistencia": null,
+    "consistencia_36m": null,
+    "var_95": null,
+    "calmar": null,
+    "meses_pos": null,
+    "total_meses": null,
+    "variacao_pl_12m": null,
+    "pl_12m_atras": null,
+    "excesso_12m": null,
+    "excesso_24m": null,
+    "excesso_36m": null,
+    "longevidade_anos": null,
+    "recomendado": false,
+    "aprovado": false,
+    "sem_dados_cvm": true
+  },
+  {
+    "nome": "Jivemauá Bossanova Crédito Securitizado II FIDC RL - Subclasse Sênior",
+    "cnpj": "64.118.207/0001-48",
+    "gestora": "JIVE HIGH YIELD GESTÃO DE RECURSOS LTDA",
+    "class_cvm": "Classes de Cotas de Fundos FIDC",
+    "class_xp": "Crédito Estruturado",
+    "subgrupo": "FIDCs",
+    "benchmark": "CDI",
+    "tem_ranking": true,
+    "captacao_aberta": false,
+    "tipo_investidor": "Qualificado",
+    "aplicacao_minima": 1000.0,
+    "movimentacao_minima": 1000.0,
+    "cotizacao_resgate": "D+0",
+    "periodo_cotizacao": "Dias Úteis",
+    "liquidacao_resgate": "D+0",
+    "periodo_liquidacao": "Dias Úteis",
+    "rent_dia": null,
+    "rent_mes": null,
+    "rent_ano": null,
+    "rent_12m": null,
+    "rent_24m": null,
+    "rent_36m": null,
+    "valor_cota": 103.90182473,
+    "data_cota": "29/04/2026",
+    "risco_genio": 13,
+    "taxa_adm": 1.0,
+    "taxa_adm_max": 1.25,
+    "taxa_perf": 10.0,
+    "pl": null,
+    "num_cotistas": null,
+    "data_inicio": null,
+    "sharpe": null,
+    "sharpe_24m": null,
+    "sharpe_36m": null,
+    "sortino": null,
+    "sortino_24m": null,
+    "sortino_36m": null,
+    "volatilidade": null,
+    "volatilidade_24m": null,
+    "volatilidade_36m": null,
+    "drawdown_max": null,
+    "drawdown_max_36m": null,
+    "consistencia": null,
+    "consistencia_36m": null,
+    "var_95": null,
+    "calmar": null,
+    "meses_pos": null,
+    "total_meses": null,
+    "variacao_pl_12m": null,
+    "pl_12m_atras": null,
+    "excesso_12m": null,
+    "excesso_24m": null,
+    "excesso_36m": null,
+    "longevidade_anos": null,
+    "recomendado": false,
+    "aprovado": false,
+    "sem_dados_cvm": true
   },
   {
     "nome": "Bradesco Ultra II FIF - CIC RF CP LP - RL",
@@ -17165,7 +18109,8 @@
     "excesso_36m": null,
     "longevidade_anos": 1.84,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "SOMMA Torino FI RF CP LP RL",
@@ -17223,7 +18168,8 @@
     "excesso_36m": 0.013896,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   },
   {
     "nome": "M8 Capital Plus FI RF CP RL LP",
@@ -17281,6 +18227,7 @@
     "excesso_36m": 0.018738,
     "longevidade_anos": 4.9,
     "recomendado": false,
-    "aprovado": false
+    "aprovado": false,
+    "sem_dados_cvm": false
   }
 ]

@@ -1,7 +1,7 @@
 {
-  "ultima_atualizacao": "2026-05-05T11:50:23.035785",
-  "total_fundos": 298,
-  "fundos_captacao_aberta": 250,
+  "ultima_atualizacao": "2026-05-05T13:02:34.090591",
+  "total_fundos": 309,
+  "fundos_captacao_aberta": 255,
   "recomendados": 0,
   "aprovados": 0,
   "benchmarks_disponiveis": [
@@ -24,10 +24,11 @@
     "Liquidez D0": 71,
     "Crédito": 136,
     "Incentivadas": 55,
-    "FIDCs": 18,
+    "FIDCs": 29,
     "Internacionais": 18
   },
   "classes_xp": [
+    "Crédito Estruturado",
     "Crédito High Grade",
     "Crédito High Yield",
     "Crédito Híbrido",
