@@ -1,0 +1,47 @@
+{
+  "ultima_atualizacao": "2026-05-05T11:50:23.035785",
+  "total_fundos": 298,
+  "fundos_captacao_aberta": 250,
+  "recomendados": 0,
+  "aprovados": 0,
+  "benchmarks_disponiveis": [
+    "CDI",
+    "IHFA",
+    "IMA-B",
+    "IPCA+3.5%",
+    "IPCA+5%",
+    "IPCA+6%",
+    "IMA-B 5"
+  ],
+  "benchmark_inflacao_efetivo": "IMA-B 5",
+  "imab5_fallback_usado": false,
+  "subgrupos_com_ranking": [
+    "Crédito",
+    "FIDCs",
+    "Incentivadas"
+  ],
+  "por_subgrupo": {
+    "Liquidez D0": 71,
+    "Crédito": 136,
+    "Incentivadas": 55,
+    "FIDCs": 18,
+    "Internacionais": 18
+  },
+  "classes_xp": [
+    "Crédito High Grade",
+    "Crédito High Yield",
+    "Crédito Híbrido",
+    "Crédito Liquidez",
+    "Crédito Privado Debêntures Incentivadas",
+    "Crédito Privado High Yield",
+    "Debêntures Incentivadas Hedgeado",
+    "Debêntures Incentivadas Não Hedgeado",
+    "Internacional Renda Fixa Hedgeado",
+    "Internacional Renda Fixa Não Hedgeado",
+    "Juros Ativo Incentivado",
+    "Macro Baixa Vol",
+    "Referenciado DI Soberano",
+    "Renda Fixa Ativo",
+    "Renda Fixa Inflação"
+  ]
+}
