@@ -66,3 +66,35 @@ considerar:
 - `dashboard_rf.html` — aba quantitativa, badge de aviso quando subgrupo=FIDCs
 - Eventualmente: `scripts/pipeline_fundos_rf.py` para enriquecer fundos
   FIDC com PDD/inadimplência se a fonte for automatizável
+
+---
+
+## 3. FIDCs novos sem informe diário CVM (`sem_dados_cvm: true`)
+
+**Decisão atual:** FIDCs com prefixo CNPJ recente (registros 2024-2025)
+ainda não publicam informe diário CVM. O pipeline marca esses fundos com
+`sem_dados_cvm: true` no fundos_rf.json e as métricas calculadas (Sharpe,
+vol, DD, Sortino, consistência, excesso, var_95, calmar) ficam `None`.
+Os fundos aparecem na lista usando rentabilidades e taxas da planilha XP
+e são selecionáveis como recomendados (FIDC tem `tem_ranking: true`).
+
+**Lista atual de afetados** (11 fundos — ver auditoria do commit `56a0628`):
+- 2 com `class_xp = "Crédito Estruturado"`: ambos Jivemaua Bossanova
+- 9 com `class_xp = "Crédito High Yield"` chegando via `class_cvm = FIDC`:
+  Verde AM Ipê, Jive BossaNova 90, Solis Antares Pioneiro, Tivio Alt 90/180,
+  Brave 180 Advisory, Itaú Crédito Estruturado Alpes III, Valora Vanguard,
+  XP Crédito Estruturado 90
+
+**Por que adiar a remediação automática:** quando a CVM começar a publicar
+(estimativa: 6-12 meses por fundo), a próxima rodada do pipeline preenche
+métricas automaticamente — sem código novo. Para a Fase 1, a flag basta.
+
+**Próximo passo opcional:** se a lista crescer e ficar persistente, avaliar
+fontes alternativas (Uqbar, gestora direto, ANBIMA Data) para puxar série
+de cota e calcular métricas sob demanda. Não é prioritário.
+
+**Onde mexer:**
+- `scripts/pipeline_fundos_rf.py` — função `salvar_outputs_rf` aplica a flag
+  e loga `[FIDC_SEM_CVM]` na rodada
+- `dashboard_rf.html` — front precisa respeitar a flag: ocultar score e
+  exibir badge "sem dados CVM" para esses fundos
