@@ -375,7 +375,7 @@ svg text{font-family:var(--font-m);}
             <th onclick="sortBy('volatilidade')">Vol</th>
             <th onclick="sortBy('drawdown_max')">Max DD</th>
             <th onclick="sortBy('pl')">PL (R$M)</th>
-            <th>Aplic. Mín</th><th>Liquidez</th><th>Tipo Inv</th><th>Captação</th><th>Classe XP</th><th>Rec.</th>
+            <th>Aplic. Mín</th><th>Liquidez</th><th>Tipo Inv</th><th>Captação</th><th>Classe XP</th><th>Benchmark</th><th>Rec.</th>
           </tr></thead>
           <tbody id="fundTableBody"></tbody>
         </table>
@@ -412,6 +412,10 @@ svg text{font-family:var(--font-m);}
   <!-- RF: pills de subgrupo, espelho da Lista Completa (sincronizadas via populateSubgroups + setSG) -->
   <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;" id="subgroupTabsQuant"></div>
 
+  <!-- RF: banner que aparece quando subgrupo é Liquidez D0 ou Internacionais
+       (sem ranking quantitativo). Preenchido por applyQuantNoRankUI(). -->
+  <div id="quantNoRankBanner" style="display:none;"></div>
+
   <!-- WEIGHT PANEL -->
   <div class="weight-panel">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
@@ -443,11 +447,15 @@ svg text{font-family:var(--font-m);}
           <th style="width:28px;">#</th>
           <th>Fundo</th>
           <th>Score</th>
+          <th>Bench</th>
           <th>Sharpe 36M</th>
           <th>Sortino 36M</th>
           <th>Vol 36M</th>
           <th>Var PL 12M</th>
           <th>PL (R$M)</th>
+          <th>Exc 12M</th>
+          <th>Exc 24M</th>
+          <th>Exc 36M</th>
           <th style="width:70px;">Rec.</th>
           <th>Classe XP</th>
         </tr></thead>
@@ -1183,6 +1191,30 @@ function matchSG(f, v) {
   if (!v) return true;
   return f.subgrupo === v;
 }
+
+// RF: subgrupos sem ranking quantitativo. Quando um deles está ativo, esconder
+// score / +Rec / pesos no Quant tab (BACKLOG #4 + spec do Bloco C/1.3.6).
+function subgrupoSemRanking() {
+  return currentSubgroup === 'Liquidez D0' || currentSubgroup === 'Internacionais';
+}
+
+// RF: badge colorida para benchmark de cada fundo (CDI ou IMA-B 5).
+function benchBadge(b) {
+  if (!b) return '<span class="neu">—</span>';
+  const isImab = b === 'IMA-B 5';
+  const color = isImab ? '#f5c842' : 'var(--accent2)';
+  const bg    = isImab ? 'rgba(245,200,66,.1)' : 'rgba(201,169,110,.1)';
+  return `<span style="font-size:11px;font-family:var(--font-m);color:${color};background:${bg};border:1px solid ${color}55;border-radius:4px;padding:2px 7px;white-space:nowrap;">${b}</span>`;
+}
+
+// RF: excesso colorido (pp, sinal, verde/vermelho — igual rent).
+function fmtExcesso(v) {
+  if (v==null||isNaN(v)) return '<span class="neu">—</span>';
+  const p = v*100;
+  const cls = p>0?'pos':p<0?'neg':'neu';
+  const s   = p>0?'+':'';
+  return `<span class="${cls} num" style="font-size:11px;">${s}${p.toFixed(2)}pp</span>`;
+}
 function setSG(v, el) {
   currentSubgroup = v;
   currentPage = 1;
@@ -1280,23 +1312,30 @@ function renderTable() {
   if (recs>0){rb.textContent=`${recs} recomendados`;rb.style.display='';}else rb.style.display='none';
   document.getElementById('fundTableBody').innerHTML=page.map((f,i)=>{
     const liq=f.cotizacao_resgate&&f.liquidacao_resgate?`${f.cotizacao_resgate}/${f.liquidacao_resgate}`:'—';
+    // RF: tooltip nas células CVM-derivadas para fundos novos sem informe diário.
+    const noCvmTitle = f.sem_dados_cvm ? ' title="Sem informe diário CVM disponível"' : '';
+    // RF: D0 e Internacionais não recebem +Rec — botão substituído por —.
+    const recCell = !f.tem_ranking
+      ? '<span class="neu" style="font-size:11px;font-family:var(--font-m);">—</span>'
+      : (f.recomendado
+          ? `<button class="btn-rec active" onclick="requestRec('${f.cnpj}')">✦ Rec</button>`
+          : `<button class="btn-rec" onclick="requestRec('${f.cnpj}')">+ Rec</button>`);
     return `<tr>
       <td class="num neu" style="font-size:11px;">${start+i+1}</td>
       <td><div class="fund-name">${f.nome}</div><div class="fund-gestora">${f.gestora}</div>
         ${f.recomendado?'<span style="font-size:9px;color:var(--green);font-family:var(--font-m);">✦ Rec</span>':''}</td>
       <td class="num">${fmtPct(getRentVal(f))}</td>
-      <td class="num">${fmtNum(f.sharpe)}</td>
-      <td class="num">${f.volatilidade!=null?fmtPct(f.volatilidade):'<span class="neu">—</span>'}</td>
-      <td class="num">${fmtPct(f.drawdown_max)}</td>
-      <td class="num">${fmtMoney(f.pl)}</td>
+      <td class="num"${noCvmTitle}>${fmtNum(f.sharpe)}</td>
+      <td class="num"${noCvmTitle}>${f.volatilidade!=null?fmtPct(f.volatilidade):'<span class="neu">—</span>'}</td>
+      <td class="num"${noCvmTitle}>${fmtPct(f.drawdown_max)}</td>
+      <td class="num"${noCvmTitle}>${fmtMoney(f.pl)}</td>
       <td style="font-size:11px;">${fmtAplic(f.aplicacao_minima)}</td>
       <td style="font-size:11px;font-family:var(--font-m);color:var(--text2);">${liq}</td>
       <td style="font-size:11px;font-family:var(--font-m);">${f.tipo_investidor||'Geral'}</td>
       <td>${f.captacao_aberta?'<span class="cap-aberta">Aberta</span>':'<span class="cap-fechada">Fechada</span>'}</td>
       <td>${classBadge(f.class_xp)}</td>
-      <td>${f.recomendado
-        ?`<button class="btn-rec active" onclick="requestRec('${f.cnpj}')">✦ Rec</button>`
-        :`<button class="btn-rec" onclick="requestRec('${f.cnpj}')">+ Rec</button>`}</td>
+      <td>${benchBadge(f.benchmark)}</td>
+      <td>${recCell}</td>
     </tr>`;
   }).join('');
   document.getElementById('pageInfo').textContent=`${start+1}–${Math.min(start+PAGE_SIZE,total)} de ${total}`;
@@ -1436,7 +1475,30 @@ function onQuantCatChange() {
   quantScoredCache=null;renderQuantRanking();
 }
 
+// RF: aplica a UI de "subgrupo sem ranking" — esconde painel de pesos e
+// mostra banner explicativo quando o pill ativo é D0 ou Internacionais.
+function applyQuantNoRankUI() {
+  const noRank = subgrupoSemRanking();
+  const wp = document.querySelector('.weight-panel');
+  if (wp) wp.style.display = noRank ? 'none' : '';
+  const banner = document.getElementById('quantNoRankBanner');
+  if (banner) {
+    if (noRank) {
+      banner.style.display = '';
+      banner.innerHTML = `
+        <div style="background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.25);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--yellow);margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+          <span style="font-size:14px;">ⓘ</span>
+          <span>Subgrupo <strong>${currentSubgroup}</strong> não recebe ranking quantitativo — produtos não comparáveis a fundos de Crédito/Incentivadas/FIDCs. Mostrando apenas a lista.</span>
+        </div>`;
+    } else {
+      banner.style.display = 'none';
+      banner.innerHTML = '';
+    }
+  }
+}
+
 function renderQuantRanking() {
+  applyQuantNoRankUI();
   const pool=getQuantPool();
   const period=document.getElementById('qPeriodSel')?.value||'12m';
   // RF: percentis calculados sobre o subgrupo (não universo todo) + filtro
@@ -1464,17 +1526,40 @@ function renderQuantRanking() {
   const rb=document.getElementById('qBadgeRec');
   if (recs>0){rb.textContent=`${recs} rec`;rb.style.display='';}else rb.style.display='none';
 
+  // RF: quando subgrupo é D0 ou Internacionais (tem_ranking=false no fundo),
+  // a aba Quant esconde score e desabilita click no row (BACKLOG #4, 1.3.6).
+  const noRank = subgrupoSemRanking();
   document.getElementById('quantRankBody').innerHTML=page.map(({fund:f,mr,score,q1count},i)=>{
     const isSel=selectedQuantFund?.cnpj===f.cnpj;
     const sc=quartilColor(pctToQ(score));
-    const stars=Array.from({length:8},(_,j)=>`<div class="star ${j<q1count?'on':'off'}"></div>`).join('');
-    return `<tr onclick="selectQuantFund('${f.cnpj}')" style="cursor:pointer;${isSel?'background:rgba(201,169,110,.06);':f.recomendado?'background:rgba(61,214,140,.04);':''}">
+    // q1count agora é sobre as 13 métricas; barra de stars proporcional.
+    const stars=Array.from({length:13},(_,j)=>`<div class="star ${j<q1count?'on':'off'}"></div>`).join('');
+    // RF: tooltip nas células CVM-derivadas para fundos novos sem informe diário.
+    const noCvmTitle = f.sem_dados_cvm ? ' title="Sem informe diário CVM disponível"' : '';
+    // RF: row clicável só quando o fundo tem ranking.
+    const clickable = f.tem_ranking;
+    const onclickAttr = clickable ? `onclick="selectQuantFund('${f.cnpj}')"` : '';
+    const rowCursor  = clickable ? 'cursor:pointer;' : '';
+    // RF: score em "—" quando subgrupo é D0/Internacionais OU quando o
+    // fundo em si não tem ranking (D0/Int filtrados pelo pipeline). Faz
+    // com que mesmo na pill "Todos" os D0/Int apareçam sem score.
+    const scoreCell = (noRank || !f.tem_ranking)
+      ? `<td><span class="neu" style="font-size:13px;font-family:var(--font-m);">—</span></td>`
+      : `<td><div style="display:flex;align-items:center;gap:6px;">
+           <span style="font-family:var(--font-m);font-size:15px;font-weight:600;color:${sc};">${score??'—'}</span>
+           <div class="star-row">${stars}</div></div></td>`;
+    // RF: +Rec só pra fundos com tem_ranking.
+    const recBtn = !f.tem_ranking
+      ? '<span class="neu" style="font-size:11px;font-family:var(--font-m);">—</span>'
+      : (f.recomendado
+          ? `<button class="btn-rec active" onclick="event.stopPropagation();toggleRec('${f.cnpj}')">✦ Rec</button>`
+          : `<button class="btn-rec" onclick="event.stopPropagation();requestRec('${f.cnpj}')">+ Rec</button>`);
+    return `<tr ${onclickAttr} style="${rowCursor}${isSel?'background:rgba(201,169,110,.06);':f.recomendado?'background:rgba(61,214,140,.04);':''}">
       <td class="neu" style="font-size:11px;font-family:var(--font-m);">${start+i+1}</td>
       <td><div style="font-size:12px;font-weight:500;">${f.nome}</div>
           <div style="font-size:10px;font-family:var(--font-m);color:var(--text3);">${f.gestora}</div></td>
-      <td><div style="display:flex;align-items:center;gap:6px;">
-        <span style="font-family:var(--font-m);font-size:15px;font-weight:600;color:${sc};">${score??'—'}</span>
-        <div class="star-row">${stars}</div></div></td>
+      ${scoreCell}
+      <td>${benchBadge(f.benchmark)}</td>
       ${TABLE_DISPLAY_COLS.map(col=>{
         const val=f[col.key];
         const allVals=currentQuantPool.map(x=>x[col.key]);
@@ -1482,16 +1567,15 @@ function renderQuantRanking() {
         const q=pctToQ(pct);
         const badge=qBadgeHtml({val,pct,q,key:col.key,fmt:col.fmt,label:''});
         const formatted=formatQuantVal(col.key,val,col.fmt);
-        return `<td><div style="display:flex;align-items:center;gap:5px;">
+        return `<td${noCvmTitle}><div style="display:flex;align-items:center;gap:5px;">
           ${badge}
           <span class="num" style="font-size:11px;">${formatted}</span>
         </div></td>`;
       }).join('')}
-      <td>
-        ${f.recomendado
-          ?`<button class="btn-rec active" onclick="event.stopPropagation();toggleRec('${f.cnpj}')">✦ Rec</button>`
-          :`<button class="btn-rec" onclick="event.stopPropagation();requestRec('${f.cnpj}')">+ Rec</button>`}
-      </td>
+      <td${noCvmTitle}>${fmtExcesso(f.excesso_12m)}</td>
+      <td${noCvmTitle}>${fmtExcesso(f.excesso_24m)}</td>
+      <td${noCvmTitle}>${fmtExcesso(f.excesso_36m)}</td>
+      <td>${recBtn}</td>
       <td>${classBadge(f.class_xp)}</td>
     </tr>`;
   }).join('');
@@ -1527,6 +1611,48 @@ function closeScorecard() {
 }
 
 function renderScorecard(fund) {
+  // RF: fundos com sem_dados_cvm:true (FIDCs novos sem informe diário) não
+  // têm métricas calculadas. Mostra um card com aviso amarelo e info básica
+  // (sem score, sem grid de métricas) — spec 1.3.5.
+  if (fund.sem_dados_cvm) {
+    const card = document.getElementById('quantScorecard');
+    card.style.display = 'block';
+    document.getElementById('quantScorecardInner').innerHTML = `
+      <div class="score-card">
+        <div class="score-header" style="margin-bottom:16px;">
+          <div>
+            <div style="font-family:var(--font-d);font-size:20px;">${fund.nome}</div>
+            <div style="font-size:12px;font-family:var(--font-m);color:var(--text3);">${fund.gestora} · ${fund.subgrupo} · ${fund.class_xp||'—'} · Benchmark: ${fund.benchmark||'—'}</div>
+          </div>
+        </div>
+        <div style="background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.3);border-radius:8px;padding:14px 18px;display:flex;align-items:center;gap:12px;">
+          <span style="font-size:22px;color:var(--yellow);">⚠</span>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--yellow);">Sem score quantitativo</div>
+            <div style="font-size:11px;font-family:var(--font-m);color:var(--text3);margin-top:3px;line-height:1.5;">
+              Fundo recente sem informe diário CVM publicado.
+              Métricas baseadas em série de cotas (Sharpe, Vol, Drawdown, Excesso vs benchmark) não estão disponíveis.
+              Próxima rodada do pipeline preenche automaticamente quando a CVM começar a publicar.
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;">
+          ${[
+            {l:'Aplicação mínima', v:fmtAplic(fund.aplicacao_minima)},
+            {l:'Liquidez', v:(fund.cotizacao_resgate&&fund.liquidacao_resgate)?`${fund.cotizacao_resgate}/${fund.liquidacao_resgate}`:'—'},
+            {l:'Tipo investidor', v:fund.tipo_investidor||'Geral'},
+            {l:'Taxa adm', v:fund.taxa_adm!=null?fund.taxa_adm.toFixed(2)+'%':'—'},
+            {l:'Taxa perf', v:fund.taxa_perf!=null?fund.taxa_perf.toFixed(0)+'%':'—'},
+            {l:'Captação', v:fund.captacao_aberta?'<span class="cap-aberta">Aberta</span>':'<span class="cap-fechada">Fechada</span>'},
+          ].map(k=>`<div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 12px;">
+            <div style="font-size:9px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.5px;">${k.l}</div>
+            <div style="font-size:13px;font-family:var(--font-m);color:var(--text);margin-top:2px;">${k.v}</div>
+          </div>`).join('')}
+        </div>
+      </div>`;
+    return;
+  }
+
   const period=document.getElementById('qPeriodSel')?.value||'12m';
 
   // RF: 2 scores SEMPRE visíveis, independente do filtro ativo:
