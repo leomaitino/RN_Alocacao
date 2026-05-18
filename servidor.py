@@ -124,6 +124,63 @@ def save_alocacoes(payload: AlocacoesPayload):
     salvar_json("estado.json", estado)
     return {"ok": True, "total": len(alocs)}
 
+# ── RF (Renda Fixa) — espelho das rotas MM acima (Etapa 1.3.8) ─────────────────
+# Padrão idêntico ao MM: senha é validada client-side via checkPassword() no
+# dashboard, não server-side. Schemas reaproveitados (PesosPayload,
+# AlocacoesPayload). Persistência em data/estado_rf.json com espelho em
+# data/recomendados_rf.json para auditoria.
+
+@api.get("/api/load-estado-rf")
+def load_estado_rf():
+    estado = ler_json("estado_rf.json", {})
+    return JSONResponse(content=estado)
+
+@api.post("/api/save-recomendados-rf")
+async def save_recomendados_rf(request: Request):
+    body = await request.json()
+    # Aceita tanto array puro ["cnpj1",...] quanto objeto {"recomendados":[...]}
+    if isinstance(body, list):
+        recomendados = body
+        aprovados = []
+    else:
+        recomendados = body.get("recomendados", [])
+        aprovados = body.get("aprovados", [])
+    # Espelho em recomendados_rf.json (auditoria)
+    dados = ler_json("recomendados_rf.json", {"recomendados": [], "aprovados": []})
+    dados["recomendados"] = recomendados
+    dados["aprovados"]    = aprovados
+    salvar_json("recomendados_rf.json", dados)
+    # Fonte da verdade para o dashboard
+    estado = ler_json("estado_rf.json", {})
+    estado["recomendados"] = recomendados
+    salvar_json("estado_rf.json", estado)
+    return {"ok": True, "total": len(recomendados)}
+
+@api.post("/api/save-pesos-rf")
+def save_pesos_rf(payload: PesosPayload):
+    estado = ler_json("estado_rf.json", {})
+    estado["pesos"] = payload.pesos
+    estado["pesos_atualizados"] = datetime.now().isoformat()
+    salvar_json("estado_rf.json", estado)
+    return {"ok": True}
+
+@api.post("/api/save-alocacoes-rf")
+def save_alocacoes_rf(payload: AlocacoesPayload):
+    estado = ler_json("estado_rf.json", {})
+    alocs = {}
+    for cnpj, peso in (payload.alocacoes or {}).items():
+        try:
+            v = float(peso)
+            if v > 0:
+                alocs[cnpj] = v
+        except Exception:
+            continue
+    estado["alocacoes"] = alocs
+    estado["alocacoes_atualizadas"] = datetime.now().isoformat()
+    salvar_json("estado_rf.json", estado)
+    return {"ok": True, "total": len(alocs)}
+
+
 # ── Servir JSONs ───────────────────────────────────────────────────────────────
 @api.get("/data/{filename}")
 def serve_data(filename: str):
