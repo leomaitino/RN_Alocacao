@@ -183,3 +183,68 @@ nos dois pipelines (já alinhado com BACKLOG #1).
 - Trend Pós-Fixado FIC FIRF Simples (D0): `sortino_24m`, `sortino_36m`
 - BRB FIRF IMA-S LP (D0): `sortino_36m`, `excesso_36m`
 - Ouro Preto FIC de FIDC (FIDCs): `excesso_36m`
+
+---
+
+## 7. Validação de senha é só client-side (compartilhado com MM)
+
+**Decisão atual:** Hoje a validação de senha acontece em `checkPassword()`
+no frontend (`dashboard_rf.html` e `dashboard.html`). Requisições POST
+diretas (curl, Postman, qualquer cliente HTTP) podem salvar
+recomendados/pesos/alocações sem senha alguma — os endpoints
+`/api/save-*-rf` aceitam o body sem checar campo `senha`.
+
+**Por que existe:** mirror exato do padrão MM em produção. Não é
+regressão da Fase 1 — o problema já existe no MM hoje.
+
+**Por que adiar:** o usuário típico está sempre passando pelo dashboard,
+onde a validação client-side cobre 99% dos casos. Atacar agora exigiria
+mexer em MM + RF simultaneamente, o que não cabe na Fase 1.
+
+**Quando revisitar:** junto com outras melhorias de segurança do servidor.
+
+**Solução envolve:**
+- (a) Servidor verificar o campo `senha` no payload de cada rota POST e
+  retornar 401 se inválido.
+- (b) Padronizar com o MM para não criar divergência entre as duas
+  pipelines de autenticação.
+- (c) Considerar token-based auth (JWT) ou rate limiting se o uso do
+  AlphaDesk crescer para fora da equipe pequena atual.
+
+**Onde mexer:**
+- `servidor.py` — todas as rotas `/api/save-*` (MM e RF)
+- `dashboard.html` + `dashboard_rf.html` — passar a senha no body do POST
+  (hoje validam só client-side e enviam sem senha)
+
+---
+
+## 8. Snapshot mensal de estado_rf.json para alimentar futura aba Histórico
+
+**Decisão atual:** A aba Histórico do dashboard RF está escondida (BACKLOG
+#5) porque não há série temporal de snapshots da carteira recomendada.
+Sem coletar esses snapshots a partir de agora, o BACKLOG #5 nunca
+destrava — sempre faltarão os "6 meses acumulados" que ele exige.
+
+**Solução proposta:** criar pipeline de snapshot mensal que copia
+`data/estado_rf.json` para `data/snapshots_estado_rf/AAAA-MM.json` (por
+exemplo `2026-06.json` no fim de junho). Acumula histórico sem nenhuma
+mudança no dashboard nem no fluxo de uso normal.
+
+**Implementação possível:**
+- (a) Cron mensal no servidor (Render.com tem cron jobs no plano pago,
+  ou um job externo no GitHub Actions).
+- (b) Commit manual no fim do mês (script `python scripts/snapshot_rf.py`
+  que copia o arquivo e gera commit). Mais simples, depende de disciplina.
+- (c) Hook no `/api/save-recomendados-rf` que detecta virada de mês e
+  faz o snapshot automaticamente antes do save. Mais robusto, sem
+  depender de cron externo.
+
+**Por que registrar agora:** se começarmos a fazer snapshots desde já,
+em 6 meses já teremos massa crítica para destravar #5. Se postergar a
+decisão, postergamos também a reativação da aba.
+
+**Onde mexer:**
+- Novo: `scripts/snapshot_estado_rf.py` (job de cópia)
+- Novo: `data/snapshots_estado_rf/` (diretório versionado com 1 arquivo
+  por mês)
+- Eventualmente: `servidor.py` se for usar abordagem (c)
