@@ -182,12 +182,20 @@
       <div class="pcard-foot"><span class="pstatus soon">Em construção</span><span class="parrow">→</span></div>
     </div>
 
-    <div class="pcard soon">
+    <a href="./dashboard_rf.html" class="pcard live">
       <div class="pcard-num">05</div>
       <div class="pcard-name">Fundos de Renda Fixa</div>
-      <div class="pcard-desc">Duration, carrego, sensibilidade e risco de taxa.</div>
-      <div class="pcard-foot"><span class="pstatus soon">Em construção</span><span class="parrow">→</span></div>
-    </div>
+      <div class="pcard-desc">Ranking quantitativo em 5 subgrupos (Liquidez, Crédito, Incentivadas, FIDCs, Internacionais) com excesso vs benchmark de cada fundo.</div>
+      <div class="pcard-foot">
+        <span class="pstatus live">Disponível</span>
+        <span class="parrow">→</span>
+      </div>
+      <div class="pcard-stats">
+        <div><div class="pstat-val" id="rfFundos">—</div><div class="pstat-lbl">fundos</div></div>
+        <div><div class="pstat-val" id="rfSubgrupos">—</div><div class="pstat-lbl">subgrupos</div></div>
+        <div><div class="pstat-val" id="rfUpd">—</div><div class="pstat-lbl">atualização</div></div>
+      </div>
+    </a>
 
     <div class="pcard soon">
       <div class="pcard-num">06</div>
@@ -261,6 +269,19 @@ async function load() {
     const d = m.ultima_atualizacao?.slice(0,10)||'—';
     document.getElementById('mmUpd').textContent  = d;
     document.getElementById('sValUpd').textContent = d;
+  } catch(e){}
+  // RF stats
+  try {
+    const f = await (await fetch('./data/fundos_rf.json?v='+Date.now())).json();
+    document.getElementById('rfFundos').textContent = f.length;
+  } catch(e){}
+  try {
+    const m = await (await fetch('./data/meta_rf.json?v='+Date.now())).json();
+    const subgs = Object.keys(m.por_subgrupo||{}).length;
+    document.getElementById('rfSubgrupos').textContent = subgs;
+    // Prefere ultima_data_cota (data dos dados CVM); cai para ultima_atualizacao do pipeline
+    const d = m.ultima_data_cota || m.ultima_atualizacao?.slice(0,10) || '—';
+    document.getElementById('rfUpd').textContent = d;
   } catch(e){}
   try {
     const c = await (await fetch('./data/cotas.json?v='+Date.now())).json();
