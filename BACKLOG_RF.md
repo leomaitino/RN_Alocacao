@@ -98,3 +98,88 @@ de cota e calcular métricas sob demanda. Não é prioritário.
   e loga `[FIDC_SEM_CVM]` na rodada
 - `dashboard_rf.html` — front precisa respeitar a flag: ocultar score e
   exibir badge "sem dados CVM" para esses fundos
+
+---
+
+## 4. Score por gestora em RF
+
+**Decisão atual:** Em MM, a aba Gestoras mostra um score médio por gestora
+calculado via `scorePool(allFunds)`. Em RF isso seria matematicamente
+incoerente — mistura D0, Crédito, Incentivadas, FIDCs e Internacionais
+(produtos não comparáveis). Solução temporária na Fase 1: omitir o score,
+mostrar apenas dados qualitativos (nome, AUM somado dos fundos da gestora
+no universo RF, lista de fundos sob gestão, texto qualitativo do
+gestoras.json).
+
+**Por que adiar:** o tratamento correto requer reescrita parcial da aba —
+calcular score-por-gestora dentro de cada subgrupo separadamente, e
+permitir que uma gestora apareça múltiplas vezes (uma vez por subgrupo
+onde ela tem fundos). Não cabe na Fase 1.
+
+**Quando revisitar:** após a Fase 1 estar em produção e termos feedback
+de uso da aba Gestoras de RF. Considerar também harmonizar com MM se a
+aba Gestoras do MM for refatorada.
+
+**Onde mexer:**
+- `dashboard_rf.html` — funções `getGestoraScore`, `renderGestorasList`,
+  `openGestora` (sub-cards de score)
+
+---
+
+## 5. Aba Histórico desabilitada na Fase 1
+
+**Decisão atual:** A aba Histórico do MM mostra a evolução da carteira
+recomendada ao longo do tempo (lê `data/historico_carteira.json`). No
+dashboard RF a aba foi escondida — a carteira recomendada de RF está
+sendo construída agora e ainda não há histórico a exibir.
+
+**Por que adiar:** sem snapshots mensais do `estado_rf.json` (que não
+existem ainda), não há série temporal a renderizar. Não há valor em
+mostrar uma aba vazia ou sintética.
+
+**Quando revisitar:** depois que houver pelo menos 6 meses de snapshots
+da carteira recomendada de RF acumulados.
+
+**Onde mexer:**
+- Pipeline novo: snapshot mensal do `estado_rf.json` para
+  `data/historico_carteira_rf.json` (estrutura espelhada da do MM)
+- `dashboard_rf.html` — desesconder o `<div class="tab" data-tab="historico">`
+  e reapontar o fetch de `historico_carteira.json` para `historico_carteira_rf.json`
+
+---
+
+## 6. Inf/NaN nas funções shared (`calcular_sortino`, `calcular_excesso_anualizado`)
+
+**Decisão atual:** O pipeline RF sanitiza inf/NaN em `gerar_fundos_rf_json`
+substituindo por `None` antes de serializar o JSON, e loga `[JSON_SANITIZE]`
+com os fundos afetados. Resolve o problema observado durante o smoke
+test do Bloco A da Etapa 1.3, onde 3 fundos produziam `Infinity` em
+`sortino_24m/36m` e `excesso_36m` — quebrando o `JSON.parse` do dashboard.
+
+**Problema:** o root cause está nas funções de cálculo compartilhadas
+com o pipeline MM (`scripts/pipeline_fundos.py`):
+- `calcular_sortino` divide `excesso.mean()` por `downside_dev`. Se
+  `downside_dev` é minúsculo mas não-zero (D0 / fundos de vol baixíssima),
+  o resultado overflowea para `inf`.
+- `calcular_excesso_anualizado` (no RF) tem `base ** (1/n_anos) - 1`. Em
+  edge cases (retorno cumulativo bizarro), `base` pode ficar inf.
+- `calcular_sharpe` tem o mesmo padrão de Sortino mas com `vol` (já tem
+  guard de `vol == 0`); poderia também produzir inf em casos extremos.
+
+**Por que adiar a correção upstream:** mexer em `pipeline_fundos.py` afeta
+o MM em produção. Não cabe no escopo da Fase 1 do RF. A sanitização no
+RF é defensiva e suficiente.
+
+**Quando revisitar:** ao consolidar tratamento de "métrica sem dados"
+nos dois pipelines (já alinhado com BACKLOG #1).
+
+**Onde mexer (consertando upstream):**
+- `scripts/pipeline_fundos.py` — adicionar `if not np.isfinite(result):
+  return None` em `calcular_sortino`, `calcular_sharpe`, `calcular_calmar`
+- Eliminar a sanitização local do `gerar_fundos_rf_json` quando upstream
+  estiver limpo
+
+**Fundos que dispararam na primeira rodada do Bloco A:**
+- Trend Pós-Fixado FIC FIRF Simples (D0): `sortino_24m`, `sortino_36m`
+- BRB FIRF IMA-S LP (D0): `sortino_36m`, `excesso_36m`
+- Ouro Preto FIC de FIDC (FIDCs): `excesso_36m`
