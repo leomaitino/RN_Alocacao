@@ -1,10 +1,10 @@
 {
-  "ultima_atualizacao": "2026-05-18T13:21:53.586253",
+  "ultima_atualizacao": "2026-05-18T13:33:21.947758",
   "ultima_data_cota": "2026-05-15",
   "total_fundos": 310,
   "fundos_captacao_aberta": 256,
   "fundos_sem_dados_cvm": 11,
-  "recomendados": 1,
+  "recomendados": 3,
   "aprovados": 0,
   "benchmarks_disponiveis": [
     "CDI",

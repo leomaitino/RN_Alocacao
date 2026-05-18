@@ -732,39 +732,31 @@ def montar_e_atualizar_benchmarks(benchmarks_atuais: dict,
                                    serie_imab_longo: pd.Series,
                                    serie_imab5: pd.Series) -> tuple[dict, str, bool]:
     """
-    Atualiza benchmarks.json adicionando IMA-B 5 (real ou fallback) e
-    preservando todas as chaves existentes do MM.
+    Atualiza benchmarks.json com IMA-B 5 (real ou fallback). Política de
+    sobrescrita por chave (corrige bug de defasagem — antes preservava tudo):
+
+      - CDI:      SOBRESCREVE quando serie_cdi (BCB API) está fresca.
+                  Side effect positivo: MM em produção também se beneficia.
+      - IPCA+X:   SOBRESCREVE quando serie_ipca está fresca.
+      - IMA-B 5:  sempre escreve (real ou fallback IMA-B longo).
+      - IMA-B (longo): PRESERVA — RF não tem fonte fresca pra essa série
+                  (sem arquivo Anbima local). Ver BACKLOG #10.
+      - IHFA:     PRESERVA — Anbima bloqueia bot, download falha. Ver BACKLOG #11.
 
     Retorna (benchmarks_atualizados, benchmark_inflacao_efetivo, fallback_usado).
-    benchmark_inflacao_efetivo é uma string descritiva pra meta_rf.json.
     """
-    benchmarks = dict(benchmarks_atuais)  # cópia rasa — preserva tudo do MM
+    benchmarks = dict(benchmarks_atuais)  # cópia rasa — preserva tudo do MM por default
 
-    # Garante CDI/IHFA/IPCA+spreads/IMA-B (só adiciona se MM ainda não escreveu)
-    if 'CDI' not in benchmarks and not serie_cdi.empty:
+    # CDI: sobrescreve com dados frescos da rodada atual
+    if not serie_cdi.empty:
         acum = calcular_acumulado(serie_cdi)
         benchmarks['CDI'] = {
             'nome': 'CDI', 'tipo': 'taxa',
             'retornos_diarios': _serie_para_dict(serie_cdi),
             'acumulado': _serie_para_dict(acum),
         }
-    if 'IHFA' not in benchmarks and not serie_ihfa.empty:
-        acum = calcular_acumulado(serie_ihfa)
-        benchmarks['IHFA'] = {
-            'nome': 'IHFA', 'tipo': 'indice',
-            'retornos_diarios': _serie_para_dict(serie_ihfa),
-            'acumulado': _serie_para_dict(acum),
-        }
-    if 'IMA-B' not in benchmarks and not serie_imab_longo.empty:
-        acum = calcular_acumulado(serie_imab_longo)
-        benchmarks['IMA-B'] = {
-            'nome': 'IMA-B', 'tipo': 'indice',
-            'retornos_diarios': _serie_para_dict(serie_imab_longo),
-            'acumulado': _serie_para_dict(acum),
-        }
+    # IPCA+spreads: sobrescreve quando há IPCA + CDI frescos
     for label, spread in IPCA_SPREADS.items():
-        if label in benchmarks:
-            continue
         s = construir_ipca_mais_spread(serie_ipca, spread, serie_cdi)
         if not s.empty:
             benchmarks[label] = {
@@ -772,6 +764,22 @@ def montar_e_atualizar_benchmarks(benchmarks_atuais: dict,
                 'retornos_diarios': _serie_para_dict(s),
                 'acumulado': _serie_para_dict(calcular_acumulado(s)),
             }
+    # IHFA: PRESERVA — RF não consegue baixar (Anbima bloqueia bot). BACKLOG #11.
+    if 'IHFA' not in benchmarks and not serie_ihfa.empty:
+        acum = calcular_acumulado(serie_ihfa)
+        benchmarks['IHFA'] = {
+            'nome': 'IHFA', 'tipo': 'indice',
+            'retornos_diarios': _serie_para_dict(serie_ihfa),
+            'acumulado': _serie_para_dict(acum),
+        }
+    # IMA-B (longo): PRESERVA — RF não tem fonte fresca, depende do MM. BACKLOG #10.
+    if 'IMA-B' not in benchmarks and not serie_imab_longo.empty:
+        acum = calcular_acumulado(serie_imab_longo)
+        benchmarks['IMA-B'] = {
+            'nome': 'IMA-B', 'tipo': 'indice',
+            'retornos_diarios': _serie_para_dict(serie_imab_longo),
+            'acumulado': _serie_para_dict(acum),
+        }
 
     # IMA-B 5 — sempre escreve (real ou fallback) para o front sempre encontrar
     fallback_usado = False
@@ -1062,7 +1070,8 @@ def salvar_outputs_rf(df_fundos: pd.DataFrame,
     # benchmarks.json — escreve atualizado (preserva chaves do MM)
     with open(output_dir / 'benchmarks.json', 'w', encoding='utf-8') as f:
         json.dump(benchmarks, f, ensure_ascii=False)
-    log.info(f"  ✓ benchmarks.json → {len(benchmarks)} chaves (preservou MM, adicionou IMA-B 5)")
+    log.info(f"  ✓ benchmarks.json → {len(benchmarks)} chaves "
+             f"(sobrescreve CDI/IPCA+spreads, preserva IMA-B longo/IHFA, escreve IMA-B 5)")
 
     # cotas_rf.json — só fundos RF. Usa df_cotas em memória (inclui mês
     # corrente). Se ausente, cai pra parquets cacheados (sem mês corrente).

@@ -1765,7 +1765,7 @@
     "excesso_24m": 0.01475,
     "excesso_36m": 0.002721,
     "longevidade_anos": 4.94,
-    "recomendado": false,
+    "recomendado": true,
     "aprovado": false,
     "sem_dados_cvm": false
   },
@@ -7606,7 +7606,7 @@
     "excesso_24m": 0.010334,
     "excesso_36m": 0.024992,
     "longevidade_anos": 4.91,
-    "recomendado": false,
+    "recomendado": true,
     "aprovado": false,
     "sem_dados_cvm": false
   },
