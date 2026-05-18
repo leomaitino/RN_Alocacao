@@ -891,25 +891,45 @@ def gerar_fundos_rf_json(df_fundos: pd.DataFrame) -> list[dict]:
 
 
 def gerar_cotas_rf_json(fundos_list: list[dict],
-                         cache_cvm_dir: Path) -> dict:
+                         cache_cvm_dir: Path,
+                         df_cotas: pd.DataFrame = None) -> dict:
     """
-    Lê os parquets do cache CVM e monta cotas_rf.json APENAS para os CNPJs RF,
-    com cota normalizada base 100. Mesma lógica de dedup-por-continuidade do MM.
+    Monta cotas_rf.json APENAS para os CNPJs RF, com cota normalizada base 100.
+
+    Fontes (em ordem de preferência):
+      1. df_cotas em memória (passado por salvar_outputs_rf) — inclui o mês
+         CORRENTE, que NÃO está nos parquets de cache (eh_mes_atual=True no
+         baixar_informes_cvm não cacheia o mês atual por design). Ver
+         BACKLOG_RF #9: mesmo bug existe no MM.
+      2. Fallback para os parquets cacheados — defasagem de até 1 mês em
+         relação à data atual (mês corrente ausente).
+
+    Mesma lógica de dedup-por-continuidade do MM.
     """
     cotas_dict = {}
-    if not cache_cvm_dir.exists():
-        log.warning(f"  cache_cvm_rf não encontrado em {cache_cvm_dir} — cotas_rf.json ficará vazio")
-        return cotas_dict
 
-    import glob
-    parquet_files = sorted(glob.glob(str(cache_cvm_dir / '*.parquet')))
-    if not parquet_files:
-        log.warning(f"  Nenhum parquet em {cache_cvm_dir}")
+    df_c = None
+    if df_cotas is not None and not df_cotas.empty:
+        df_c = df_cotas.copy()
+        log.info(f"  cotas_rf.json: fonte = df em memória "
+                 f"({len(df_c)} registros, inclui mês corrente)")
+    elif cache_cvm_dir.exists():
+        import glob
+        parquet_files = sorted(glob.glob(str(cache_cvm_dir / '*.parquet')))
+        if parquet_files:
+            try:
+                frames = [pd.read_parquet(pf) for pf in parquet_files]
+                df_c = pd.concat(frames, ignore_index=True)
+                log.warning(f"  cotas_rf.json: fonte = fallback parquets "
+                            f"({len(parquet_files)} meses) — mês corrente AUSENTE, "
+                            f"gráficos vão ficar defasados")
+            except Exception as e:
+                log.warning(f"  ✗ Falha lendo parquets: {e}")
+    if df_c is None or df_c.empty:
+        log.warning(f"  Nenhuma fonte de cotas disponível — cotas_rf.json vazio")
         return cotas_dict
 
     try:
-        frames = [pd.read_parquet(pf) for pf in parquet_files]
-        df_c = pd.concat(frames, ignore_index=True)
         df_c['DT_COMPTC'] = pd.to_datetime(df_c['DT_COMPTC'])
         # Detecta coluna de quota
         quota_col = next(
@@ -991,7 +1011,8 @@ def salvar_outputs_rf(df_fundos: pd.DataFrame,
                       output_dir: Path,
                       cache_cvm_dir: Path,
                       benchmark_inflacao_efetivo: str,
-                      fallback_usado: bool):
+                      fallback_usado: bool,
+                      df_cotas: pd.DataFrame = None):
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # fundos_rf.json — filtra fundos sem volatilidade (sem dados CVM confiáveis).
@@ -1043,8 +1064,9 @@ def salvar_outputs_rf(df_fundos: pd.DataFrame,
         json.dump(benchmarks, f, ensure_ascii=False)
     log.info(f"  ✓ benchmarks.json → {len(benchmarks)} chaves (preservou MM, adicionou IMA-B 5)")
 
-    # cotas_rf.json — só fundos RF
-    cotas_dict = gerar_cotas_rf_json(fundos_list, cache_cvm_dir)
+    # cotas_rf.json — só fundos RF. Usa df_cotas em memória (inclui mês
+    # corrente). Se ausente, cai pra parquets cacheados (sem mês corrente).
+    cotas_dict = gerar_cotas_rf_json(fundos_list, cache_cvm_dir, df_cotas=df_cotas)
     cotas_path = output_dir / 'cotas_rf.json'
     if cotas_dict:
         with open(cotas_path, 'w', encoding='utf-8') as f:
@@ -1137,6 +1159,7 @@ def main():
     df = aplicar_recomendados_rf(df, output_dir)
 
     metricas_temp = {}
+    df_cotas = None  # disponibilizado fora do bloco para passar a salvar_outputs_rf
     if not args.sem_cvm:
         # 3. CVM cadastro (data_inicio)
         log.info("\n[CVM — Cadastro]")
@@ -1191,10 +1214,11 @@ def main():
         }
         df = segunda_passagem_sharpe_excesso_rf(df, bench_map, metricas_temp)
 
-    # 7. Salvar outputs
+    # 7. Salvar outputs (df_cotas em memória inclui mês corrente — fix do bug
+    # que cotas_rf.json ficava defasado pegando só os parquets cacheados).
     log.info("\n[Salvando outputs RF]")
     salvar_outputs_rf(df, benchmarks, output_dir, cache_cvm_rf,
-                      infl_efetivo, fallback_usado)
+                      infl_efetivo, fallback_usado, df_cotas=df_cotas)
 
     # Resumo
     log.info("\n" + "=" * 60)

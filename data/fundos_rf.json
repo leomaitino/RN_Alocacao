@@ -10851,7 +10851,7 @@
     "excesso_24m": null,
     "excesso_36m": null,
     "longevidade_anos": 1.83,
-    "recomendado": false,
+    "recomendado": true,
     "aprovado": false,
     "sem_dados_cvm": false
   },
