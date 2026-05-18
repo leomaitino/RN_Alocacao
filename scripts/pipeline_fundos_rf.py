@@ -396,7 +396,9 @@ def enriquecer_metricas_rf(df_fundos: pd.DataFrame, df_cotas: pd.DataFrame):
         variacao_pl_12m = None
         if len(pl_serie) >= DIAS_UTEIS_ANO:
             pl_12m_atras = float(pl_serie.iloc[-DIAS_UTEIS_ANO]) / 1e6
-            if pl_12m_atras and pl_12m_atras > 0:
+            # Guard: pl_atual pode ser None se PL recente é 0/None mas o fundo
+            # tinha PL 12M atrás. Edge case real (fundo que foi a quase-zero).
+            if pl_atual is not None and pl_12m_atras and pl_12m_atras > 0:
                 variacao_pl_12m = round((pl_atual - pl_12m_atras) / pl_12m_atras, 6)
 
         # Consistência (% meses positivos) — geral e 36M
@@ -854,15 +856,37 @@ def aplicar_recomendados_rf(df_fundos: pd.DataFrame, output_dir: Path) -> pd.Dat
 # ---------------------------------------------------------------------------
 
 def gerar_fundos_rf_json(df_fundos: pd.DataFrame) -> list[dict]:
+    """
+    Converte df_fundos em lista de dicts JSON-safe.
+
+    Sanitiza inf/NaN → None: o spec do JSON não permite Infinity/NaN; o
+    JSON.parse do JS rejeita com SyntaxError. Algumas funções de cálculo
+    (calcular_sortino especialmente, e excesso anualizado em edge cases)
+    retornam inf quando o downside_dev é minúsculo mas não-zero — comum em
+    fundos D0 de vol baixíssima. Ver BACKLOG_RF.md #6.
+    """
     colunas_excluir = {'_ret', '_cotas'}
     registros = []
+    nao_finitos = {}  # campo -> [nomes] para log
     for _, row in df_fundos.iterrows():
         d = {}
+        nome_row = row.get('nome', '?')
         for k, v in row.items():
             if k in colunas_excluir:
                 continue
-            d[k] = _to_serializable(v)
+            v_serial = _to_serializable(v)
+            if isinstance(v_serial, float) and not np.isfinite(v_serial):
+                nao_finitos.setdefault(k, []).append(nome_row)
+                v_serial = None
+            d[k] = v_serial
         registros.append(d)
+    if nao_finitos:
+        log.warning("  [JSON_SANITIZE] valores inf/nan substituídos por None:")
+        for campo in sorted(nao_finitos):
+            nomes = nao_finitos[campo]
+            log.warning(f"  [JSON_SANITIZE]   {campo}: {len(nomes)} fundo(s)")
+            for n in nomes[:5]:
+                log.warning(f"  [JSON_SANITIZE]     · {n}")
     return registros
 
 
@@ -905,6 +929,7 @@ def gerar_cotas_rf_json(fundos_list: list[dict],
 
         df_c = df_c.sort_values(['CNPJ_NORM', 'DT_COMPTC'])
         cnpj_map = {re.sub(r'[./-]', '', f['cnpj']): f['cnpj'] for f in fundos_list}
+        cotas_sanitizadas = []  # [(cnpj, motivo)] para log
 
         for cnpj_norm, grp in df_c.groupby('CNPJ_NORM'):
             cnpj_orig = cnpj_map.get(cnpj_norm)
@@ -930,11 +955,31 @@ def gerar_cotas_rf_json(fundos_list: list[dict],
             if len(cotas) < 2:
                 continue
             base = cotas.iloc[0]
+            # Guard: base ZERO ou não-finito → série inteira viraria inf/NaN
+            # (raro mas acontece em FIDCs novos com cota inicial 0).
+            if not np.isfinite(base) or base == 0:
+                cotas_sanitizadas.append((cnpj_orig, 'base inválida'))
+                continue
             norm = (cotas / base * 100).round(4)
+            # Filtra qualquer ponto não-finito que tenha sobrado (defensivo)
+            datas_norm = [d.strftime('%Y-%m-%d') for d in norm.index]
+            valores_norm = norm.tolist()
+            par_validos = [(d, v) for d, v in zip(datas_norm, valores_norm)
+                           if isinstance(v, (int, float)) and np.isfinite(v)]
+            n_descartados = len(valores_norm) - len(par_validos)
+            if n_descartados > 0:
+                cotas_sanitizadas.append((cnpj_orig, f'{n_descartados} pontos inf/nan'))
+            if len(par_validos) < 2:
+                continue
+            datas_f, valores_f = zip(*par_validos)
             cotas_dict[cnpj_orig] = {
-                'datas':   [d.strftime('%Y-%m-%d') for d in norm.index],
-                'valores': norm.tolist(),
+                'datas':   list(datas_f),
+                'valores': list(valores_f),
             }
+        if cotas_sanitizadas:
+            log.warning(f"  [COTAS_SANITIZE] {len(cotas_sanitizadas)} série(s) com inf/nan tratadas:")
+            for cnpj, motivo in cotas_sanitizadas[:10]:
+                log.warning(f"  [COTAS_SANITIZE]   · {cnpj}: {motivo}")
         log.info(f"  → cotas_rf.json: {len(cotas_dict)} séries")
     except Exception as e:
         log.warning(f"  ✗ cotas_rf.json não gerado: {e}")

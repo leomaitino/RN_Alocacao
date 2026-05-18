@@ -128,9 +128,14 @@ def save_alocacoes(payload: AlocacoesPayload):
 @api.get("/data/{filename}")
 def serve_data(filename: str):
     allowed = {
+        # MM (multimercados)
         "fundos.json", "benchmarks.json", "cotas.json",
         "meta.json", "gestoras.json", "recomendados.json", "conteudo.json",
-        "estado.json", "pesos.json", "historico_carteira.json"
+        "estado.json", "pesos.json", "historico_carteira.json",
+        # RF (renda fixa) — adicionado na Etapa 1.3.0 do dashboard de RF.
+        # benchmarks.json é compartilhado entre MM e RF (já listado acima).
+        "fundos_rf.json", "cotas_rf.json", "meta_rf.json",
+        "estado_rf.json", "recomendados_rf.json",
     }
     if filename not in allowed:
         raise HTTPException(404, "Arquivo não encontrado")
@@ -147,6 +152,12 @@ def root():
 @api.get("/dashboard.html", include_in_schema=False)
 def dashboard():
     return FileResponse(str(BASE_DIR / "dashboard.html"))
+
+@api.get("/dashboard_rf.html", include_in_schema=False)
+def dashboard_rf():
+    # Etapa 1.3.0 — serve o HTML do dashboard de Renda Fixa.
+    # Rotas /api/save-*-rf e /api/load-estado-rf são adicionadas na Etapa 1.3.8.
+    return FileResponse(str(BASE_DIR / "dashboard_rf.html"))
 
 # ── Comparador ─────────────────────────────────────────────────────────────────
 @api.get("/comparador", include_in_schema=False)
