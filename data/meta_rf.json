@@ -1,7 +1,9 @@
 {
-  "ultima_atualizacao": "2026-05-18T11:57:58.686251",
+  "ultima_atualizacao": "2026-05-18T12:38:14.410175",
+  "ultima_data_cota": "2026-04-30",
   "total_fundos": 310,
   "fundos_captacao_aberta": 256,
+  "fundos_sem_dados_cvm": 11,
   "recomendados": 0,
   "aprovados": 0,
   "benchmarks_disponiveis": [
