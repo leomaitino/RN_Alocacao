@@ -409,6 +409,9 @@ svg text{font-family:var(--font-m);}
     </div>
   </div>
 
+  <!-- RF: pills de subgrupo, espelho da Lista Completa (sincronizadas via populateSubgroups + setSG) -->
+  <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;" id="subgroupTabsQuant"></div>
+
   <!-- WEIGHT PANEL -->
   <div class="weight-panel">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
@@ -443,7 +446,6 @@ svg text{font-family:var(--font-m);}
           <th>Sharpe 36M</th>
           <th>Sortino 36M</th>
           <th>Vol 36M</th>
-          <th>Corr. CDI</th>
           <th>Var PL 12M</th>
           <th>PL (R$M)</th>
           <th style="width:70px;">Rec.</th>
@@ -724,20 +726,29 @@ let authUnlocked = false;
 // ══════════════════════════════════════════════════════════
 // QUANT METRICS CONFIG
 // ══════════════════════════════════════════════════════════
-// ── 11 métricas: Sharpe 12/24/36M + Sortino/DD/Vol/Consist/CorrCDI (36M) + VarPL (12M) + PL + Longevidade
-// Pesos padrão: Sharpe 36M=3, 24M=2, 12M=1 | resto=1
+// ── 13 métricas (RF): Sharpe 12/24/36M + Excesso 12/24/36M + Sortino 36M +
+//    DD/Vol/Consist 36M + VarPL 12M + PL + Longevidade.
+// Removida vs MM: corr_cdi_36m (não faz sentido em RF — todos próximos a CDI).
+// Adicionadas vs MM: 3 excessos vs benchmark do fundo (CDI ou IMA-B 5).
+// Pesos padrão (soma=20):
+//   3: Sharpe 36M, Excesso 36M
+//   2: Sharpe 24M, Excesso 24M, Sortino 36M
+//   1: as outras 8 (Sharpe 12M, Excesso 12M, DD/Vol/Consist 36M, VarPL 12M,
+//      PL, Longevidade)
 const QUANT_METRICS = [
-  // Sharpe — 3 janelas, pesos crescentes para refletir consistência de longo prazo
+  // Sharpe vs benchmark do fundo — 3 janelas, peso crescente
   { key:'sharpe',     label:'Sharpe 12M',      dir:'higher', period:true,  periodFixed:'12m', fmt:'num3', defaultWeight:1 },
   { key:'sharpe',     label:'Sharpe 24M',      dir:'higher', period:true,  periodFixed:'24m', fmt:'num3', defaultWeight:2 },
   { key:'sharpe',     label:'Sharpe 36M',      dir:'higher', period:true,  periodFixed:'36m', fmt:'num3', defaultWeight:3 },
+  // Excesso anualizado vs benchmark do fundo — 3 janelas, peso crescente (RF)
+  { key:'excesso_12m', label:'Excesso 12M',    dir:'higher', period:false, fixedKey:'excesso_12m',         fmt:'pct1', defaultWeight:1 },
+  { key:'excesso_24m', label:'Excesso 24M',    dir:'higher', period:false, fixedKey:'excesso_24m',         fmt:'pct1', defaultWeight:2 },
+  { key:'excesso_36m', label:'Excesso 36M',    dir:'higher', period:false, fixedKey:'excesso_36m',         fmt:'pct1', defaultWeight:3 },
   // Risco — todos em 36M fixo
-  { key:'sortino',    label:'Sortino 36M',     dir:'higher', period:false, fixedKey:'sortino_36m',         fmt:'num3', defaultWeight:1 },
+  { key:'sortino',    label:'Sortino 36M',     dir:'higher', period:false, fixedKey:'sortino_36m',         fmt:'num3', defaultWeight:2 },
   { key:'drawdown_max',label:'Drawdown 36M',   dir:'lower',  period:false, fixedKey:'drawdown_max_36m',    fmt:'pct',  defaultWeight:1 },
   { key:'volatilidade',label:'Volatilidade 36M',dir:'lower', period:false, fixedKey:'volatilidade_36m',    fmt:'pct',  defaultWeight:1 },
   { key:'consistencia',label:'Consistência 36M',dir:'higher',period:false, fixedKey:'consistencia_36m',    fmt:'pct1', defaultWeight:1 },
-  // Correlação CDI 36M — lower is better (menor correlação = mais alfa real)
-  { key:'corr_cdi_36m',label:'Corr. CDI 36M',  dir:'lower',  period:false, fixedKey:'corr_cdi_36m',        fmt:'num3', defaultWeight:1 },
   // Dinâmica de captação
   { key:'variacao_pl_12m',label:'Var. PL 12M', dir:'higher', period:false, fmt:'pct1', defaultWeight:1 },
   // Estrutural
@@ -747,12 +758,12 @@ const QUANT_METRICS = [
 
 let weights = QUANT_METRICS.map(m => m.defaultWeight);
 
-// Columns shown in the quant ranking table (compact — 6 key metrics)
+// Columns shown in the quant ranking table — RF (5 key metrics, sem Corr CDI).
+// Coluna "Benchmark" e colunas de Excesso entram no Bloco C (1.3.7).
 const TABLE_DISPLAY_COLS = [
   { key:'sharpe_36m',       fmt:'num3',  dir:'higher' },
   { key:'sortino_36m',      fmt:'num3',  dir:'higher' },
   { key:'volatilidade_36m', fmt:'pct',   dir:'lower'  },
-  { key:'corr_cdi_36m',     fmt:'num3',  dir:'lower'  },
   { key:'variacao_pl_12m',  fmt:'pct1',  dir:'higher' },
   { key:'pl',               fmt:'money', dir:'higher' },
 ];
@@ -1121,34 +1132,72 @@ async function saveAlocacoes(senha) {
 // ══════════════════════════════════════════════════════════
 // TAB 1: COMPARAÇÃO
 // ══════════════════════════════════════════════════════════
+// Reconstrói os dropdowns de Classe XP (filterClassXP na Lista Completa e
+// qCatSel na Análise Quantitativa) mostrando apenas classes do subgrupo ativo.
+// Sem subgrupo selecionado, mostra todas as classes do universo.
+// Preserva a seleção atual se ela ainda for válida no novo subgrupo.
+function rebuildClassXpSelects() {
+  const pool = currentSubgroup
+    ? allFunds.filter(f => f.subgrupo === currentSubgroup)
+    : allFunds;
+  const classes = [...new Set(pool.map(f => f.class_xp).filter(Boolean))].sort();
+  for (const id of ['filterClassXP', 'qCatSel']) {
+    const sel = document.getElementById(id);
+    if (!sel) continue;
+    const prevVal = sel.value;
+    const placeholder = id === 'qCatSel' ? 'Todas as categorias' : 'Todas';
+    sel.innerHTML = `<option value="">${placeholder}</option>` +
+      classes.map(c => `<option value="${c}">${c}</option>`).join('');
+    sel.value = classes.includes(prevVal) ? prevVal : '';
+  }
+}
+
 function initComparacao() {
-  const sel=document.getElementById('filterClassXP');
-  [...new Set(allFunds.map(f=>f.class_xp).filter(Boolean))].sort().forEach(c=>{
-    const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);
-  });
+  rebuildClassXpSelects();
   populateSubgroups();
   applyFilters();
 }
 function populateSubgroups() {
-  const groups=[{l:'Todos',v:''},{l:'Macro',v:'macro'},{l:'Long & Short',v:'ls'},{l:'Quantitativo',v:'Quantitativo'},{l:'Multiestratégia',v:'Multiestratégia'},{l:'Alternativo',v:'alt'},{l:'Internacional',v:'int'}];
-  document.getElementById('subgroupTabs').innerHTML=groups.map(g=>{
-    const n=g.v===''?allFunds.length:allFunds.filter(f=>matchSG(f,g.v)).length;
+  // RF: 5 subgrupos fixos baseados em f.subgrupo (vindo do pipeline).
+  // Renderiza em DOIS containers — Lista Completa (#subgroupTabs) e Análise
+  // Quantitativa (#subgroupTabsQuant) — para o usuário ter o mesmo controle
+  // visível em ambas as abas. Sincronia bidirecional via setSG.
+  const groups = [
+    {l:'Todos',          v:''},
+    {l:'Liquidez D0',    v:'Liquidez D0'},
+    {l:'Crédito',        v:'Crédito'},
+    {l:'Incentivadas',   v:'Incentivadas'},
+    {l:'FIDCs',          v:'FIDCs'},
+    {l:'Internacionais', v:'Internacionais'},
+  ];
+  const html = groups.map(g=>{
+    const n = g.v==='' ? allFunds.length : allFunds.filter(f=>matchSG(f,g.v)).length;
     return `<button class="sg-pill ${g.v===currentSubgroup?'active':''}" onclick="setSG('${g.v}',this)">${g.l} (${n})</button>`;
   }).join('');
+  for (const id of ['subgroupTabs', 'subgroupTabsQuant']) {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = html;
+  }
 }
-function matchSG(f,v) {
+function matchSG(f, v) {
   if (!v) return true;
-  const c=(f.class_xp||'').toLowerCase();
-  if (v==='macro') return c.includes('macro');
-  if (v==='ls') return c.includes('long short');
-  if (v==='alt') return c.includes('alternativo');
-  if (v==='int') return c.includes('internacional');
-  return f.class_xp===v;
+  return f.subgrupo === v;
 }
-function setSG(v,el) {
-  currentSubgroup=v;
-  document.querySelectorAll('.sg-pill').forEach(p=>p.classList.remove('active'));
-  el.classList.add('active');currentPage=1;applyFilters();
+function setSG(v, el) {
+  currentSubgroup = v;
+  currentPage = 1;
+  // RF: re-renderiza as pills em AMBOS containers (#subgroupTabs e
+  // #subgroupTabsQuant) — populateSubgroups já marca a pill ativa via
+  // `g.v===currentSubgroup`. Mais robusto que mexer em el.classList.
+  populateSubgroups();
+  // Reconstrói os dropdowns de Classe XP nos dois containers, listando só
+  // as classes do subgrupo ativo.
+  rebuildClassXpSelects();
+  applyFilters();
+  // Invalida cache do score e atualiza a Quantitativa pra refletir o novo
+  // pool — assim o ranking não fica defasado se o usuário trocar de aba.
+  quantScoredCache = null;
+  if (typeof renderQuantRanking === 'function') renderQuantRanking();
 }
 function applyFilters() {
   const cXP=document.getElementById('filterClassXP').value;
@@ -1287,11 +1336,8 @@ function exportCSV() {
 // TAB 2: ANÁLISE QUANTITATIVA
 // ══════════════════════════════════════════════════════════
 function initQuant() {
-  // Populate category filter
-  const sel=document.getElementById('qCatSel');
-  [...new Set(allFunds.map(f=>f.class_xp).filter(Boolean))].sort().forEach(c=>{
-    const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);
-  });
+  // Categoria XP: já populada por rebuildClassXpSelects() em initComparacao.
+  // (Se a ordem de init mudar, descomentar: rebuildClassXpSelects();)
   buildWeightSliders();
   renderQuantRanking();
 }
@@ -1327,9 +1373,15 @@ function resetWeights() {
 }
 
 function getQuantPool() {
+  // RF: pool é scoped pelo subgrupo selecionado (pill da Lista Completa).
+  // Sem subgrupo selecionado, retorna todo o universo (D0+Crédito+Inc+FIDCs+Int
+  // misturados — incoerente para ranking, mas é estado inicial. Usuário deve
+  // clicar uma pill para ranking fazer sentido).
+  // Filtro secundário por class_xp (dropdown) e busca textual continuam.
   const cat = document.getElementById('qCatSel')?.value || '';
   const q   = (document.getElementById('qSearchInput')?.value || '').toLowerCase();
   return allFunds.filter(f => {
+    if (currentSubgroup && f.subgrupo !== currentSubgroup) return false;
     if (cat && f.class_xp !== cat) return false;
     if (q && !(f.nome + f.gestora).toLowerCase().includes(q)) return false;
     return true;
@@ -1387,9 +1439,15 @@ function onQuantCatChange() {
 function renderQuantRanking() {
   const pool=getQuantPool();
   const period=document.getElementById('qPeriodSel')?.value||'12m';
-  // Percentis sempre calculados sobre TODOS os fundos (cat filter ok, busca textual não)
+  // RF: percentis calculados sobre o subgrupo (não universo todo) + filtro
+  // de cat (class_xp) opcional. Busca textual NÃO afeta percentis — só filtra
+  // a tela. Isso garante que o ranking é coerente dentro da taxonomia.
   const cat = document.getElementById('qCatSel')?.value || '';
-  const fullPool = allFunds.filter(f => !cat || f.class_xp === cat);
+  const fullPool = allFunds.filter(f => {
+    if (currentSubgroup && f.subgrupo !== currentSubgroup) return false;
+    if (cat && f.class_xp !== cat) return false;
+    return true;
+  });
   const allScored = scorePool(fullPool, period);
   // Filtra para exibição (busca textual), mantendo scores calculados sobre o universo completo
   const q = (document.getElementById('qSearchInput')?.value || '').toLowerCase();
@@ -1469,13 +1527,24 @@ function closeScorecard() {
 }
 
 function renderScorecard(fund) {
-  const pool=getQuantPool();
   const period=document.getElementById('qPeriodSel')?.value||'12m';
-  const entry=(quantScoredCache||scorePool(pool,period)).find(e=>e.fund.cnpj===fund.cnpj);
-  if (!entry) return;
-  const {mr,score,q1count}=entry;
-  const oQ=pctToQ(score),gc=quartilColor(oQ);
-  const cat=document.getElementById('qCatSel')?.value||'';
+
+  // RF: 2 scores SEMPRE visíveis, independente do filtro ativo:
+  //   - Score [Subgrupo do fundo]: pool = todos os fundos do subgrupo do fundo
+  //     (apples-to-apples, peer comparison)
+  //   - Score Universo: pool = todos os 310 fundos RF (contexto amplo)
+  // Esses scores são estáveis por fundo — não dependem de qual pill está ativa.
+  const poolSubgrupo = allFunds.filter(f => f.subgrupo === fund.subgrupo);
+  const scoredSubgrupo = scorePool(poolSubgrupo, period);
+  const entrySub = scoredSubgrupo.find(e => e.fund.cnpj === fund.cnpj);
+  if (!entrySub) return;
+  const { mr, score: scoreSubgrupo, q1count } = entrySub;
+  const qSub = pctToQ(scoreSubgrupo), gcSub = quartilColor(qSub);
+
+  const scoredUniverso = scorePool(allFunds, period);
+  const scoreUniverso = scoredUniverso.find(e => e.fund.cnpj === fund.cnpj)?.score ?? null;
+  const qUni = pctToQ(scoreUniverso), gcUni = quartilColor(qUni);
+
   const card=document.getElementById('quantScorecard');
   card.style.display='block';
   document.getElementById('quantScorecardInner').innerHTML=`
@@ -1483,23 +1552,25 @@ function renderScorecard(fund) {
       <div class="score-header">
         <div>
           <div style="font-family:var(--font-d);font-size:20px;">${fund.nome}</div>
-          <div style="font-size:12px;font-family:var(--font-m);color:var(--text3);">${fund.gestora} · ${fund.class_xp||'—'} · ${fund.tipo_investidor||'Geral'}</div>
+          <div style="font-size:12px;font-family:var(--font-m);color:var(--text3);">${fund.gestora} · ${fund.subgrupo} · ${fund.class_xp||'—'} · ${fund.tipo_investidor||'Geral'}</div>
         </div>
         <div style="display:flex;align-items:center;gap:14px;">
           <div style="text-align:center;">
-            <div class="grade-circle" style="color:${gc};border-color:${gc}40;background:${gc}12;">${score??'—'}</div>
-            <div style="font-size:10px;font-family:var(--font-m);color:var(--text3);margin-top:3px;">Percentil</div>
+            <div class="grade-circle" style="color:${gcSub};border-color:${gcSub}40;background:${gcSub}12;">${scoreSubgrupo??'—'}</div>
+            <div style="font-size:10px;font-family:var(--font-m);color:var(--text3);margin-top:3px;">${fund.subgrupo} (${poolSubgrupo.length})</div>
+          </div>
+          <div style="text-align:center;">
+            <div class="grade-circle" style="color:${gcUni};border-color:${gcUni}40;background:${gcUni}12;">${scoreUniverso??'—'}</div>
+            <div style="font-size:10px;font-family:var(--font-m);color:var(--text3);margin-top:3px;">Universo (${allFunds.length})</div>
           </div>
           <div>
-            <div style="font-size:26px;font-family:var(--font-m);font-weight:700;color:${gc};">Q${oQ||'—'}</div>
-            <div style="font-size:10px;font-family:var(--font-m);color:var(--text3);">${q1count}/8 em Q1</div>
+            <div style="font-size:26px;font-family:var(--font-m);font-weight:700;color:${gcSub};">Q${qSub||'—'}</div>
+            <div style="font-size:10px;font-family:var(--font-m);color:var(--text3);">${q1count}/${mr.length} em Q1</div>
           </div>
         </div>
       </div>
       <div style="font-size:11px;font-family:var(--font-m);color:var(--text3);margin-bottom:14px;">
-        Contra <strong style="color:var(--text2);">${pool.length} fundos</strong>
-        ${cat?`da categoria <strong style="color:var(--text2);">${fund.class_xp}</strong>`:'(universo completo)'}
-        · Período: <strong style="color:var(--text2);">${period}</strong>
+        Score <strong style="color:${gcSub};">${fund.subgrupo}</strong> à esquerda · Score <strong style="color:${gcUni};">universo</strong> à direita · Período: <strong style="color:var(--text2);">${period}</strong>
       </div>
       <div class="quartil-grid">
         ${mr.map(r=>{
@@ -1520,14 +1591,14 @@ function renderScorecard(fund) {
           </div>`;
         }).join('')}
       </div>
-      ${q1count>=6?`<div style="margin-top:14px;background:rgba(61,214,140,.08);border:1px solid rgba(61,214,140,.3);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:10px;">
+      ${q1count>=10?`<div style="margin-top:14px;background:rgba(61,214,140,.08);border:1px solid rgba(61,214,140,.3);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:10px;">
         <span style="font-size:20px;">✦</span>
         <div><div style="font-size:13px;font-weight:600;color:var(--green);">Forte candidato a recomendado</div>
-        <div style="font-size:11px;font-family:var(--font-m);color:var(--text3);">${q1count}/8 métricas em Q1</div></div></div>`
-      :q1count>=3?`<div style="margin-top:14px;background:rgba(201,169,110,.06);border:1px solid rgba(201,169,110,.3);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:10px;">
+        <div style="font-size:11px;font-family:var(--font-m);color:var(--text3);">${q1count}/${mr.length} métricas em Q1</div></div></div>`
+      :q1count>=5?`<div style="margin-top:14px;background:rgba(201,169,110,.06);border:1px solid rgba(201,169,110,.3);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:10px;">
         <span style="font-size:20px;">◈</span>
         <div><div style="font-size:13px;font-weight:600;color:var(--accent2);">Candidato com ressalvas</div>
-        <div style="font-size:11px;font-family:var(--font-m);color:var(--text3);">${q1count}/8 métricas em Q1</div></div></div>`:''}
+        <div style="font-size:11px;font-family:var(--font-m);color:var(--text3);">${q1count}/${mr.length} métricas em Q1</div></div></div>`:''}
     </div>`;
 }
 
