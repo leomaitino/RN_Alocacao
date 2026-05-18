@@ -293,3 +293,63 @@ a sanitização inf/NaN upstream (BACKLOG #6).
 - `scripts/pipeline_fundos.py` — `salvar_outputs` (etapa 7 inline).
   Extrair em função `gerar_cotas_json(fundos_list, cache_cvm_dir,
   df_cotas=None)` espelhando o padrão do RF.
+
+---
+
+## 10. IMA-B longo defasado no benchmarks.json
+
+**Decisão atual:** O IMA-B longo (chave `IMA-B` em `benchmarks.json`)
+está em 2026-04-02 (46 dias atrás) na rodada de 2026-05-18. O pipeline
+RF não baixa essa série — `montar_e_atualizar_benchmarks` agora
+SOBRESCREVE CDI e IPCA+spreads com dados frescos (fix do commit
+`fix(rf): overwrite stale benchmarks`), mas PRESERVA `IMA-B` porque o
+RF não tem fonte para essa série (nenhum fundo de RF usa IMA-B longo
+como referência — Inflação/Incentivadas usam IMA-B 5).
+
+**Problema:** o MM usa IMA-B longo para alguns fundos macro/inflação e
+portanto sofre a defasagem em produção. A chave `IMA-B` no
+`benchmarks.json` compartilhado fica congelada na data da última rodada
+do pipeline MM, que pode ser semanas atrás.
+
+**Por que adiar:** o RF não depende dessa chave; ela só está no JSON
+porque o MM herda do mesmo arquivo. Fix cabe na próxima manutenção do
+pipeline MM, não em hotfix RF.
+
+**Solução:**
+- (a) Adicionar arquivo `input/IMAB-HISTORICO.xlsx` versionado (parecido
+  com `IMAB5-HISTORICO.xlsx`) e fazer o pipeline MM carregá-lo. Mesmo
+  padrão. Usuário baixa da Anbima quando quiser atualizar.
+- (b) Aplicar no `pipeline_fundos.py` (MM) a mesma lógica de sobrescrever
+  do RF — fonte do IMA-B longo passa a alimentar o JSON em cada rodada
+  do MM em vez de depender de inicialização única.
+
+**Onde mexer:**
+- `scripts/pipeline_fundos.py` — `montar_benchmarks` ou função
+  equivalente que escreve `benchmarks.json`.
+- Eventualmente `input/IMAB-HISTORICO.xlsx` para fonte fresca.
+
+---
+
+## 11. IHFA defasado por bloqueio de bot da Anbima
+
+**Decisão atual:** IHFA em 2026-03-31 (48 dias atrás). Pipeline tenta 3
+URLs conhecidas mas Anbima responde 403 / página HTML em vez de CSV. RF
+preserva a chave (mesma decisão do IMA-B longo).
+
+**Problema:** o MM usa IHFA como benchmark de comparação multimercados.
+Em produção o gráfico do MM mostra IHFA atrasado.
+
+**Por que adiar:** não afeta RF (nenhum benchmark RF é IHFA).
+
+**Solução possível:**
+- (a) Baixar manualmente o CSV/Excel do IHFA da Anbima e versionar em
+  `input/IHFA-HISTORICO.xlsx`. Pipeline carrega via `--ihfa
+  caminho.csv` (suporte já existe no MM). Cadência: mensal ou semanal,
+  conforme apetite.
+- (b) Aceitar que o IHFA fica defasado até alguém atualizar manualmente.
+  Documentar no README a frequência esperada.
+
+**Onde mexer:**
+- `scripts/pipeline_fundos.py` — não muda código, só o caminho passado
+  pra `baixar_ihfa(caminho_local=...)`.
+- Operacional: agendar download manual da Anbima.
