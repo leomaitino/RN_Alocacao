@@ -248,3 +248,48 @@ decisão, postergamos também a reativação da aba.
 - Novo: `data/snapshots_estado_rf/` (diretório versionado com 1 arquivo
   por mês)
 - Eventualmente: `servidor.py` se for usar abordagem (c)
+
+---
+
+## 9. Mesmo bug (cotas defasadas pelo mês corrente) existe no pipeline MM
+
+**Decisão atual:** No pipeline RF, o bug foi corrigido — `gerar_cotas_rf_json`
+agora aceita `df_cotas` em memória (preferência) com fallback para parquets.
+Resultado: `cotas_rf.json` inclui o mês corrente (até 2026-05-15 em maio/2026
+em vez de parar em 2026-04-30). Ver commit `fix(rf): include current-month
+CVM data in cotas_rf.json`.
+
+**Problema:** A lógica análoga em `pipeline_fundos.py` (MM) tem a mesma
+falha:
+- A geração de `cotas.json` lê apenas dos parquets cacheados (etapa 7 do
+  `salvar_outputs`).
+- `baixar_informes_cvm` não cacheia o mês corrente por design
+  (`if not eh_mes_atual: chunk.to_parquet(...)`) — para sempre re-baixar
+  o mês em andamento e pegar dados novos publicados durante o dia.
+- Resultado: `cotas.json` em produção fica defasado em até 2-4 semanas.
+
+**Por que passou despercebido:** O dashboard MM mostra retornos acumulados
+de longa data (5 anos). Numa série de 1300 pontos, perder 10-20 pontos
+recentes é visualmente imperceptível. Só ficou óbvio no RF porque a gente
+foi verificar explicitamente a última data por fundo.
+
+**Por que adiar:** mexer no `pipeline_fundos.py` afeta produção do MM
+imediatamente. Cabe numa janela de manutenção planejada do pipeline MM,
+não num hotfix isolado.
+
+**Quando revisitar:** próxima rodada de manutenção do pipeline MM —
+provavelmente junto com a correção do `or 0` no Sharpe (BACKLOG #1) e
+a sanitização inf/NaN upstream (BACKLOG #6).
+
+**Como aplicar o fix (~30 linhas):**
+- Refatorar a função que gera `cotas.json` em `pipeline_fundos.py`
+  (atualmente inline no `salvar_outputs`) para aceitar `df_cotas` como
+  parâmetro opcional.
+- Passar o `df_cotas` em memória do `main()` para essa função.
+- Manter fallback para parquets (compatibilidade quando rodando
+  `--sem-cvm` ou em ambientes sem rede).
+
+**Onde mexer:**
+- `scripts/pipeline_fundos.py` — `salvar_outputs` (etapa 7 inline).
+  Extrair em função `gerar_cotas_json(fundos_list, cache_cvm_dir,
+  df_cotas=None)` espelhando o padrão do RF.
