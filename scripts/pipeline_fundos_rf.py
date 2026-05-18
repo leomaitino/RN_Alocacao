@@ -1065,10 +1065,20 @@ def salvar_outputs_rf(df_fundos: pd.DataFrame,
     por_subgrupo = {}
     for sg in ['Liquidez D0', 'Crédito', 'Incentivadas', 'FIDCs', 'Internacionais']:
         por_subgrupo[sg] = sum(1 for f in fundos_list if f.get('subgrupo') == sg)
+    # Data de referência = data da cota mais recente em cotas_rf.json (max
+    # entre todas as séries). Útil pro front exibir "dados atualizados até".
+    ultima_data_cota = None
+    if cotas_dict:
+        all_max = [s['datas'][-1] for s in cotas_dict.values() if s.get('datas')]
+        if all_max:
+            ultima_data_cota = max(all_max)  # formato YYYY-MM-DD
+    sem_dados_cvm_count = sum(1 for f in fundos_list if f.get('sem_dados_cvm'))
     meta = {
         "ultima_atualizacao": datetime.now().isoformat(),
+        "ultima_data_cota":   ultima_data_cota,  # data CVM mais recente nos cotas
         "total_fundos": len(fundos_list),
         "fundos_captacao_aberta": sum(1 for f in fundos_list if f.get('captacao_aberta')),
+        "fundos_sem_dados_cvm":   sem_dados_cvm_count,
         "recomendados": sum(1 for f in fundos_list if f.get('recomendado')),
         "aprovados":    sum(1 for f in fundos_list if f.get('aprovado')),
         "benchmarks_disponiveis": list(benchmarks.keys()),
