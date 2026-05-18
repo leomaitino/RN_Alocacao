@@ -1,7 +1,7 @@
 {
-  "ultima_atualizacao": "2026-05-05T13:02:34.090591",
-  "total_fundos": 309,
-  "fundos_captacao_aberta": 255,
+  "ultima_atualizacao": "2026-05-18T11:57:58.686251",
+  "total_fundos": 310,
+  "fundos_captacao_aberta": 256,
   "recomendados": 0,
   "aprovados": 0,
   "benchmarks_disponiveis": [
@@ -23,7 +23,7 @@
   "por_subgrupo": {
     "Liquidez D0": 71,
     "Crédito": 136,
-    "Incentivadas": 55,
+    "Incentivadas": 56,
     "FIDCs": 29,
     "Internacionais": 18
   },
