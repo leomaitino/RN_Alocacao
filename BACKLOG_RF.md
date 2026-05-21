@@ -126,19 +126,44 @@ aba Gestoras do MM for refatorada.
 
 ---
 
-## 5. Aba Histórico desabilitada na Fase 1
+## 5. ✓ PARCIALMENTE RESOLVIDO — Aba Histórico
 
-**Decisão atual:** A aba Histórico do MM mostra a evolução da carteira
+**Status:** Aba REATIVADA no commit `feat(rf-dashboard): reactivate history
+tab` (2026-05-19). Carrega `data/historico_carteira_rf.json` (snapshots
+manuais) e renderiza:
+- Gráfico Carteira RN vs CDI (base 100 desde primeiro snapshot, linha
+  vertical em cada virada com tooltip).
+- Card de mudança por snapshot (saídas em vermelho com motivo, entradas
+  em verde com tese).
+- Botão "Ver composição completa" expandindo lista de fundos com peso.
+- Cotas de Incentivadas refletem gross-up de IR (vem do cotas_rf.json
+  já transformado pelo pipeline desde Bloco i).
+
+**Pendente:** automação do snapshot mensal (BACKLOG #8 segue aberto).
+Hoje cada nova versão da carteira recomendada exige edição manual do
+JSON + commit. Pipeline automático cobriria isso ao detectar virada de
+mês (ou save de recomendados) e gerar o snapshot.
+
+**Próxima evolução opcional:** popular snapshot anterior (carteira pré-
+revisão de maio/2026) para o gráfico ter mais histórico que apenas os
+~14 dias atuais. User irá popular em sessão à parte.
+
+---
+
+**Histórico (mantido para auditoria):**
+A aba Histórico do MM mostra a evolução da carteira
 recomendada ao longo do tempo (lê `data/historico_carteira.json`). No
-dashboard RF a aba foi escondida — a carteira recomendada de RF está
-sendo construída agora e ainda não há histórico a exibir.
+dashboard RF a aba estava escondida — a carteira recomendada de RF
+estava sendo construída e não havia histórico a exibir.
 
-**Por que adiar:** sem snapshots mensais do `estado_rf.json` (que não
-existem ainda), não há série temporal a renderizar. Não há valor em
-mostrar uma aba vazia ou sintética.
+**Por que estava adiado:** sem snapshots mensais do `estado_rf.json`,
+não havia série temporal a renderizar. Não havia valor em mostrar uma
+aba vazia ou sintética.
 
-**Quando revisitar:** depois que houver pelo menos 6 meses de snapshots
-da carteira recomendada de RF acumulados.
+**Quando revisitar (status original):** depois que houver pelo menos 6
+meses de snapshots da carteira recomendada de RF acumulados. **Status
+atualizado:** resolvido parcialmente com snapshots manuais; automação
+mensal pendente em #8.
 
 **Onde mexer:**
 - Pipeline novo: snapshot mensal do `estado_rf.json` para
@@ -183,6 +208,39 @@ nos dois pipelines (já alinhado com BACKLOG #1).
 - Trend Pós-Fixado FIC FIRF Simples (D0): `sortino_24m`, `sortino_36m`
 - BRB FIRF IMA-S LP (D0): `sortino_36m`, `excesso_36m`
 - Ouro Preto FIC de FIDC (FIDCs): `excesso_36m`
+
+---
+
+## 12. Visão cross-subgrupo Crédito + Incentivadas com gross-up
+
+**Decisão atual:** O dashboard separa por subgrupo (5 pills). Quando
+um usuário precisa responder "qual o melhor produto pro meu cliente PF
+agora — incentivada ou crédito privado high grade?", precisa olhar 2
+rankings e mentalmente comparar.
+
+**Contexto:** O gross-up implementado em Bloco i (commit `8c13a2d`,
+2026-05-19) já permite comparação fiscal justa entre os 2 subgrupos no
+nível dos dados — incentivada com gross-up de 15% representa o "bruto
+equivalente" se fosse tributada, ficando peer-to-peer com crédito.
+
+**Solução proposta:** criar uma visão opcional "Crédito Cliente"
+(ou similar) que combina os subgrupos Crédito + Incentivadas num
+ranking único:
+- Pool = {Crédito} ∪ {Incentivadas}
+- Score quantitativo recalculado nesse pool combinado.
+- Gross-up já garante comparação justa (incentivadas já vêm grosseadas
+  do pipeline).
+- Filtros adicionais por benchmark (CDI vs IMA-B 5) ou por classe XP
+  ajudam a refinar a comparação.
+
+**Por que adiar:** evolução pós-Fase 1. Não bloqueia deploy nem o uso
+atual. Fica como roadmap.
+
+**Onde mexer:**
+- `dashboard_rf.html` — nova pill "Crédito Cliente" (ou checkbox de
+  combinar) que muda o subgrupo lógico pra union dos 2.
+- Pode requerer ajuste em `getQuantPool()` pra aceitar set de subgrupos
+  em vez de string única.
 
 ---
 
