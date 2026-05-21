@@ -216,9 +216,10 @@ svg text{font-family:var(--font-m);}
   <div class="tab"         onclick="switchTab('comparacao',this)">Lista Completa</div>
   <div class="tab"         onclick="switchTab('quant',this)">Análise Quantitativa</div>
   <div class="tab"         onclick="switchTab('graficos',this)">Gráficos</div>
-  <!-- Aba Histórico escondida no RF (BACKLOG #5): carteira recomendada de RF
-       está sendo construída agora; sem snapshots mensais não há histórico. -->
-  <div class="tab" style="display:none;" onclick="switchTab('historico',this)">Histórico</div>
+  <!-- Aba Histórico reativada no Bloco ii (2026-05-19) — BACKLOG #5 parcial.
+       Lê data/historico_carteira_rf.json (snapshots manuais; pipeline de
+       snapshot mensal automático segue como BACKLOG #8). -->
+  <div class="tab"         onclick="switchTab('historico',this)">Histórico</div>
   <div class="tab"         onclick="switchTab('gestoras',this)">Gestoras</div>
 </nav>
 
@@ -549,47 +550,46 @@ svg text{font-family:var(--font-m);}
 </div>
 
 <!-- ═══ TAB 5: HISTÓRICO ══════════════════════════════════════════════ -->
+<!-- RF: estrutura simplificada vs MM. Renderiza snapshots manuais de
+     data/historico_carteira_rf.json com: gráfico Carteira vs CDI no topo,
+     cards de mudança com saídas/entradas, composição expansível. -->
 <div id="tab-historico" class="tab-content">
 <div class="main">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
     <div>
       <div style="font-family:var(--font-d);font-size:22px;margin-bottom:2px;">Histórico da Carteira RN</div>
-      <div style="font-size:12px;color:var(--text3);font-family:var(--font-m);" id="histSubtitle">Evolução do portfólio recomendado vs benchmarks</div>
-    </div>
-    <div style="display:flex;gap:8px;align-items:center;">
-      <div class="filter-group"><div class="filter-label">Período</div>
-        <select class="filter-select" id="histPeriodSel" onchange="renderHistorico()">
-          <option value="12">12 meses</option><option value="24">24 meses</option>
-          <option value="36" selected>36 meses</option><option value="60">Desde o início</option>
-        </select></div>
+      <div style="font-size:12px;color:var(--text3);font-family:var(--font-m);">
+        Evolução do portfólio recomendado vs CDI · snapshots manuais
+      </div>
     </div>
   </div>
 
-  <!-- Chart -->
-  <div class="chart-container" style="margin-bottom:20px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-      <div style="font-size:13px;font-weight:600;">Portfólio RN vs Benchmarks</div>
-      <div id="histChartLegend" style="display:flex;gap:12px;flex-wrap:wrap;"></div>
+  <!-- Estado vazio (sem snapshots) -->
+  <div id="histEmpty" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:60px;text-align:center;">
+    <div style="font-size:32px;margin-bottom:12px;">📊</div>
+    <div style="font-family:var(--font-d);font-size:18px;margin-bottom:8px;">Nenhum snapshot registrado</div>
+    <div style="font-size:12px;color:var(--text3);font-family:var(--font-m);">
+      Adicione entradas em <code style="color:var(--accent2);">data/historico_carteira_rf.json</code> para popular esta aba.
     </div>
-    <div class="chart-canvas" id="histChartWrapper"></div>
   </div>
 
-  <!-- Stats cards -->
-  <div id="histStats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px;"></div>
-
-  <!-- Timeline -->
-  <div class="table-wrapper" style="margin-bottom:20px;">
-    <div class="table-header-bar">
-      <div class="table-title">Timeline de Alterações</div>
+  <!-- Conteúdo renderizado pelo JS -->
+  <div id="histContent" style="display:none;">
+    <!-- Gráfico Carteira vs CDI -->
+    <div class="chart-container" style="margin-bottom:20px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+        <div style="font-size:13px;font-weight:600;">Evolução da Carteira RN vs CDI (base 100)</div>
+        <div id="histChartLegend" style="display:flex;gap:14px;flex-wrap:wrap;font-family:var(--font-m);font-size:11px;color:var(--text2);"></div>
+      </div>
+      <div class="chart-canvas" id="histChartWrapper"></div>
+      <div style="margin-top:10px;font-size:10px;font-family:var(--font-m);color:var(--text3);text-align:right;">
+        Cotas de Incentivadas refletem gross-up de IR (PF, 15%)
+      </div>
     </div>
-    <div id="histTimeline" style="padding:20px 24px;"></div>
+
+    <!-- Cards de mudança por snapshot, ordem cronológica reversa (mais recente primeiro) -->
+    <div id="histSnapshots"></div>
   </div>
-
-  <!-- Correlation matrices -->
-  <div id="histCorrSection" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(460px,1fr));gap:16px;margin-bottom:20px;"></div>
-
-  <!-- Current/Past portfolios detail -->
-  <div id="histCarteiras" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;"></div>
 </div>
 </div>
 
@@ -836,10 +836,10 @@ async function loadData() {
 
     // Load historico da carteira
     try {
-      const hResp = await fetch('./data/historico_carteira.json?v=' + Date.now());
+      const hResp = await fetch('./data/historico_carteira_rf.json?v=' + Date.now());
       historicoCarteira = await hResp.json();
-      console.log(`historico_carteira.json: ${historicoCarteira.carteiras?.length} carteiras`);
-    } catch(e) { historicoCarteira = null; console.warn('historico_carteira.json não carregado:', e); }
+      console.log(`historico_carteira_rf.json: ${historicoCarteira.snapshots?.length||0} snapshots`);
+    } catch(e) { historicoCarteira = null; console.warn('historico_carteira_rf.json não carregado:', e); }
 
     document.getElementById('headerMeta').innerHTML =
       `Atualização: <span>${meta.ultima_atualizacao?.slice(0,10)||'—'}</span> &nbsp;·&nbsp; ` +
@@ -2389,361 +2389,277 @@ function renderCorrTable(seriesList) {
 // ══════════════════════════════════════════════════════════
 // TAB: HISTÓRICO DA CARTEIRA
 // ══════════════════════════════════════════════════════════
+// RF: carrega historico_carteira_rf.json (snapshots manuais) e renderiza:
+//   - Gráfico Carteira RN vs CDI (base 100 desde primeiro snapshot)
+//   - Card de mudança por snapshot (ordem cronológica reversa)
+//   - Composição expansível (23 fundos com peso)
+// Linha vertical na data de cada virada com tooltip via verticalMarkers
+// do renderLineChartInto.
 
 function initHistorico() {
   renderHistorico();
 }
 
-function buildHistoricalPortfolioSeries(months) {
-  // Composite portfolio that chains historical carteiras.
-  // Each carteira period: equal-weight of its funds.
-  // At rebalance (carteira transition), portfolio value carries over seamlessly.
-  if (!historicoCarteira || !historicoCarteira.carteiras) return null;
-  if (!Object.keys(cotasSeries).length) return null;
+function _parseDate(s) { return s ? new Date(s) : null; }
+function _fmtBR(d) {
+  return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});
+}
 
-  const cutoff = new Date();
-  cutoff.setMonth(cutoff.getMonth() - months);
+// Constrói série da Carteira RN (base 100 desde data_inicio do snapshot mais
+// antigo). Para cada data, pega último valor disponível de cada fundo do
+// snapshot vigente (forward-fill), normaliza pelo valor na data_inicio do
+// snapshot e faz média ponderada pelo peso declarado.
+function buildCarteiraHistoricoSeries(snapshots) {
+  if (!snapshots || !snapshots.length) return null;
+  if (!cotasSeries || !Object.keys(cotasSeries).length) return null;
 
-  const carteiras = historicoCarteira.carteiras.slice().sort((a,b) => a.inicio.localeCompare(b.inicio));
+  // Ordena cronologicamente (mais antigo primeiro)
+  const snaps = [...snapshots].sort((a,b) => a.data_inicio.localeCompare(b.data_inicio));
 
-  // Build per-fund lookup: cnpj -> { time -> cotaNorm }
-  const fundLookup = {};
-  const allTimeSet = new Set();
-  carteiras.forEach(cart => cart.fundos.forEach(f => {
-    if (fundLookup[f.cnpj]) return;
-    const raw = cotasSeries[f.cnpj];
-    if (!raw || !raw.datas) return;
-    const map = {};
-    for (let i = 0; i < raw.datas.length; i++) {
-      const t = new Date(raw.datas[i] + 'T12:00:00').getTime();
-      map[t] = raw.valores[i];
-      if (t >= cutoff.getTime()) allTimeSet.add(t);
+  // Coleta todas as datas de todos os fundos envolvidos, filtrando >= data_inicio
+  // do primeiro snapshot.
+  const firstStart = _parseDate(snaps[0].data_inicio);
+  const cnpjsAll = new Set();
+  snaps.forEach(s => s.fundos.forEach(f => cnpjsAll.add(f.cnpj)));
+
+  const fundCotas = {};  // cnpj -> [{d:Date, v:number}]
+  cnpjsAll.forEach(cnpj => {
+    const c = cotasSeries[cnpj];
+    if (!c) return;
+    fundCotas[cnpj] = c.datas.map((d,i)=>({d:new Date(d), v:c.valores[i]}))
+                              .filter(p => p.d >= firstStart);
+  });
+
+  // Datas comuns: união, ordenadas
+  const allDatas = new Set();
+  Object.values(fundCotas).forEach(arr => arr.forEach(p => allDatas.add(p.d.getTime())));
+  const datasOrdenadas = [...allDatas].sort((a,b)=>a-b).map(t => new Date(t));
+  if (!datasOrdenadas.length) return null;
+
+  // Pra cada snapshot, baseline de cada fundo (valor na data_inicio do snapshot)
+  snaps.forEach(s => {
+    s._inicio = _parseDate(s.data_inicio);
+    s._fim    = s.data_fim ? _parseDate(s.data_fim) : null;
+    s._baselines = {};
+    s.fundos.forEach(f => {
+      const arr = fundCotas[f.cnpj];
+      if (!arr || !arr.length) return;
+      const base = arr.find(p => p.d >= s._inicio);
+      if (base) s._baselines[f.cnpj] = base.v;
+    });
+  });
+
+  // Concatenação multi-snapshot: continuidade via fator acumulador
+  const valoresCarteira = [];
+  let acumulador = 1.0;
+  let snapAtivoIdx = -1;
+  let valorFinalSnapAnterior = 100.0;
+
+  datasOrdenadas.forEach(dt => {
+    let snapIdx = -1;
+    for (let i = snaps.length-1; i >= 0; i--) {
+      const s = snaps[i];
+      if (dt >= s._inicio && (s._fim === null || dt < s._fim)) {
+        snapIdx = i;
+        break;
+      }
     }
-    fundLookup[f.cnpj] = map;
-  }));
+    if (snapIdx < 0) return;
 
-  const allTimes = [...allTimeSet].sort((a,b) => a-b);
-  if (allTimes.length < 2) return null;
-
-  // For each day, determine active carteira and compute equal-weight return
-  let portValue = 100;
-  const resultDatas = [];
-  const resultVals = [];
-  let prevFundVals = null;  // { cnpj: lastRawValue }
-  let activeCartFunds = null;
-
-  for (const t of allTimes) {
-    const date = new Date(t);
-
-    // Find active carteira for this date
-    let activeCart = null;
-    for (let i = carteiras.length - 1; i >= 0; i--) {
-      const ci = new Date(carteiras[i].inicio + 'T12:00:00');
-      const cf = carteiras[i].fim ? new Date(carteiras[i].fim + 'T12:00:00') : new Date('2099-12-31T12:00:00');
-      if (date >= ci && date <= cf) { activeCart = carteiras[i]; break; }
-    }
-    if (!activeCart) continue;
-
-    const cnpjs = activeCart.fundos.map(f => f.cnpj).filter(c => fundLookup[c]);
-    if (!cnpjs.length) continue;
-
-    // Get today's values
-    const todayMap = {};
-    cnpjs.forEach(c => { const v = fundLookup[c][t]; if (v != null) todayMap[c] = v; });
-    const activeCNPJs = Object.keys(todayMap);
-    if (!activeCNPJs.length) continue;
-
-    // Check if carteira changed
-    const cartKey = activeCNPJs.sort().join(',');
-    if (activeCartFunds !== cartKey) {
-      // New carteira or first day — snapshot current values as base
-      activeCartFunds = cartKey;
-      prevFundVals = { ...todayMap };
-      resultDatas.push(date);
-      resultVals.push(portValue);
-      continue;
+    if (snapIdx !== snapAtivoIdx) {
+      acumulador = valorFinalSnapAnterior / 100.0;
+      snapAtivoIdx = snapIdx;
     }
 
-    // Compute equal-weight daily return: avg of individual fund returns
-    let totalRet = 0;
-    let nFunds = 0;
-    activeCNPJs.forEach(c => {
-      const prev = prevFundVals[c];
-      const curr = todayMap[c];
-      if (prev && prev > 0 && curr) {
-        totalRet += curr / prev - 1;
-        nFunds++;
+    const snap = snaps[snapIdx];
+    let pesoNorm = 0, pesoTotal = 0;
+    snap.fundos.forEach(f => {
+      const arr = fundCotas[f.cnpj];
+      const base = snap._baselines[f.cnpj];
+      if (!arr || !base) return;
+      let v = null;
+      for (let i = arr.length-1; i >= 0; i--) {
+        if (arr[i].d <= dt) { v = arr[i].v; break; }
+      }
+      if (v !== null) {
+        const norm = (v / base) * 100;
+        pesoNorm += norm * (f.peso || 1);
+        pesoTotal += (f.peso || 1);
       }
     });
-
-    if (nFunds > 0) {
-      const avgRet = totalRet / nFunds;
-      portValue = portValue * (1 + avgRet);
+    if (pesoTotal > 0) {
+      const media = pesoNorm / pesoTotal;
+      const valorFinal = media * acumulador;
+      valoresCarteira.push({d: dt, v: valorFinal});
+      valorFinalSnapAnterior = valorFinal;
     }
+  });
 
-    prevFundVals = { ...todayMap };
-    resultDatas.push(date);
-    resultVals.push(Math.round(portValue * 100) / 100);
-  }
+  if (valoresCarteira.length < 2) return null;
+  return {
+    name: 'Carteira RN',
+    color: '#FC753E',
+    isPortfolio: true,
+    datas:   valoresCarteira.map(p => p.d),
+    valores: valoresCarteira.map(p => p.v),
+  };
+}
 
-  if (resultDatas.length < 2) return null;
+// Série do CDI normalizada base 100 desde dataInicio.
+function buildCdiHistoricoSeries(dataInicio, dataFimMax) {
+  const cdiAcum = benchmarks && benchmarks['CDI'] && benchmarks['CDI'].acumulado;
+  if (!cdiAcum) return null;
+  const inicio = (dataInicio instanceof Date) ? dataInicio : new Date(dataInicio);
 
-  // Normalize to base 100 at window start
-  const base = resultVals[0];
-  return { datas: resultDatas, valores: resultVals.map(v => Math.round(v/base*10000)/100) };
+  const pontos = Object.entries(cdiAcum)
+    .map(([d,v]) => ({d: new Date(d), v}))
+    .filter(p => p.d >= inicio && (!dataFimMax || p.d <= dataFimMax))
+    .sort((a,b) => a.d - b.d);
+  if (pontos.length < 2) return null;
+  const base = pontos[0].v;
+  return {
+    name: 'CDI',
+    color: '#999',
+    isBench: true,
+    datas:   pontos.map(p => p.d),
+    valores: pontos.map(p => (p.v / base) * 100),
+  };
 }
 
 function renderHistorico() {
-  if (!historicoCarteira) return;
-  const months = parseInt(document.getElementById('histPeriodSel')?.value || '36');
+  const h = historicoCarteira;
+  if (!h || !h.snapshots || !h.snapshots.length) {
+    document.getElementById('histEmpty').style.display = '';
+    document.getElementById('histContent').style.display = 'none';
+    return;
+  }
+  document.getElementById('histEmpty').style.display = 'none';
+  document.getElementById('histContent').style.display = '';
 
-  // === CHART ===
-  const portSeries = buildHistoricalPortfolioSeries(months);
-  const BENCH_COLORS = {
-    'CDI':     '#7aab8a',
-    'IPCA+5%': '#c9a96e',
-    'IHFA':    '#8878b8',
-    'IMA-B':   '#5a9898',
-  };
-  const refDatas = portSeries ? portSeries.datas : null;
-  const benchSeriesList = Object.entries(BENCH_COLORS).map(([key, color]) => {
-    const s = refDatas ? getBenchmarkAligned(key, months, refDatas) : getBenchmarkSeries(key, months);
-    return s ? { ...s, name: key, color, isBench: true } : null;
-  }).filter(Boolean);
+  const snapshots = h.snapshots;
+  const snapsOrdenados = [...snapshots].sort((a,b) => a.data_inicio.localeCompare(b.data_inicio));
+  const firstStart = _parseDate(snapsOrdenados[0].data_inicio);
 
-  const allSeries = [
-    ...(portSeries ? [{ ...portSeries, name:'Portfólio RN (Histórico)', color:'#ffffff', isPortfolio:true }] : []),
-    ...benchSeriesList
-  ];
+  // === Gráfico ===
+  const serieCarteira = buildCarteiraHistoricoSeries(snapshots);
+  const serieCdi      = buildCdiHistoricoSeries(firstStart, new Date());
+  const series = [serieCarteira, serieCdi].filter(Boolean);
+  const verticalMarkers = snapsOrdenados.map(s => ({
+    date: _parseDate(s.data_inicio),
+    label: _fmtBR(_parseDate(s.data_inicio)) + ' · ' + (s.descricao || s.tipo || ''),
+  }));
 
-  if (allSeries.length) {
-    renderLineChartInto('histChartWrapper', allSeries, null, 'base100');
-    document.getElementById('histChartLegend').innerHTML = allSeries.map(s =>
-      `<div style="display:flex;align-items:center;gap:5px;font-size:11px;font-family:var(--font-m);">
-        <div style="width:18px;height:${s.isPortfolio?'3px':'2px'};background:${s.color};border-radius:1px;"></div>
-        <span style="${s.isPortfolio?'font-weight:600;':''}">${s.name}</span>
-      </div>`
+  if (series.length) {
+    renderLineChartInto('histChartWrapper', series, null, 'base100', verticalMarkers);
+    document.getElementById('histChartLegend').innerHTML = series.map(s =>
+      '<div style="display:flex;align-items:center;gap:6px;">' +
+        '<div style="width:18px;height:' + (s.isPortfolio?'3':'2') + 'px;background:' + s.color + ';border-radius:1px;' + (s.isBench?'border-top:1px dashed '+s.color:'') + '"></div>' +
+        '<span style="' + (s.isPortfolio?'font-weight:600;color:var(--text);':'color:var(--text2);') + '">' + s.name + '</span>' +
+      '</div>'
     ).join('');
   } else {
-    document.getElementById('histChartWrapper').innerHTML = '<div style="padding:24px;color:var(--text3);font-family:var(--font-m);font-size:12px;text-align:center;">Sem dados históricos disponíveis</div>';
+    document.getElementById('histChartWrapper').innerHTML =
+      '<div style="padding:24px;color:var(--text3);font-family:var(--font-m);font-size:12px;text-align:center;">Sem dados de cota disponíveis pra montar o gráfico</div>';
   }
 
-  // === STATS ===
-  if (portSeries && portSeries.valores.length > 1) {
-    const ret = (portSeries.valores[portSeries.valores.length-1] / portSeries.valores[0] - 1) * 100;
-    const days = (portSeries.datas[portSeries.datas.length-1] - portSeries.datas[0]) / (1000*60*60*24);
-    const annRet = days > 0 ? (Math.pow(1 + ret/100, 365/days) - 1) * 100 : 0;
-
-    // Max drawdown
-    let maxDD = 0, peak = 0;
-    portSeries.valores.forEach(v => {
-      if (v > peak) peak = v;
-      const dd = (peak - v) / peak;
-      if (dd > maxDD) maxDD = dd;
-    });
-
-    // Benchmark comparison
-    const cdiSeries = benchSeriesList.find(s => s.name === 'CDI');
-    const cdiRet = cdiSeries && cdiSeries.valores.length > 1
-      ? (cdiSeries.valores[cdiSeries.valores.length-1] / cdiSeries.valores[0] - 1) * 100 : 0;
-
-    const stats = [
-      { label: 'RETORNO TOTAL', value: `${ret>=0?'+':''}${ret.toFixed(1)}%`, color: ret>=0?'var(--green)':'var(--red)' },
-      { label: 'RETORNO ANUALIZADO', value: `${annRet>=0?'+':''}${annRet.toFixed(1)}%`, color: annRet>=0?'var(--green)':'var(--red)' },
-      { label: 'VS CDI', value: `${(ret-cdiRet)>=0?'+':''}${(ret-cdiRet).toFixed(1)}%`, color: (ret-cdiRet)>=0?'var(--green)':'var(--red)' },
-      { label: '% CDI', value: cdiRet > 0 ? `${(ret/cdiRet*100).toFixed(0)}%` : '—', color: 'var(--text1)' },
-      { label: 'MAX DRAWDOWN', value: `-${(maxDD*100).toFixed(2)}%`, color: 'var(--yellow)' },
-      { label: 'CARTEIRAS', value: `${historicoCarteira.carteiras.length}`, color: 'var(--text1)' },
-    ];
-
-    document.getElementById('histStats').innerHTML = stats.map(s =>
-      `<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;">
-        <div style="font-size:9px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;">${s.label}</div>
-        <div style="font-size:18px;font-weight:600;color:${s.color};">${s.value}</div>
-      </div>`
-    ).join('');
-  }
-
-  // === TIMELINE ===
-  const timeline = historicoCarteira.timeline || [];
-  document.getElementById('histTimeline').innerHTML = timeline.length
-    ? timeline.map((ev, i) => {
-      const isLast = i === timeline.length - 1;
-      const entradas = ev.entraram?.length
-        ? `<div style="margin-top:6px;"><span style="color:var(--green);font-size:10px;font-weight:600;">ENTRARAM:</span> <span style="font-size:11px;">${ev.entraram.join(', ')}</span></div>` : '';
-      const saidas = ev.sairam?.length
-        ? `<div style="margin-top:3px;"><span style="color:var(--red);font-size:10px;font-weight:600;">SAÍRAM:</span> <span style="font-size:11px;">${ev.sairam.join(', ')}</span></div>` : '';
-      const continuaram = ev.continuaram?.length
-        ? `<div style="margin-top:3px;"><span style="color:var(--accent2);font-size:10px;font-weight:600;">CONTINUARAM:</span> <span style="font-size:11px;">${ev.continuaram.join(', ')}</span></div>` : '';
-
-      return `<div style="display:flex;gap:16px;${!isLast ? 'padding-bottom:20px;' : ''}">
-        <div style="display:flex;flex-direction:column;align-items:center;min-width:14px;">
-          <div style="width:12px;height:12px;border-radius:50%;background:${isLast?'var(--accent2)':'var(--border2)'};border:2px solid ${isLast?'var(--accent2)':'var(--text3)'};flex-shrink:0;"></div>
-          ${!isLast ? '<div style="width:2px;flex:1;background:var(--border2);margin-top:4px;"></div>' : ''}
-        </div>
-        <div style="flex:1;padding-bottom:4px;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
-            <span style="font-family:var(--font-m);font-size:12px;color:var(--accent2);font-weight:600;">${ev.data}</span>
-            <span style="font-size:13px;font-weight:500;">${ev.evento}</span>
-          </div>
-          <div style="font-size:11px;font-family:var(--font-m);color:var(--text3);margin-bottom:4px;">${ev.descricao}</div>
-          ${entradas}${saidas}${continuaram}
-        </div>
-      </div>`;
-    }).join('')
-    : '<div style="color:var(--text3);font-family:var(--font-m);font-size:12px;">Nenhum evento registrado</div>';
-
-  // === CORRELATION MATRICES ===
-  const carteiras = historicoCarteira.carteiras || [];
-  const corrHtml = carteiras.map(cart => {
-    // Build daily returns for each fund in this carteira
-    const fundReturns = {};
-    const allRetDates = new Set();
-    cart.fundos.forEach(f => {
-      const raw = cotasSeries[f.cnpj];
-      if (!raw || !raw.datas || raw.datas.length < 10) return;
-      const rets = [];
-      const dates = [];
-      for (let i = 1; i < raw.datas.length; i++) {
-        const r = raw.valores[i] / raw.valores[i-1] - 1;
-        rets.push(r);
-        dates.push(raw.datas[i]);
-      }
-      fundReturns[f.cnpj] = { rets, dates, nome: f.nome };
-      dates.forEach(d => allRetDates.add(d));
-    });
-
-    const cnpjs = cart.fundos.map(f => f.cnpj).filter(c => fundReturns[c]);
-    if (cnpjs.length < 2) return '';
-
-    // Align returns on common dates
-    const commonDates = [...allRetDates].sort();
-    const aligned = {};
-    cnpjs.forEach(c => {
-      const dateMap = {};
-      const fr = fundReturns[c];
-      fr.dates.forEach((d, i) => { dateMap[d] = fr.rets[i]; });
-      aligned[c] = commonDates.map(d => dateMap[d] ?? null);
-    });
-
-    // Compute pairwise correlation
-    function pearson(a, b) {
-      const pairs = [];
-      for (let i = 0; i < a.length; i++) {
-        if (a[i] != null && b[i] != null) pairs.push([a[i], b[i]]);
-      }
-      if (pairs.length < 20) return null;
-      const n = pairs.length;
-      const mx = pairs.reduce((s,p) => s+p[0], 0) / n;
-      const my = pairs.reduce((s,p) => s+p[1], 0) / n;
-      let num = 0, dx = 0, dy = 0;
-      pairs.forEach(([x,y]) => { num += (x-mx)*(y-my); dx += (x-mx)**2; dy += (y-my)**2; });
-      return dx > 0 && dy > 0 ? num / Math.sqrt(dx * dy) : null;
-    }
-
-    const corrMatrix = cnpjs.map(ci => cnpjs.map(cj => ci === cj ? 1.0 : pearson(aligned[ci], aligned[cj])));
-
-    // Short names
-    const shortNames = cnpjs.map(c => {
-      const n = fundReturns[c].nome;
-      return n.replace(/ Advisory.*| FIF.*| FIC.*| FI .*| em Cotas.*/i, '').replace(/Gama Schroder Gaia Contour Tech Equity LS BRL/i, 'Gama Schroder Contour').trim();
-    });
-
-    // Render table
-    function corrColor(v) {
-      if (v == null) return 'color:var(--text3)';
-      if (v >= 0.7) return 'color:#f05c6e';
-      if (v >= 0.4) return 'color:#f5c842';
-      if (v >= 0.1) return 'color:var(--text1)';
-      if (v >= -0.1) return 'color:var(--text3)';
-      return 'color:#3dd68c';
-    }
-
-    const statusLabel = cart.status === 'provisoria' ? 'Provisória' : cart.status === 'encerrada' ? 'Encerrada' : 'Ativa';
-    const statusColor = cart.status === 'provisoria' ? 'var(--yellow)' : cart.status === 'encerrada' ? 'var(--text3)' : 'var(--green)';
-
-    // Average correlation (off-diagonal)
-    let corrSum = 0, corrN = 0;
-    for (let i = 0; i < cnpjs.length; i++) {
-      for (let j = i+1; j < cnpjs.length; j++) {
-        if (corrMatrix[i][j] != null) { corrSum += corrMatrix[i][j]; corrN++; }
-      }
-    }
-    const avgCorr = corrN > 0 ? (corrSum / corrN) : null;
-
-    return `<div class="table-wrapper">
-      <div class="table-header-bar">
-        <div>
-          <div class="table-title">Correlação — ${cart.nome}</div>
-          <div style="font-size:10px;font-family:var(--font-m);color:var(--text3);margin-top:2px;">
-            <span style="color:${statusColor};">${statusLabel}</span> · ${cnpjs.length} fundos
-            ${avgCorr != null ? ` · correlação média: <span style="${corrColor(avgCorr)};font-weight:600;">${avgCorr.toFixed(2)}</span>` : ''}
-          </div>
-        </div>
-      </div>
-      <div style="overflow-x:auto;padding:12px;">
-        <table style="border-collapse:collapse;font-size:10px;font-family:var(--font-m);width:100%;">
-          <thead><tr>
-            <th style="text-align:left;padding:4px 6px;min-width:100px;"></th>
-            ${shortNames.map(n => `<th style="padding:4px 3px;text-align:center;font-weight:400;color:var(--text3);max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${n}">${n.length > 10 ? n.slice(0,9)+'…' : n}</th>`).join('')}
-          </tr></thead>
-          <tbody>
-          ${cnpjs.map((ci, i) => `<tr>
-            <td style="padding:4px 6px;font-weight:500;white-space:nowrap;color:var(--text2);" title="${shortNames[i]}">${shortNames[i].length > 16 ? shortNames[i].slice(0,15)+'…' : shortNames[i]}</td>
-            ${cnpjs.map((cj, j) => {
-              const v = corrMatrix[i][j];
-              if (i === j) return '<td style="padding:4px 3px;text-align:center;color:var(--text3);">—</td>';
-              const bg = v != null && v >= 0.7 ? 'background:rgba(240,92,110,.08);' : v != null && v < -0.1 ? 'background:rgba(61,214,140,.06);' : '';
-              return `<td style="padding:4px 3px;text-align:center;${corrColor(v)};${bg}font-weight:500;">${v != null ? v.toFixed(2) : '—'}</td>`;
-            }).join('')}
-          </tr>`).join('')}
-          </tbody>
-        </table>
-      </div>
-    </div>`;
+  // === Cards de snapshot (ordem cronológica reversa — mais recente primeiro) ===
+  const snapsReversos = [...snapsOrdenados].reverse();
+  document.getElementById('histSnapshots').innerHTML = snapsReversos.map((s, idx) => {
+    const muds = s.mudancas || {};
+    const saidas = (muds.saidas || []).map(x => (
+      '<div style="display:flex;gap:10px;padding:8px 12px;background:rgba(176,96,96,.06);border-left:3px solid var(--red);border-radius:0 6px 6px 0;margin-bottom:4px;">' +
+        '<span style="color:var(--red);font-family:var(--font-m);font-size:14px;">↓</span>' +
+        '<div style="flex:1;">' +
+          '<div style="font-size:12px;font-weight:500;">' + (x.nome || '') + '</div>' +
+          '<div style="font-size:10px;font-family:var(--font-m);color:var(--text3);margin-top:2px;">' + (x.cnpj || '') + ' · ' + (x.motivo || '') + '</div>' +
+        '</div>' +
+      '</div>'
+    )).join('');
+    const entradas = (muds.entradas || []).map(x => (
+      '<div style="display:flex;gap:10px;padding:8px 12px;background:rgba(122,171,138,.06);border-left:3px solid var(--green);border-radius:0 6px 6px 0;margin-bottom:4px;">' +
+        '<span style="color:var(--green);font-family:var(--font-m);font-size:14px;">↑</span>' +
+        '<div style="flex:1;">' +
+          '<div style="font-size:12px;font-weight:500;">' + (x.nome || '') + '</div>' +
+          '<div style="font-size:10px;font-family:var(--font-m);color:var(--text3);margin-top:2px;">' + (x.cnpj || '') + ' · ' + (x.tese || '') + '</div>' +
+        '</div>' +
+      '</div>'
+    )).join('');
+    const fundosLista = (s.fundos || []).map(f => (
+      '<tr>' +
+        '<td style="padding:6px 12px;font-size:11px;">' + (f.nome || '') + '</td>' +
+        '<td style="padding:6px 12px;font-size:10px;font-family:var(--font-m);color:var(--text3);">' + (f.cnpj || '') + '</td>' +
+        '<td style="padding:6px 12px;font-size:11px;font-family:var(--font-m);text-align:right;">' + (f.peso*100).toFixed(2) + '%</td>' +
+      '</tr>'
+    )).join('');
+    const dataLabel = s.data_fim
+      ? (_fmtBR(_parseDate(s.data_inicio)) + ' → ' + _fmtBR(_parseDate(s.data_fim)))
+      : ('desde ' + _fmtBR(_parseDate(s.data_inicio)) + ' (vigente)');
+    const temMudancas = (muds.saidas && muds.saidas.length) || (muds.entradas && muds.entradas.length);
+    return (
+      '<div class="table-wrapper" style="margin-bottom:14px;">' +
+        '<div class="table-header-bar">' +
+          '<div>' +
+            '<div style="font-size:13px;font-weight:600;">' + dataLabel + '</div>' +
+            '<div style="font-size:10px;font-family:var(--font-m);color:var(--text3);margin-top:2px;">' +
+              (s.tipo || 'snapshot') + ' · ' + (s.fundos||[]).length + ' fundos' +
+            '</div>' +
+          '</div>' +
+          '<button class="btn-ghost" onclick="toggleComposicaoSnapshot(' + idx + ')" style="font-size:11px;padding:5px 11px;">' +
+            '<span id="histToggleLabel' + idx + '">Ver composição completa</span>' +
+          '</button>' +
+        '</div>' +
+        '<div style="padding:14px 18px;">' +
+          (s.descricao ? ('<div style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.5;">' + s.descricao + '</div>') : '') +
+          (temMudancas ? (
+            '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">' +
+              '<div>' +
+                '<div style="font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;">' +
+                  'Saídas' + (muds.saidas ? ' (' + muds.saidas.length + ')' : '') +
+                '</div>' +
+                (saidas || '<div style="font-size:11px;color:var(--text3);font-family:var(--font-m);">—</div>') +
+              '</div>' +
+              '<div>' +
+                '<div style="font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;">' +
+                  'Entradas' + (muds.entradas ? ' (' + muds.entradas.length + ')' : '') +
+                '</div>' +
+                (entradas || '<div style="font-size:11px;color:var(--text3);font-family:var(--font-m);">—</div>') +
+              '</div>' +
+            '</div>'
+          ) : '') +
+          '<div id="histComposicao' + idx + '" style="display:none;margin-top:18px;border-top:1px solid var(--border);padding-top:14px;">' +
+            '<div style="font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;">' +
+              'Composição completa (' + (s.fundos||[]).length + ' fundos · peso igual)' +
+            '</div>' +
+            '<div style="overflow-x:auto;">' +
+              '<table style="width:100%;border-collapse:collapse;">' +
+                '<thead><tr>' +
+                  '<th style="padding:6px 12px;text-align:left;font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border);">Fundo</th>' +
+                  '<th style="padding:6px 12px;text-align:left;font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border);">CNPJ</th>' +
+                  '<th style="padding:6px 12px;text-align:right;font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border);">Peso</th>' +
+                '</tr></thead>' +
+                '<tbody>' + fundosLista + '</tbody>' +
+              '</table>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>'
+    );
   }).join('');
-  document.getElementById('histCorrSection').innerHTML = corrHtml;
-
-  // === CARTEIRAS DETAIL ===
-  document.getElementById('histCarteiras').innerHTML = carteiras.map(cart => {
-    const statusColor = cart.status === 'provisoria' ? 'var(--yellow)' : cart.status === 'ativa' ? 'var(--green)' : 'var(--text3)';
-    const statusLabel = cart.status === 'provisoria' ? 'Provisória' : cart.status === 'ativa' ? 'Ativa' : 'Encerrada';
-    const periodo = cart.fim ? `${cart.inicio} → ${cart.fim}` : `${cart.inicio} → atual`;
-
-    return `<div class="table-wrapper">
-      <div class="table-header-bar">
-        <div>
-          <div class="table-title">${cart.nome}</div>
-          <div style="font-size:10px;font-family:var(--font-m);color:var(--text3);margin-top:2px;">${periodo} · ${cart.pesos} · <span style="color:${statusColor};">${statusLabel}</span></div>
-        </div>
-        <span class="badge ${cart.status==='encerrada'?'':'blue'}">${cart.fundos.length} fundos</span>
-      </div>
-      <table class="data-table"><thead><tr>
-        <th style="text-align:left;width:50%;">Fundo</th>
-        <th>Ret 12M</th><th>Vol 36M</th><th>Sharpe 36M</th>
-      </tr></thead><tbody>
-      ${cart.fundos.map(f => {
-        const fund = allFunds.find(x => x.cnpj === f.cnpj);
-        const r12 = fund?.rent_12m != null ? (fund.rent_12m*100).toFixed(2)+'%' : '—';
-        const vol = fund?.volatilidade_36m != null ? (fund.volatilidade_36m*100).toFixed(2)+'%' : '—';
-        const sh = fund?.sharpe_36m != null ? fund.sharpe_36m.toFixed(3) : '—';
-        const nameShort = f.nome.replace(/ Advisory.*| FIF.*| FIC.*/i, '').trim();
-        return `<tr>
-          <td style="font-size:12px;">${nameShort}<br><span style="font-size:10px;color:var(--text3);font-family:var(--font-m);">${f.cnpj}</span></td>
-          <td class="num ${fund?.rent_12m>=0?'pos':'neg'}">${r12}</td>
-          <td class="num">${vol}</td>
-          <td class="num ${fund?.sharpe_36m>=0?'pos':'neg'}">${sh}</td>
-        </tr>`;
-      }).join('')}
-      </tbody></table>
-    </div>`;
-  }).join('');
-
-  // Update subtitle
-  const nFunds = carteiras.reduce((s,c) => s + c.fundos.length, 0);
-  document.getElementById('histSubtitle').textContent =
-    `${carteiras.length} composições · ${nFunds} fundos no total · desde ${carteiras[0]?.inicio || '—'}`;
 }
+
+function toggleComposicaoSnapshot(idx) {
+  const el = document.getElementById('histComposicao' + idx);
+  const lbl = document.getElementById('histToggleLabel' + idx);
+  if (!el) return;
+  if (el.style.display === 'none') {
+    el.style.display = '';
+    if (lbl) lbl.textContent = 'Ocultar composição';
+  } else {
+    el.style.display = 'none';
+    if (lbl) lbl.textContent = 'Ver composição completa';
+  }
+}
+
 
 // TAB 4: GESTORAS (with avg score)
 // ══════════════════════════════════════════════════════════
@@ -3141,7 +3057,7 @@ function renderHomeChart() {
 }
 
 // Factored-out SVG renderer (shared by home and graficos tabs)
-function renderLineChartInto(wrapperId, seriesList, cdiSeries, mode) {
+function renderLineChartInto(wrapperId, seriesList, cdiSeries, mode, verticalMarkers) {
   const wrapper = document.getElementById(wrapperId);
   if (!wrapper || !seriesList.length) return;
   wrapper.offsetHeight; // force reflow
@@ -3203,9 +3119,25 @@ function renderLineChartInto(wrapperId, seriesList, cdiSeries, mode) {
     return `<path d="${p.line}" fill="none" stroke="${s.color}" stroke-width="${sw}" ${dash} opacity="0.9"/>${p.dots}`;
   }).join('');
 
+  // RF: verticalMarkers opcional pra desenhar linhas verticais com tooltip
+  // (usado no histórico de carteiras para marcar datas de virada de snapshot).
+  let markers = '';
+  if (verticalMarkers && verticalMarkers.length) {
+    markers = verticalMarkers.map(m => {
+      const t = (m.date instanceof Date) ? m.date.getTime() : new Date(m.date).getTime();
+      if (t < allTimes[0] || t > allTimes[allTimes.length-1]) return '';
+      const x = scaleX(t).toFixed(1);
+      const color = m.color || 'var(--accent2)';
+      const label = (m.label || '').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+      return `<line x1="${x}" y1="${PT}" x2="${x}" y2="${H-PB}" stroke="${color}" stroke-width="1" stroke-dasharray="3,3" opacity="0.55">
+        <title>${label}</title>
+      </line>`;
+    }).join('');
+  }
+
   wrapper.innerHTML = `<svg width="${W}" height="${H}" style="display:block;overflow:visible;">
     <rect x="${PL}" y="${PT}" width="${cW}" height="${cH}" fill="#090909" rx="2"/>
-    ${grid}${ref}${axes}${yLab}${xLab}${paths}
+    ${grid}${ref}${axes}${yLab}${xLab}${markers}${paths}
   </svg>`;
 }
 
