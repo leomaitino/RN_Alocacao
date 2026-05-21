@@ -222,6 +222,13 @@ svg text{font-family:var(--font-m);}
   <div class="tab"         onclick="switchTab('gestoras',this)">Gestoras</div>
 </nav>
 
+<!-- Aviso global de gross-up — visível em todas as abas. Renderizado via JS
+     a partir dos campos gross_up_* do meta_rf.json; oculto se gross_up_aplicado
+     for false ou se o meta não tiver os campos (compat com runs antigos). -->
+<div id="grossUpNotice" style="display:none;background:rgba(245,200,66,.08);color:var(--yellow);
+     font-size:12px;padding:8px 14px;border-radius:4px;margin:12px 32px 0;border:1px solid rgba(245,200,66,.2);
+     font-family:var(--font-m);"></div>
+
 <!-- ═══ TAB 0: HOME — RECOMENDADOS ════════════════════════════════ -->
 <div id="tab-home" class="tab-content active">
 <div class="main">
@@ -837,6 +844,18 @@ async function loadData() {
     document.getElementById('headerMeta').innerHTML =
       `Atualização: <span>${meta.ultima_atualizacao?.slice(0,10)||'—'}</span> &nbsp;·&nbsp; ` +
       `Fundos: <span>${meta.total_fundos}</span> &nbsp;·&nbsp; Plataforma: <span>XP Investimentos</span>`;
+
+    // Aviso global de gross-up — exibido em todas as abas se o meta_rf indica
+    // que a transformação foi aplicada. Campos vêm do pipeline (Bloco i 1.3).
+    if (meta.gross_up_aplicado && meta.gross_up_aplicado_em?.length) {
+      const subgs = meta.gross_up_aplicado_em.join(', ');
+      const premissa = meta.gross_up_premissa || 'PF, alíquota 15%';
+      const noticeEl = document.getElementById('grossUpNotice');
+      if (noticeEl) {
+        noticeEl.innerHTML = `Retornos, excessos e gráficos de <strong>${subgs}</strong> com gross-up de IR (premissa: ${premissa})`;
+        noticeEl.style.display = '';
+      }
+    }
 
     initHome();
     initComparacao();
