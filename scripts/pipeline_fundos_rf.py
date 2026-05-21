@@ -149,6 +149,23 @@ EXCLUSOES_EXPLICITAS = {'Renda Fixa Pré'}
 
 CVM_CLASS_FIDC = 'Classes de Cotas de Fundos FIDC'
 
+# Gross-up de IR — aplicado APENAS no subgrupo Incentivadas.
+# Premissa: PF, alíquota 15% (worst-case na tabela regressiva para
+# rendimentos de renda fixa). Fator multiplicativo = 1 / (1 − 0.15).
+# Conceitualmente representa o "retorno bruto equivalente" caso o fundo
+# fosse tributado — torna a comparação com fundos não-isentos honesta.
+# Aplicado em:
+#   - rent_dia/mes/ano/12m/24m/36m (multiplicação direta, simplificação)
+#   - retornos diários da série CVM antes de calcular Sharpe/Sortino/Excesso
+#   - série de cotas em cotas_rf.json (recompõe cota a partir de retornos
+#     diários grosseados)
+# NÃO aplicado em: volatilidade, drawdown, consistência, var_95, PL,
+# longevidade, número de cotistas (são métricas de risco/estrutura puras).
+GROSS_UP_FATOR = 1 / (1 - 0.15)  # ≈ 1.1765
+GROSS_UP_PREMISSA = 'PF, alíquota 15%'
+GROSS_UP_APLICADO_EM = ['Incentivadas']
+GROSS_UP_MIN_PONTOS_COTA = 30  # série com menos do que isso → pula gross-up
+
 
 # ---------------------------------------------------------------------------
 # Subgrupo / Benchmark helpers
@@ -354,6 +371,44 @@ def ler_planilha_xp_rf(caminho: str) -> pd.DataFrame:
 
 
 # ---------------------------------------------------------------------------
+# ETAPA 1.5 — Gross-up de IR para Incentivadas (entre planilha e CVM)
+# ---------------------------------------------------------------------------
+
+def aplicar_gross_up_incentivadas(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Aplica gross-up de IR (fator GROSS_UP_FATOR ≈ 1.1765) nas rentabilidades
+    acumuladas vindas da planilha XP para fundos do subgrupo Incentivadas.
+
+    Multiplicação direta nos campos rent_*. Para fundos sem_dados_cvm:true,
+    apenas estes campos vêm da planilha — métricas calculadas continuam None.
+
+    O gross-up no retorno diário (que afeta Sharpe/Sortino/Excesso) é aplicado
+    em momento diferente — dentro de segunda_passagem_sharpe_excesso_rf, onde
+    a série `_ret` está disponível. O gross-up nas cotas (para gráficos) é
+    aplicado em gerar_cotas_rf_json.
+
+    Conceitualmente é simplificação: multiplicação direta no retorno acumulado
+    não é matematicamente idêntica a multiplicar cada retorno diário (por
+    composição). Para 12M com retornos típicos de RF (~10-15% a.a.), a
+    diferença é menor que 0.7p.p. — aceitável.
+    """
+    rent_cols = ['rent_dia', 'rent_mes', 'rent_ano', 'rent_12m', 'rent_24m', 'rent_36m']
+    mask = df['subgrupo'] == 'Incentivadas'
+    n_fundos = int(mask.sum())
+    if n_fundos == 0:
+        log.info("  [GROSS_UP] nenhum fundo Incentivadas — pulando")
+        return df
+    for col in rent_cols:
+        if col not in df.columns:
+            continue
+        # Multiplica apenas onde mask=True E valor não é None/NaN
+        col_mask = mask & df[col].notna()
+        df.loc[col_mask, col] = df.loc[col_mask, col] * GROSS_UP_FATOR
+    log.info(f"  [GROSS_UP] aplicado em {n_fundos} fundos Incentivadas — rents da planilha XP")
+    return df
+
+
+# ---------------------------------------------------------------------------
 # ETAPA 2 — Métricas (RF) — primeira passagem (sem benchmark)
 # ---------------------------------------------------------------------------
 
@@ -539,6 +594,17 @@ def segunda_passagem_sharpe_excesso_rf(df_fundos: pd.DataFrame,
             # fallback duro: CDI (não deveria acontecer, mas evita travar a passagem)
             bench_serie = serie_cdi
 
+        # GROSS-UP: para fundos Incentivadas, grossea retorno diário antes de
+        # calcular Sharpe/Sortino. Para Excesso (que usa série de cotas),
+        # reconstrói cota a partir do retorno diário grosseado.
+        # Vol/DD/consistência já foram calculadas em enriquecer_metricas_rf
+        # com a série ORIGINAL — não são afetadas.
+        if row.get('subgrupo') == 'Incentivadas':
+            ret = ret * GROSS_UP_FATOR
+            if cotas is not None and len(cotas) > 1:
+                ret_diario = cotas.pct_change().fillna(0) * GROSS_UP_FATOR
+                cotas = cotas.iloc[0] * (1 + ret_diario).cumprod()
+
         J1 = DIAS_UTEIS_ANO
         J2 = DIAS_UTEIS_ANO * 2
         J3 = DIAS_UTEIS_ANO * 3
@@ -558,6 +624,9 @@ def segunda_passagem_sharpe_excesso_rf(df_fundos: pd.DataFrame,
         return row
 
     df_fundos = df_fundos.apply(aplicar, axis=1)
+    # Calmar: já calculado em enriquecer_metricas_rf usando row.rent_12m.
+    # Como aplicar_gross_up_incentivadas roda ANTES de enriquecer_metricas_rf,
+    # o rent_12m já está grosseado quando calmar é calculado. Não precisa refazer.
     return df_fundos
 
 
@@ -969,7 +1038,10 @@ def gerar_cotas_rf_json(fundos_list: list[dict],
 
         df_c = df_c.sort_values(['CNPJ_NORM', 'DT_COMPTC'])
         cnpj_map = {re.sub(r'[./-]', '', f['cnpj']): f['cnpj'] for f in fundos_list}
-        cotas_sanitizadas = []  # [(cnpj, motivo)] para log
+        subgrupo_por_cnpj = {re.sub(r'[./-]', '', f['cnpj']): f.get('subgrupo') for f in fundos_list}
+        cotas_sanitizadas = []     # [(cnpj, motivo)] para log
+        gross_up_pulado = []       # [(cnpj_orig, motivo)] para log
+        gross_up_aplicado = 0      # contador
 
         for cnpj_norm, grp in df_c.groupby('CNPJ_NORM'):
             cnpj_orig = cnpj_map.get(cnpj_norm)
@@ -1000,6 +1072,18 @@ def gerar_cotas_rf_json(fundos_list: list[dict],
             if not np.isfinite(base) or base == 0:
                 cotas_sanitizadas.append((cnpj_orig, 'base inválida'))
                 continue
+            # GROSS-UP: pra fundos Incentivadas, recompõe cota a partir dos
+            # retornos diários grosseados (r * GROSS_UP_FATOR). Se série tem
+            # menos pontos que GROSS_UP_MIN_PONTOS_COTA, pula e mantém original.
+            is_incentivada = subgrupo_por_cnpj.get(cnpj_norm) == 'Incentivadas'
+            if is_incentivada:
+                if len(cotas) >= GROSS_UP_MIN_PONTOS_COTA:
+                    ret_diario = cotas.pct_change().fillna(0) * GROSS_UP_FATOR
+                    cotas = cotas.iloc[0] * (1 + ret_diario).cumprod()
+                    base = cotas.iloc[0]  # mesmo valor — cota[0] não muda no gross-up
+                    gross_up_aplicado += 1
+                else:
+                    gross_up_pulado.append((cnpj_orig, f'{len(cotas)} pontos < {GROSS_UP_MIN_PONTOS_COTA}'))
             norm = (cotas / base * 100).round(4)
             # Filtra qualquer ponto não-finito que tenha sobrado (defensivo)
             datas_norm = [d.strftime('%Y-%m-%d') for d in norm.index]
@@ -1020,6 +1104,12 @@ def gerar_cotas_rf_json(fundos_list: list[dict],
             log.warning(f"  [COTAS_SANITIZE] {len(cotas_sanitizadas)} série(s) com inf/nan tratadas:")
             for cnpj, motivo in cotas_sanitizadas[:10]:
                 log.warning(f"  [COTAS_SANITIZE]   · {cnpj}: {motivo}")
+        if gross_up_aplicado:
+            log.info(f"  [GROSS_UP] cota grosseada em {gross_up_aplicado} fundo(s) Incentivadas")
+        if gross_up_pulado:
+            log.warning(f"  [GROSS_UP_PULADO] {len(gross_up_pulado)} fundo(s) Incentivadas com série curta — cota não grosseada:")
+            for cnpj, motivo in gross_up_pulado[:10]:
+                log.warning(f"  [GROSS_UP_PULADO]   · {cnpj}: {motivo}")
         log.info(f"  → cotas_rf.json: {len(cotas_dict)} séries")
     except Exception as e:
         log.warning(f"  ✗ cotas_rf.json não gerado: {e}")
@@ -1130,6 +1220,12 @@ def salvar_outputs_rf(df_fundos: pd.DataFrame,
         "subgrupos_com_ranking": sorted(SUBGRUPOS_COM_RANKING),
         "por_subgrupo": por_subgrupo,
         "classes_xp": sorted(set(f.get('class_xp', '') for f in fundos_list)),
+        # Gross-up de IR aplicado nos fundos Incentivadas (Bloco i de 2026-05-19).
+        # Front usa esses campos pra exibir aviso global no dashboard.
+        "gross_up_aplicado":     True,
+        "gross_up_premissa":     GROSS_UP_PREMISSA,
+        "gross_up_fator":        round(GROSS_UP_FATOR, 4),
+        "gross_up_aplicado_em":  GROSS_UP_APLICADO_EM,
     }
     with open(output_dir / 'meta_rf.json', 'w', encoding='utf-8') as f:
         json.dump(meta, f, ensure_ascii=False, indent=2)
@@ -1177,6 +1273,12 @@ def main():
     if df.empty:
         log.error("Nenhum fundo válido após filtros — abortando.")
         return
+
+    # 1.5. Gross-up de IR (subgrupo Incentivadas) — multiplica rents da planilha.
+    # Rodado AQUI (antes de CVM) pra que calmar (calculado mais tarde a partir
+    # de rent_12m) já saia grosseado naturalmente, sem precisar recalcular.
+    log.info("\n[Gross-up de IR — Incentivadas]")
+    df = aplicar_gross_up_incentivadas(df)
 
     # 2. Templates manuais (só recomendados_rf.json)
     log.info("\n[Arquivos manuais RF]")
