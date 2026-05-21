@@ -565,21 +565,23 @@ def segunda_passagem_sharpe_excesso_rf(df_fundos: pd.DataFrame,
 # ETAPA 4 — IMA-B 5 (download/parse Excel ANBIMA)
 # ---------------------------------------------------------------------------
 
-def _parsear_excel_imab5(caminho: str, sheet_hint: str | None = None) -> pd.Series:
+def _parsear_excel_anbima(caminho: str, label: str = 'IMA-B 5',
+                           sheet_hint: str | None = None) -> pd.Series:
     """
-    Parser flexível do Excel ANBIMA do IMA Histórico.
+    Parser genérico de planilhas Anbima (IMA-B 5, IMA-B longo, IHFA).
 
-    Estratégia para escolher a aba:
-      0. Se `sheet_hint` (vindo de --imab5-sheet) for passado, tenta usar
-         exatamente essa aba; se não existir, falha e retorna série vazia
-         (não cai pra heurística — explícito vence implícito).
-      1. Procura aba cujo nome contém 'IMA-B 5' mas NÃO termina com '+' nem
-         tem '+' depois do '5' (para distinguir IMA-B 5 vs IMA-B 5+).
-      2. Fallback: se o arquivo tem só 1 aba, usa ela (caso usuário tenha
-         exportado só o IMA-B 5 num Excel mono-aba).
+    Os arquivos Anbima de IMA/IHFA têm estrutura uniforme:
+      - aba única (geralmente nomeada `Historico`) ou multi-aba (IMA Histórico
+        completo, com uma por índice).
+      - colunas: 'Índice', 'Data de Referência', 'Número Índice',
+        'Variação Diária (%)', ... — algumas com header variável.
 
-    Detecta colunas de data e de número-índice ou variação diária.
-    Converte para série de retornos diários (decimal).
+    Estratégia de escolha de aba:
+      0. sheet_hint (--imab5-sheet / --imab-sheet / --ihfa-sheet) → exato.
+      1. Se o arquivo tem só 1 aba → usa ela.
+      2. Senão falha (peça pra usuário passar sheet_hint).
+
+    label é só pra mensagens de log e diferenciar os 3 contextos de uso.
     """
     import openpyxl
     wb = openpyxl.load_workbook(caminho, read_only=True)
@@ -588,40 +590,27 @@ def _parsear_excel_imab5(caminho: str, sheet_hint: str | None = None) -> pd.Seri
 
     aba_alvo = None
     if sheet_hint:
-        # Aba explícita via --imab5-sheet
         if sheet_hint in abas:
             aba_alvo = sheet_hint
-            log.info(f"  IMA-B 5: usando aba forçada via --imab5-sheet: '{aba_alvo}'")
+            log.info(f"  {label}: usando aba forçada: '{aba_alvo}'")
         else:
-            log.warning(f"  IMA-B 5: aba '{sheet_hint}' (--imab5-sheet) não existe. "
-                        f"Abas disponíveis: {abas}")
+            log.warning(f"  {label}: aba '{sheet_hint}' não existe. Abas: {abas}")
             return pd.Series(dtype=float)
+    elif len(abas) == 1:
+        aba_alvo = abas[0]
+        log.info(f"  {label}: usando única aba '{aba_alvo}'")
     else:
-        # Heurística: procura "IMA-B 5", excluindo "IMA-B 5+"
-        candidatas = []
-        for nome in abas:
-            nome_norm = nome.strip().upper().replace(' ', '')
-            if 'IMA-B5' in nome_norm and '5+' not in nome_norm and '5MAIS' not in nome_norm:
-                candidatas.append(nome)
-        if candidatas:
-            aba_alvo = candidatas[0]
-        else:
-            # fallback: aceita usuário ter mandado planilha de aba única só do IMA-B 5
-            if len(abas) == 1:
-                aba_alvo = abas[0]
-                log.warning(f"  IMA-B 5: nenhuma aba 'IMA-B 5' encontrada; usando única aba "
-                            f"'{aba_alvo}'. Para forçar use --imab5-sheet NOME.")
-            else:
-                log.warning(f"  IMA-B 5: nenhuma aba reconhecida. Abas: {abas}. "
-                            f"Use --imab5-sheet NOME para forçar.")
-                return pd.Series(dtype=float)
+        log.warning(f"  {label}: múltiplas abas ({abas}); use sheet_hint pra forçar.")
+        return pd.Series(dtype=float)
 
-    log.info(f"  IMA-B 5: lendo aba '{aba_alvo}'")
-
-    # Tenta múltiplos header_rows porque ANBIMA varia o layout
+    # Tenta múltiplos header_rows porque ANBIMA varia o layout.
+    # IMPORTANTE: NÃO forçar dtype=str — deixa pandas detectar datetime nativo
+    # das células Excel. Forçar string + parse com dayfirst quebra em arquivos
+    # cujo formato de célula é MDY-US (caso real do IHFA-HISTORICO.xlsx: data
+    # "05/12/2026" virava 2026-12-05 em vez de 2026-05-12).
     for header_row in [0, 1, 2, 3]:
         try:
-            df = pd.read_excel(caminho, sheet_name=aba_alvo, header=header_row, dtype=str)
+            df = pd.read_excel(caminho, sheet_name=aba_alvo, header=header_row)
             if df.shape[1] < 2:
                 continue
             df.columns = [str(c).strip() for c in df.columns]
@@ -643,24 +632,28 @@ def _parsear_excel_imab5(caminho: str, sheet_hint: str | None = None) -> pd.Seri
             if not col_data or (not col_var and not col_idx):
                 continue
 
-            # Excel pode entregar a coluna já como datetime — pular conversão
-            # para silenciar UserWarning de dayfirst em valores datetime nativos.
+            # Coluna de data: pandas geralmente entrega datetime64 nativo
+            # quando a célula Excel tem formato de data. Se vier como string,
+            # converte SEM dayfirst (deixa pandas heurística decidir).
             if not pd.api.types.is_datetime64_any_dtype(df[col_data]):
-                df[col_data] = pd.to_datetime(df[col_data], dayfirst=True, errors='coerce')
+                df[col_data] = pd.to_datetime(df[col_data], errors='coerce')
             df = df.dropna(subset=[col_data]).set_index(col_data).sort_index()
+
+            def _to_num(s):
+                """Converte coluna pra float, tratando string com vírgula decimal."""
+                if pd.api.types.is_numeric_dtype(s):
+                    return pd.to_numeric(s, errors='coerce')
+                return pd.to_numeric(
+                    s.astype(str).str.replace('.', '', regex=False).str.replace(',', '.', regex=False).str.replace('%', '', regex=False),
+                    errors='coerce',
+                )
 
             if col_var:
                 # Variação diária em % → decimal
-                ret = pd.to_numeric(
-                    df[col_var].astype(str).str.replace(',', '.', regex=False).str.replace('%', '', regex=False),
-                    errors='coerce',
-                ).dropna() / 100.0
+                ret = _to_num(df[col_var]).dropna() / 100.0
             else:
                 # Número-índice → calcula retorno diário
-                idx = pd.to_numeric(
-                    df[col_idx].astype(str).str.replace('.', '', regex=False).str.replace(',', '.', regex=False),
-                    errors='coerce',
-                ).dropna()
+                idx = _to_num(df[col_idx]).dropna()
                 ret = idx.pct_change().dropna()
 
             if len(ret) > 100:
@@ -668,31 +661,47 @@ def _parsear_excel_imab5(caminho: str, sheet_hint: str | None = None) -> pd.Seri
         except Exception:
             continue
 
-    log.warning(f"  IMA-B 5: não foi possível parsear a aba '{aba_alvo}'")
+    log.warning(f"  {label}: não foi possível parsear a aba '{aba_alvo}'")
     return pd.Series(dtype=float)
+
+
+def _carregar_anbima_xlsx(caminho_local: str | None, label: str,
+                           sheet_hint: str | None = None) -> pd.Series:
+    """Wrapper comum: valida path, chama parser, loga o range carregado."""
+    if not caminho_local:
+        return pd.Series(dtype=float)
+    if not os.path.exists(caminho_local):
+        log.warning(f"  {label}: arquivo não encontrado: {caminho_local}")
+        return pd.Series(dtype=float)
+    log.info(f"Carregando {label} do arquivo: {caminho_local}")
+    serie = _parsear_excel_anbima(caminho_local, label=label, sheet_hint=sheet_hint)
+    if not serie.empty:
+        log.info(f"  → {label}: {len(serie)} dias ({serie.index[0].date()} a {serie.index[-1].date()})")
+    return serie
 
 
 def baixar_imab5(caminho_local: str | None,
                   sheet_hint: str | None = None) -> pd.Series:
     """
     Carrega série diária do IMA-B 5 a partir de arquivo Excel local.
-
-    Sem download automático: ANBIMA bloqueia bots. Usuário deve baixar de
-    https://www.anbima.com.br/pt_br/informar/estatisticas/precos-e-indices/ima-historico.htm
-    e passar via --imab5. Opcionalmente, --imab5-sheet força o nome da aba.
+    Sem download automático: ANBIMA bloqueia bots.
+    Fonte: https://www.anbima.com.br/pt_br/informar/estatisticas/precos-e-indices/ima-historico.htm
     """
     if not caminho_local:
         log.warning("  IMA-B 5: --imab5 não fornecido")
-        return pd.Series(dtype=float)
-    if not os.path.exists(caminho_local):
-        log.warning(f"  IMA-B 5: arquivo não encontrado: {caminho_local}")
-        return pd.Series(dtype=float)
+    return _carregar_anbima_xlsx(caminho_local, label='IMA-B 5', sheet_hint=sheet_hint)
 
-    log.info(f"Carregando IMA-B 5 do arquivo: {caminho_local}")
-    serie = _parsear_excel_imab5(caminho_local, sheet_hint=sheet_hint)
-    if not serie.empty:
-        log.info(f"  → IMA-B 5: {len(serie)} dias ({serie.index[0].date()} a {serie.index[-1].date()})")
-    return serie
+
+def baixar_imab_xlsx(caminho_local: str | None,
+                      sheet_hint: str | None = None) -> pd.Series:
+    """Carrega IMA-B longo a partir de XLSX Anbima (mesmo formato do IMA-B 5)."""
+    return _carregar_anbima_xlsx(caminho_local, label='IMA-B', sheet_hint=sheet_hint)
+
+
+def baixar_ihfa_xlsx(caminho_local: str | None,
+                      sheet_hint: str | None = None) -> pd.Series:
+    """Carrega IHFA a partir de XLSX Anbima (mesmo formato do IMA-B 5)."""
+    return _carregar_anbima_xlsx(caminho_local, label='IHFA', sheet_hint=sheet_hint)
 
 
 # ---------------------------------------------------------------------------
@@ -733,15 +742,17 @@ def montar_e_atualizar_benchmarks(benchmarks_atuais: dict,
                                    serie_imab5: pd.Series) -> tuple[dict, str, bool]:
     """
     Atualiza benchmarks.json com IMA-B 5 (real ou fallback). Política de
-    sobrescrita por chave (corrige bug de defasagem — antes preservava tudo):
+    sobrescrita por chave:
 
       - CDI:      SOBRESCREVE quando serie_cdi (BCB API) está fresca.
-                  Side effect positivo: MM em produção também se beneficia.
       - IPCA+X:   SOBRESCREVE quando serie_ipca está fresca.
       - IMA-B 5:  sempre escreve (real ou fallback IMA-B longo).
-      - IMA-B (longo): PRESERVA — RF não tem fonte fresca pra essa série
-                  (sem arquivo Anbima local). Ver BACKLOG #10.
-      - IHFA:     PRESERVA — Anbima bloqueia bot, download falha. Ver BACKLOG #11.
+      - IMA-B (longo): SOBRESCREVE quando serie_imab_longo é fresca (XLSX
+                  Anbima via --imab); preserva existente se vazia. Resolveu
+                  BACKLOG #10 com este fix.
+      - IHFA:     SOBRESCREVE quando serie_ihfa é fresca (XLSX Anbima via
+                  --ihfa); preserva existente se vazia (Anbima bloqueia bot,
+                  então sem --ihfa fica preservado). Resolveu BACKLOG #11.
 
     Retorna (benchmarks_atualizados, benchmark_inflacao_efetivo, fallback_usado).
     """
@@ -764,16 +775,17 @@ def montar_e_atualizar_benchmarks(benchmarks_atuais: dict,
                 'retornos_diarios': _serie_para_dict(s),
                 'acumulado': _serie_para_dict(calcular_acumulado(s)),
             }
-    # IHFA: PRESERVA — RF não consegue baixar (Anbima bloqueia bot). BACKLOG #11.
-    if 'IHFA' not in benchmarks and not serie_ihfa.empty:
+    # IHFA: SOBRESCREVE quando há fonte fresca via --ihfa XLSX Anbima.
+    # Vazia (Anbima sempre bloqueia bot via URL e sem --ihfa) → preserva.
+    if not serie_ihfa.empty:
         acum = calcular_acumulado(serie_ihfa)
         benchmarks['IHFA'] = {
             'nome': 'IHFA', 'tipo': 'indice',
             'retornos_diarios': _serie_para_dict(serie_ihfa),
             'acumulado': _serie_para_dict(acum),
         }
-    # IMA-B (longo): PRESERVA — RF não tem fonte fresca, depende do MM. BACKLOG #10.
-    if 'IMA-B' not in benchmarks and not serie_imab_longo.empty:
+    # IMA-B (longo): SOBRESCREVE quando há fonte fresca via --imab XLSX Anbima.
+    if not serie_imab_longo.empty:
         acum = calcular_acumulado(serie_imab_longo)
         benchmarks['IMA-B'] = {
             'nome': 'IMA-B', 'tipo': 'indice',
@@ -1138,14 +1150,18 @@ def main():
                         help='Pula download CVM (sem métricas quant)')
     parser.add_argument('--anos-historico', type=int, default=5,
                         help='Anos de histórico CVM (padrão: 5)')
-    parser.add_argument('--ihfa', default=None, help='Caminho CSV do IHFA')
-    parser.add_argument('--imab', default=None, help='Caminho CSV do IMA-B (longo)')
+    parser.add_argument('--ihfa', default=None,
+                        help='Caminho do IHFA (XLSX Anbima ou CSV legado)')
+    parser.add_argument('--ihfa-sheet', default=None,
+                        help='Força o nome da aba no XLSX do IHFA (default: aba única).')
+    parser.add_argument('--imab', default=None,
+                        help='Caminho do IMA-B longo (XLSX Anbima ou CSV legado)')
+    parser.add_argument('--imab-sheet', default=None,
+                        help='Força o nome da aba no XLSX do IMA-B longo.')
     parser.add_argument('--imab5', default=None,
                         help='Caminho XLSX do IMA-B 5 (ANBIMA — IMA Histórico)')
     parser.add_argument('--imab5-sheet', default=None,
-                        help=('Força o nome da aba a usar no XLSX do IMA-B 5. '
-                              'Sem isso, o parser procura aba "IMA-B 5" e cai em '
-                              'fallback de aba única se houver só 1.'))
+                        help='Força o nome da aba no XLSX do IMA-B 5.')
     args = parser.parse_args()
 
     output_dir = Path(args.output)
@@ -1187,19 +1203,30 @@ def main():
     log.info("\n[Benchmarks]")
     serie_cdi  = baixar_cdi()
     serie_ipca = baixar_ipca()
-    serie_ihfa = baixar_ihfa(caminho_local=args.ihfa)
 
-    # IMA-B longo: do CSV (--imab) ou do benchmarks.json existente
+    # IHFA: prioriza XLSX Anbima local (--ihfa file.xlsx). Para .csv ou
+    # download remoto (que normalmente falha), cai pra baixar_ihfa.
+    if args.ihfa and args.ihfa.lower().endswith('.xlsx'):
+        serie_ihfa = baixar_ihfa_xlsx(args.ihfa, sheet_hint=args.ihfa_sheet)
+    else:
+        serie_ihfa = baixar_ihfa(caminho_local=args.ihfa)
+
     benchmarks_atuais = carregar_benchmarks_existente(output_dir)
+
+    # IMA-B longo: prioriza --imab .xlsx (Anbima). Suporta .csv legado.
+    # Sem --imab, tenta carregar do benchmarks.json existente.
     serie_imab_longo = pd.Series(dtype=float)
     if args.imab and os.path.exists(args.imab):
-        log.info(f"  Carregando IMA-B (longo) do CSV: {args.imab}")
-        try:
-            with open(args.imab, 'rb') as f:
-                serie_imab_longo = _parsear_csv_ihfa(f.read())
-            log.info(f"  IMA-B (longo): {len(serie_imab_longo)} dias")
-        except Exception as e:
-            log.warning(f"  Falha ao ler --imab: {e}")
+        if args.imab.lower().endswith('.xlsx'):
+            serie_imab_longo = baixar_imab_xlsx(args.imab, sheet_hint=args.imab_sheet)
+        else:
+            log.info(f"  Carregando IMA-B (longo) do CSV: {args.imab}")
+            try:
+                with open(args.imab, 'rb') as f:
+                    serie_imab_longo = _parsear_csv_ihfa(f.read())
+                log.info(f"  IMA-B (longo): {len(serie_imab_longo)} dias")
+            except Exception as e:
+                log.warning(f"  Falha ao ler --imab: {e}")
     if serie_imab_longo.empty:
         serie_imab_longo = carregar_imab_existente(benchmarks_atuais)
         if not serie_imab_longo.empty:

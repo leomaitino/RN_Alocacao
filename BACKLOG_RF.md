@@ -296,11 +296,21 @@ a sanitização inf/NaN upstream (BACKLOG #6).
 
 ---
 
-## 10. IMA-B longo defasado no benchmarks.json
+## 10. ✓ RESOLVIDO — IMA-B longo defasado no benchmarks.json
 
-**Decisão atual:** O IMA-B longo (chave `IMA-B` em `benchmarks.json`)
-está em 2026-04-02 (46 dias atrás) na rodada de 2026-05-18. O pipeline
-RF não baixa essa série — `montar_e_atualizar_benchmarks` agora
+**Status:** Resolvido no commit `fix(rf): support manual IMA-B and IHFA
+history files` (2026-05-19). Pipeline RF agora aceita `--imab
+input/IMAB-HISTORICO.xlsx` (Anbima) e sobrescreve a chave `IMA-B`. Última
+data passa a refletir o arquivo Anbima (2026-05-20 na primeira rodada
+com o fix). Atualização: usuário baixa novo XLSX da Anbima quando
+quiser refresh.
+
+---
+
+**Histórico (mantido para auditoria):**
+O IMA-B longo (chave `IMA-B` em `benchmarks.json`)
+estava em 2026-04-02 (46 dias atrás) na rodada de 2026-05-18. O pipeline
+RF não baixava essa série — `montar_e_atualizar_benchmarks` agora
 SOBRESCREVE CDI e IPCA+spreads com dados frescos (fix do commit
 `fix(rf): overwrite stale benchmarks`), mas PRESERVA `IMA-B` porque o
 RF não tem fonte para essa série (nenhum fundo de RF usa IMA-B longo
@@ -330,9 +340,22 @@ pipeline MM, não em hotfix RF.
 
 ---
 
-## 11. IHFA defasado por bloqueio de bot da Anbima
+## 11. ✓ RESOLVIDO — IHFA defasado por bloqueio de bot da Anbima
 
-**Decisão atual:** IHFA em 2026-03-31 (48 dias atrás). Pipeline tenta 3
+**Status:** Resolvido no commit `fix(rf): support manual IMA-B and IHFA
+history files` (2026-05-19). Pipeline RF agora aceita `--ihfa
+input/IHFA-HISTORICO.xlsx` (Anbima) e sobrescreve a chave `IHFA`.
+Última data passa a refletir o arquivo Anbima (2026-05-18 na primeira
+rodada com o fix). Bonus: durante o fix descobri e corrigi um bug
+secundário no parser que interpretava datas MDY-US (formato de célula
+do IHFA XLSX) como DMY com `dayfirst=True`, produzindo datas no futuro
+(2026-12-05 em vez de 2026-05-12). Removido `dtype=str` no
+`pd.read_excel` — agora pandas detecta datetime nativo.
+
+---
+
+**Histórico (mantido para auditoria):**
+IHFA estava em 2026-03-31 (48 dias atrás). Pipeline tenta 3
 URLs conhecidas mas Anbima responde 403 / página HTML em vez de CSV. RF
 preserva a chave (mesma decisão do IMA-B longo).
 
