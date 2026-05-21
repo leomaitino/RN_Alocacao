@@ -193,6 +193,11 @@ def serve_data(filename: str):
         # benchmarks.json é compartilhado entre MM e RF (já listado acima).
         "fundos_rf.json", "cotas_rf.json", "meta_rf.json",
         "estado_rf.json", "recomendados_rf.json",
+        # historico_carteira_rf.json: snapshots manuais da carteira recomendada
+        # (Bloco ii 2026-05-19). NÃO há rota POST — atualização via commit no
+        # JSON (não é fluxo do usuário no dashboard). Ver BACKLOG #8 para
+        # automação futura (snapshot mensal automático).
+        "historico_carteira_rf.json",
     }
     if filename not in allowed:
         raise HTTPException(404, "Arquivo não encontrado")

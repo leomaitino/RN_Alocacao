@@ -1,0 +1,165 @@
+{
+  "_instrucoes": "Snapshots manuais da carteira recomendada de RF. Cada item representa uma vigência [data_inicio, data_fim). data_fim=null indica vigência atual. mudancas detalha saídas/entradas vs snapshot anterior; null no primeiro snapshot.",
+  "_ultima_revisao": "2026-05-20",
+  "snapshots": [
+    {
+      "data_inicio": "2026-05-20",
+      "data_fim": null,
+      "tipo": "rebalanceamento",
+      "descricao": "Revisão pós-abertura de spreads em incentivadas (maio/2026). 3 saídas de fundos com performance descolada do peer group. 3 entradas de alternativas com resiliência demonstrada no período.",
+      "fundos": [
+        {
+          "cnpj": "21.185.984/0001-00",
+          "nome": "BNP Paribas Rubi FIF RF CP RL",
+          "peso": 0.04348
+        },
+        {
+          "cnpj": "13.823.084/0001-05",
+          "nome": "SulAmérica Crédito Ativo FIRF CP LP",
+          "peso": 0.04348
+        },
+        {
+          "cnpj": "32.846.811/0001-02",
+          "nome": "Sparta Top Advisory FIC FIF RF CP LP RL",
+          "peso": 0.04348
+        },
+        {
+          "cnpj": "14.171.644/0001-57",
+          "nome": "BTG Pactual Crédito Corporativo I FIF em Cotas de FIRF",
+          "peso": 0.04348
+        },
+        {
+          "cnpj": "32.990.051/0001-02",
+          "nome": "Kinea Oportunidade FIF RF CP RL - Subclasse I",
+          "peso": 0.04348
+        },
+        {
+          "cnpj": "35.648.999/0001-64",
+          "nome": "SPX Seahawk Advisory FIC FIRF CP LP",
+          "peso": 0.04348
+        },
+        {
+          "cnpj": "32.225.663/0001-09",
+          "nome": "ARX Hedge FIC Incentivado Financeiro em Infra RF RL",
+          "peso": 0.04348
+        },
+        {
+          "cnpj": "32.319.627/0001-04",
+          "nome": "ARX Elbrus Advisory FIC Incentivado FIF em Infra RF RL",
+          "peso": 0.04348
+        },
+        {
+          "cnpj": "26.759.909/0001-11",
+          "nome": "Sparta Debêntures Incentivadas FIC FIF-Infra RF RL",
+          "peso": 0.04348
+        },
+        {
+          "cnpj": "39.959.025/0001-52",
+          "nome": "Sparta Debêntures Incentivadas Inflação FIC de Fundos Incentivados de Investimento Financeiro",
+          "peso": 0.04348
+        },
+        {
+          "cnpj": "30.178.843/0001-43",
+          "nome": "Plural Debentures Incentivadas Hedge 30 FIC FIF RF CP RL",
+          "peso": 0.04348
+        },
+        {
+          "cnpj": "51.112.363/0001-50",
+          "nome": "Absolute Hidra IPCA FIC de FIF RF Investimento em Infra CP",
+          "peso": 0.04348
+        },
+        {
+          "cnpj": "54.699.979/0001-67",
+          "nome": "Legacy Capital Compound Advisory FIF CIC de Fundo de Incent Invest Deb Incent IPCA RF RL",
+          "peso": 0.04348
+        },
+        {
+          "cnpj": "25.213.405/0001-39",
+          "nome": "AZ Quest Debêntures Incentivadas CP FIC de FIF Incentivado de Investimento em Infra RF",
+          "peso": 0.04348
+        },
+        {
+          "cnpj": "41.594.333/0001-73",
+          "nome": "JGP Debêntures Incentivadas Juros Reais FIF Incentivado em Infra RF RL",
+          "peso": 0.04348
+        },
+        {
+          "cnpj": "57.027.498/0001-01",
+          "nome": "Absolute Hidra CDI Plus Advisory FIC FI Infra RF CP RL",
+          "peso": 0.04348
+        },
+        {
+          "cnpj": "22.150.467/0001-50",
+          "nome": "Vinci Crédito Estruturado Selection Advisory FIDC RL",
+          "peso": 0.04348
+        },
+        {
+          "cnpj": "43.121.036/0001-36",
+          "nome": "Jive BossaNova High Yield Advisory FIC FIDC",
+          "peso": 0.04348
+        },
+        {
+          "cnpj": "20.441.301/0001-68",
+          "nome": "Artesanal CP FIDC RL",
+          "peso": 0.04348
+        },
+        {
+          "cnpj": "26.841.302/0001-86",
+          "nome": "M8 Credit Opportunities FIC de FI em FIDC",
+          "peso": 0.04348
+        },
+        {
+          "cnpj": "50.716.952/0001-84",
+          "nome": "M8 Credit Advanced FIC FIDC",
+          "peso": 0.04348
+        },
+        {
+          "cnpj": "34.431.610/0001-61",
+          "nome": "Root Capital High Yield Advisory FIC de FIF Multimercado CP RL",
+          "peso": 0.04348
+        },
+        {
+          "cnpj": "42.405.028/0001-59",
+          "nome": "Root Capital Crédito HG Plus FIC de FIF Multimercado CP RL",
+          "peso": 0.04348
+        }
+      ],
+      "mudancas": {
+        "saidas": [
+          {
+            "cnpj": "50.891.130/0001-30",
+            "nome": "Legacy Capital Compound FIF DEB Infra CDI Ativo RF CP RL",
+            "motivo": "Excesso 12M de −6,23% (catastrófico), descolado do peer group"
+          },
+          {
+            "cnpj": "50.862.124/0001-54",
+            "nome": "Vinland Incentivado Debêntures Infra Ativo FIF RF CP LP RL - Subclasse I",
+            "motivo": "PL caiu 25% em 12M (resgate), performance fraca"
+          },
+          {
+            "cnpj": "53.110.230/0001-70",
+            "nome": "SPX Seahawk Deb Incentivadas Advisory FIF CIC Incentivado RL",
+            "motivo": "Performance descolada do peer group (~−1,5%), Sharpe 36M negativo"
+          }
+        ],
+        "entradas": [
+          {
+            "cnpj": "25.213.405/0001-39",
+            "nome": "AZ Quest Debêntures Incentivadas CP FIC de FIF Incentivado de Investimento em Infra RF",
+            "tese": "Maior Excesso 36M do universo (+4,16% sem gross-up)"
+          },
+          {
+            "cnpj": "41.594.333/0001-73",
+            "nome": "JGP Debêntures Incentivadas Juros Reais FIF Incentivado em Infra RF RL",
+            "tese": "Único do universo com Excesso positivo nas 3 janelas"
+          },
+          {
+            "cnpj": "57.027.498/0001-01",
+            "nome": "Absolute Hidra CDI Plus Advisory FIC FI Infra RF CP RL",
+            "tese": "Mesma gestora do Hidra IPCA já em carteira; repõe perna CDI"
+          }
+        ]
+      }
+    }
+  ]
+}

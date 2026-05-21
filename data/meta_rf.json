@@ -52,5 +52,7 @@
   "gross_up_fator": 1.1765,
   "gross_up_aplicado_em": [
     "Incentivadas"
-  ]
+  ],
+  "historico_disponivel": true,
+  "historico_primeiro_snapshot": "2026-05-20"
 }
