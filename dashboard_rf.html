@@ -2410,98 +2410,102 @@ function _fmtBR(d) {
 // snapshot vigente (forward-fill), normaliza pelo valor na data_inicio do
 // snapshot e faz média ponderada pelo peso declarado.
 function buildCarteiraHistoricoSeries(snapshots) {
+  // Constrói série da Carteira RN usando MÉDIA DE RETORNOS DIÁRIOS (não média
+  // de cotas normalizadas). Razão: a versão anterior gerava degraus de diluição
+  // quando fundos novos entravam no snapshot (eram normalizados a 100 enquanto
+  // os outros já estavam em 110+), resultando em queda artificial da média.
+  //
+  // Algoritmo:
+  //   Para cada dia D na união de datas:
+  //     1. snap = snapshot vigente em D (último com data_inicio <= D < data_fim)
+  //     2. fundos_válidos = { f ∈ snap.fundos | f tem cota em D E em D-1 }
+  //     3. r_f = cota[D]/cota[D-1] - 1 para cada f ∈ fundos_válidos
+  //     4. media_ret = arithmetic mean dos r_f (peso igual entre participantes do dia)
+  //     5. cota_carteira[D] = cota_carteira[D-1] * (1 + media_ret)
+  //   Base: cota_carteira[primeiro_dia_com_pelo_menos_1_fundo_valido] = 100
+  //
+  // Continuidade multi-snapshot é automática: no dia da virada, snap muda,
+  // mas o acumulador (cota_carteira) continua aplicando o retorno do dia.
+  // Gross-up das Incentivadas já está aplicado nas cotas em cotas_rf.json —
+  // não precisa reaplicar aqui.
   if (!snapshots || !snapshots.length) return null;
   if (!cotasSeries || !Object.keys(cotasSeries).length) return null;
 
-  // Ordena cronologicamente (mais antigo primeiro)
   const snaps = [...snapshots].sort((a,b) => a.data_inicio.localeCompare(b.data_inicio));
+  const inicioGlobal = snaps[0].data_inicio;
 
-  // Coleta todas as datas de todos os fundos envolvidos, filtrando >= data_inicio
-  // do primeiro snapshot.
-  const firstStart = _parseDate(snaps[0].data_inicio);
-  const cnpjsAll = new Set();
-  snaps.forEach(s => s.fundos.forEach(f => cnpjsAll.add(f.cnpj)));
+  // Lookup por cnpj: Map<dataStr, valor>. Strings YYYY-MM-DD ordenam lexico,
+  // batendo com ordem cronológica — evita conversões Date desnecessárias.
+  const todosCnpjs = new Set();
+  snaps.forEach(s => s.fundos.forEach(f => todosCnpjs.add(f.cnpj)));
 
-  const fundCotas = {};  // cnpj -> [{d:Date, v:number}]
-  cnpjsAll.forEach(cnpj => {
+  const fundLookup = {};
+  const dateSet = new Set();
+  todosCnpjs.forEach(cnpj => {
     const c = cotasSeries[cnpj];
-    if (!c) return;
-    fundCotas[cnpj] = c.datas.map((d,i)=>({d:new Date(d), v:c.valores[i]}))
-                              .filter(p => p.d >= firstStart);
+    if (!c || !c.datas.length) return;
+    const m = new Map();
+    for (let i = 0; i < c.datas.length; i++) {
+      m.set(c.datas[i], c.valores[i]);
+      dateSet.add(c.datas[i]);
+    }
+    fundLookup[cnpj] = m;
   });
+  // Union de datas, filtrada por inicioGlobal e ordenada
+  const datasUteis = [...dateSet].sort().filter(d => d >= inicioGlobal);
+  if (datasUteis.length < 2) return null;
 
-  // Datas comuns: união, ordenadas
-  const allDatas = new Set();
-  Object.values(fundCotas).forEach(arr => arr.forEach(p => allDatas.add(p.d.getTime())));
-  const datasOrdenadas = [...allDatas].sort((a,b)=>a-b).map(t => new Date(t));
-  if (!datasOrdenadas.length) return null;
-
-  // Pra cada snapshot, baseline de cada fundo (valor na data_inicio do snapshot)
-  snaps.forEach(s => {
-    s._inicio = _parseDate(s.data_inicio);
-    s._fim    = s.data_fim ? _parseDate(s.data_fim) : null;
-    s._baselines = {};
-    s.fundos.forEach(f => {
-      const arr = fundCotas[f.cnpj];
-      if (!arr || !arr.length) return;
-      const base = arr.find(p => p.d >= s._inicio);
-      if (base) s._baselines[f.cnpj] = base.v;
-    });
-  });
-
-  // Concatenação multi-snapshot: continuidade via fator acumulador
-  const valoresCarteira = [];
-  let acumulador = 1.0;
-  let snapAtivoIdx = -1;
-  let valorFinalSnapAnterior = 100.0;
-
-  datasOrdenadas.forEach(dt => {
-    let snapIdx = -1;
+  // Helper: encontra snapshot vigente em data dStr (YYYY-MM-DD)
+  // data_fim é exclusivo (dStr < data_fim).
+  function snapAtivoEm(dStr) {
     for (let i = snaps.length-1; i >= 0; i--) {
       const s = snaps[i];
-      if (dt >= s._inicio && (s._fim === null || dt < s._fim)) {
-        snapIdx = i;
-        break;
-      }
+      if (dStr >= s.data_inicio && (s.data_fim === null || dStr < s.data_fim)) return s;
     }
-    if (snapIdx < 0) return;
+    return null;
+  }
 
-    if (snapIdx !== snapAtivoIdx) {
-      acumulador = valorFinalSnapAnterior / 100.0;
-      snapAtivoIdx = snapIdx;
+  // Itera datas, calcula retorno diário ponderado, acumula
+  const result = [];
+  let cotaCarteira = null;
+
+  for (let i = 1; i < datasUteis.length; i++) {
+    const dStr     = datasUteis[i];
+    const dPrevStr = datasUteis[i-1];
+    const snap = snapAtivoEm(dStr);
+    if (!snap) continue;
+
+    // Retornos diários dos fundos válidos (com cota em D e D-1)
+    const retornos = [];
+    for (const f of snap.fundos) {
+      const m = fundLookup[f.cnpj];
+      if (!m) continue;
+      const v_curr = m.get(dStr);
+      const v_prev = m.get(dPrevStr);
+      if (v_curr === undefined || v_prev === undefined || v_prev === 0) continue;
+      retornos.push(v_curr / v_prev - 1);
     }
+    if (retornos.length === 0) continue;
 
-    const snap = snaps[snapIdx];
-    let pesoNorm = 0, pesoTotal = 0;
-    snap.fundos.forEach(f => {
-      const arr = fundCotas[f.cnpj];
-      const base = snap._baselines[f.cnpj];
-      if (!arr || !base) return;
-      let v = null;
-      for (let i = arr.length-1; i >= 0; i--) {
-        if (arr[i].d <= dt) { v = arr[i].v; break; }
-      }
-      if (v !== null) {
-        const norm = (v / base) * 100;
-        pesoNorm += norm * (f.peso || 1);
-        pesoTotal += (f.peso || 1);
-      }
-    });
-    if (pesoTotal > 0) {
-      const media = pesoNorm / pesoTotal;
-      const valorFinal = media * acumulador;
-      valoresCarteira.push({d: dt, v: valorFinal});
-      valorFinalSnapAnterior = valorFinal;
+    const mediaRet = retornos.reduce((a,b)=>a+b,0) / retornos.length;
+
+    if (cotaCarteira === null) {
+      // Primeiro dia válido — registra o ponto-base (D-1 = 100) e aplica o
+      // primeiro retorno em D. Garante que o gráfico tem um ponto inicial.
+      cotaCarteira = 100;
+      result.push({ d: new Date(dPrevStr), v: 100 });
     }
-  });
+    cotaCarteira *= (1 + mediaRet);
+    result.push({ d: new Date(dStr), v: cotaCarteira });
+  }
 
-  if (valoresCarteira.length < 2) return null;
+  if (result.length < 2) return null;
   return {
     name: 'Carteira RN',
     color: '#FC753E',
     isPortfolio: true,
-    datas:   valoresCarteira.map(p => p.d),
-    valores: valoresCarteira.map(p => p.v),
+    datas:   result.map(p => p.d),
+    valores: result.map(p => p.v),
   };
 }
 
