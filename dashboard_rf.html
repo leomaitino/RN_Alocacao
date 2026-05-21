@@ -131,6 +131,19 @@ td{padding:9px 12px;font-size:12px;vertical-align:middle;}
 .btn-rec:hover{background:rgba(61,214,140,.25);}
 .btn-rec.active{background:rgba(61,214,140,.9);color:var(--bg);}
 
+/* RF: modo somente leitura em produção (Render). Esconde controles de escrita
+   via class .is-production no <body>. Detecção em JS via window.location.hostname.
+   Detalhe: as funções de save (requestRec/toggleRec/requestSavePesos/
+   requestSaveAlocacoes/checkPassword) também têm early return em produção,
+   defesa em camadas. */
+body.is-production .btn-rec,
+body.is-production button[onclick*="requestSave"],
+body.is-production button[onclick*="equalizarAlocacoes"],
+body.is-production button[onclick*="inverseVolAlocacoes"],
+body.is-production #pwModal { display: none !important; }
+body.is-production input[type=range] { pointer-events: none; opacity: 0.5; }
+body.is-production input[type=number] { pointer-events: none; opacity: 0.7; background: var(--surface); }
+
 /* VOL / CAP BADGES */
 .vol-alta{background:rgba(245,200,66,.1);color:var(--yellow);border:1px solid rgba(245,200,66,.25);}
 .vol-media{background:rgba(201,169,110,.1);color:var(--accent2);border:1px solid rgba(201,169,110,.25);}
@@ -229,6 +242,14 @@ svg text{font-family:var(--font-m);}
 <div id="grossUpNotice" style="display:none;background:rgba(245,200,66,.08);color:var(--yellow);
      font-size:12px;padding:8px 14px;border-radius:4px;margin:12px 32px 0;border:1px solid rgba(245,200,66,.2);
      font-family:var(--font-m);"></div>
+
+<!-- Aviso de modo somente leitura — mostrado apenas em produção (window.location.hostname
+     contém "onrender.com"). Estilo discreto (cinza), abaixo do aviso de gross-up. -->
+<div id="readOnlyNotice" style="display:none;background:rgba(255,255,255,.03);color:var(--text2);
+     font-size:11px;padding:6px 14px;border-radius:4px;margin:8px 32px 0;border:1px solid var(--border);
+     font-family:var(--font-m);">
+  Modo somente leitura — alterações de carteira são feitas localmente pela RN Investimentos.
+</div>
 
 <!-- ═══ TAB 0: HOME — RECOMENDADOS ════════════════════════════════ -->
 <div id="tab-home" class="tab-content active">
@@ -713,6 +734,17 @@ svg text{font-family:var(--font-m);}
 // ══════════════════════════════════════════════════════════
 // GLOBAL STATE
 // ══════════════════════════════════════════════════════════
+// Modo somente leitura — detecta produção via hostname. Em local
+// (127.0.0.1, localhost, IPs LAN) tudo funciona normalmente.
+// Script roda no fim do <body>, então DOMContentLoaded já passou e
+// document.body / #readOnlyNotice já existem — setamos imediatamente.
+const IS_PRODUCTION = window.location.hostname.includes('onrender.com');
+if (IS_PRODUCTION) {
+  document.body.classList.add('is-production');
+  const el = document.getElementById('readOnlyNotice');
+  if (el) el.style.display = '';
+}
+
 let allFunds = [];
 let filteredFunds = [];
 let benchmarks = {};
@@ -1134,6 +1166,7 @@ function inverseVolAlocacoes() {
 
 let pwPendingAlocacoes = false;
 function requestSaveAlocacoes() {
+  if (IS_PRODUCTION) return;  // read-only em produção
   if (authUnlocked) { saveAlocacoes(PW); return; }
   pwPendingAction = 'alocacoes';
   document.getElementById('pwModal').classList.add('active');
@@ -1769,6 +1802,7 @@ function exportQuantCSV() {
 // PASSWORD / REC TOGGLE
 // ══════════════════════════════════════════════════════════
 function requestRec(cnpj) {
+  if (IS_PRODUCTION) return;  // read-only em produção
   pwPendingCNPJ=cnpj; pwPendingAction='rec';
   if (authUnlocked) { doToggleRec(cnpj); return; }
   document.getElementById('pwInput').value='';
@@ -1777,6 +1811,7 @@ function requestRec(cnpj) {
   setTimeout(()=>document.getElementById('pwInput').focus(),100);
 }
 function toggleRec(cnpj) {
+  if (IS_PRODUCTION) return;  // read-only em produção
   pwPendingCNPJ=cnpj; pwPendingAction='rec';
   if (authUnlocked) { doToggleRec(cnpj); return; }
   document.getElementById('pwInput').value='';
@@ -1806,6 +1841,7 @@ function checkPassword() {
 }
 
 function requestSavePesos() {
+  if (IS_PRODUCTION) return;  // read-only em produção
   if (authUnlocked) { savePesos(PW); return; }
   pwPendingAction='pesos';
   pwPendingCNPJ=null;
