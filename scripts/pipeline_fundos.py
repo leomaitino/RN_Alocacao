@@ -792,7 +792,10 @@ def enriquecer_metricas(df_fundos: pd.DataFrame, df_cotas: pd.DataFrame) -> pd.D
         variacao_pl_12m = None
         if len(pl_serie) >= DIAS_UTEIS_ANO:
             pl_12m_atras = float(pl_serie.iloc[-DIAS_UTEIS_ANO]) / 1e6
-            if pl_12m_atras and pl_12m_atras > 0:
+            # Guard: pl_atual pode ser None se PL recente é 0/None mas o fundo
+            # tinha PL 12M atrás. Espelha fix análogo no pipeline_fundos_rf.py
+            # (commit dc69ea4) — caso real: fundo que foi a quase-zero.
+            if pl_atual is not None and pl_12m_atras and pl_12m_atras > 0:
                 variacao_pl_12m = round((pl_atual - pl_12m_atras) / pl_12m_atras, 6)
 
         # Consistência: % de meses com retorno positivo
