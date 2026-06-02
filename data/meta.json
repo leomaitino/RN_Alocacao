@@ -1,6 +1,33 @@
 {
-  "atualizado_em": "2026-04-06T10:46:23.483451",
-  "total_fundos": 148,
-  "fonte_xp": "lista-fundos.xlsx",
-  "notas": "Recalculado com fix de subclasses CVM + agregação PL"
+  "ultima_atualizacao": "2026-06-02T09:57:59.887177",
+  "total_fundos": 196,
+  "fundos_captacao_aberta": 170,
+  "recomendados": 10,
+  "aprovados": 0,
+  "benchmarks_disponiveis": [
+    "CDI",
+    "IMA-B",
+    "IPCA+3.5%",
+    "IPCA+5%",
+    "IPCA+6%"
+  ],
+  "classes_xp": [
+    "Fundo Listado",
+    "Internacional Ações Hedgeado",
+    "Internacional Ações Não Hedgeado",
+    "Internacional Macro Hedgeado",
+    "Internacional Multimercado Hedgeado",
+    "Internacional Multimercado Não Hedgeado",
+    "Long Short Direcional",
+    "Long Short Neutro",
+    "Macro Alta Vol",
+    "Macro Baixa Vol",
+    "Macro Média Vol",
+    "Multiestratégia",
+    "Não classificado",
+    "Quantitativo",
+    "Renda Variável Long Biased",
+    "Renda Variável Long Only Valor",
+    "Renda Variável Long Short Direcional"
+  ]
 }
