@@ -299,7 +299,7 @@ def importar_imab_xlsx(arquivo):
     """Importa histórico do IMA-B de arquivo Excel da ANBIMA."""
     print(f"\n📥 Importando IMA-B de {arquivo}...")
     try:
-        df = pd.read_excel(arquivo, skiprows=1)
+        df = pd.read_excel(arquivo)  # header na linha 0 — formato Anbima Jun/2026
         print(f"  Colunas encontradas: {list(df.columns)}")
         # ANBIMA geralmente tem: Data, Número Índice, Retorno Diário, ...
         # Tenta identificar colunas automaticamente
@@ -308,7 +308,13 @@ def importar_imab_xlsx(arquivo):
         for col in df.columns:
             cs = str(col).lower()
             if 'data' in cs or 'date' in cs: col_data = col
-            if 'retorno' in cs and 'dia' in cs: col_ret = col
+            # Anbima Jun/2026 usa "Variação Diária (%)"; formatos antigos
+            # usavam "Retorno Diário". 'dia' não casa com 'diária' (á Unicode),
+            # então checa as variações específicas.
+            tem_periodicidade = any(p in cs for p in ['dia', 'diária', 'diaria', 'diário', 'diario'])
+            tem_metrica = any(m in cs for m in ['retorno', 'variação', 'variacao'])
+            if tem_metrica and tem_periodicidade:
+                col_ret = col
         if not col_data or not col_ret:
             print(f"  ✗ Não foi possível identificar colunas. Colunas disponíveis: {list(df.columns)}")
             print("  Edite o script e ajuste col_data e col_ret manualmente.")
@@ -321,7 +327,8 @@ def importar_imab_xlsx(arquivo):
         for _, row in df.iterrows():
             try:
                 d = pd.to_datetime(row[col_data]).strftime("%Y-%m-%d")
-                v = float(row[col_ret]) / 100 if float(row[col_ret]) > 0.1 else float(row[col_ret])
+                # Anbima entrega em % (ex: 0.1546 representa 0.1546%), sempre /100
+                v = float(row[col_ret]) / 100
                 if d not in dados["IMA-B"]["retornos_diarios"]:
                     dados["IMA-B"]["retornos_diarios"][d] = v
                     novos += 1
@@ -335,14 +342,20 @@ def importar_ihfa_xlsx(arquivo):
     """Importa histórico do IHFA de arquivo Excel da ANBIMA."""
     print(f"\n📥 Importando IHFA de {arquivo}...")
     try:
-        df = pd.read_excel(arquivo, skiprows=1)
+        df = pd.read_excel(arquivo)  # header na linha 0 — formato Anbima Jun/2026
         print(f"  Colunas encontradas: {list(df.columns)}")
         col_data = None
         col_ret  = None
         for col in df.columns:
             cs = str(col).lower()
             if 'data' in cs or 'date' in cs: col_data = col
-            if 'retorno' in cs and 'dia' in cs: col_ret = col
+            # Anbima Jun/2026 usa "Variação Diária (%)"; formatos antigos
+            # usavam "Retorno Diário". 'dia' não casa com 'diária' (á Unicode),
+            # então checa as variações específicas.
+            tem_periodicidade = any(p in cs for p in ['dia', 'diária', 'diaria', 'diário', 'diario'])
+            tem_metrica = any(m in cs for m in ['retorno', 'variação', 'variacao'])
+            if tem_metrica and tem_periodicidade:
+                col_ret = col
         if not col_data or not col_ret:
             print(f"  ✗ Colunas não identificadas: {list(df.columns)}")
             return
@@ -354,7 +367,8 @@ def importar_ihfa_xlsx(arquivo):
         for _, row in df.iterrows():
             try:
                 d = pd.to_datetime(row[col_data]).strftime("%Y-%m-%d")
-                v = float(row[col_ret]) / 100 if float(row[col_ret]) > 0.1 else float(row[col_ret])
+                # Anbima entrega em % (ex: 0.1546 representa 0.1546%), sempre /100
+                v = float(row[col_ret]) / 100
                 if d not in dados["IHFA"]["retornos_diarios"]:
                     dados["IHFA"]["retornos_diarios"][d] = v
                     novos += 1
@@ -377,16 +391,20 @@ if __name__ == "__main__":
     print(f"🗓  Atualização de dados — {HOJE}")
     print(f"📁 Pasta: {SCRIPT_DIR}")
 
+    importou_anbima = False
     if args.imab:
         importar_imab_xlsx(args.imab)
-    elif args.ihfa:
+        importou_anbima = True
+    if args.ihfa:
         importar_ihfa_xlsx(args.ihfa)
-    elif args.apenas_mercado:
+        importou_anbima = True
+    if args.apenas_mercado:
         atualizar_mercado(args.desde)
     elif args.apenas_bench:
         atualizar_benchmarks(args.desde)
-    else:
+    elif not importou_anbima:
         atualizar_benchmarks(args.desde)
+        atualizar_mercado(args.desde)
         atualizar_mercado(args.desde)
 
     print("\n✅ Concluído! Copie benchmarks.json e mercado.json para a pasta comparador/ no GitHub.")
