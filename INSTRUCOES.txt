@@ -79,39 +79,50 @@ AlphaDesk/
   ROTINA MENSAL (atualizar dados + abrir dashboard)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-PASSO 1 — Baixe a planilha atualizada da XP
-  • Acesse o portal XP e exporte a lista de fundos multimercado
-  • Salve como "lista-fundos.xlsx" na pasta input/
+PASSO 1 — Baixe da ANBIMA (série histórica, Excel) e salve em input/:
+  • IMA-B    → input/IMAB-HISTORICO.xlsx
+  • IMA-B 5  → input/IMAB5-HISTORICO.xlsx
+  • IHFA     → input/IHFA-HISTORICO.xlsx
+  (se o site salvar como .xls, renomeie para .xlsx — o conteúdo já é xlsx)
 
-PASSO 2 — Abra o PowerShell dentro da pasta AlphaDesk
+PASSO 2 — Exporte a lista de fundos da XP (pode ser uma única exportação
+  com MM + RF) e salve em input/ (ex.: input/lista-fundos-AAAA-MM-DD.xlsx).
+  As rentabilidades Dia/Mês/Ano/12M/24M/36M e a data da cota vêm SÓ dessa
+  planilha — sem exportação nova esses campos ficam defasados.
 
-PASSO 3 — Rode o pipeline (leva ~2 min por causa do cache):
-       python scripts/pipeline_fundos.py --xp input/lista-fundos.xlsx --ihfa input/ihfa.csv
+PASSO 3 — Para atualizar SEM incluir fundos novos, filtre a exportação
+  pelos fundos que já estão no dashboard (fundo que sumiu da XP é mantido
+  com a linha antiga, para os recomendados nunca desaparecerem):
+       python scripts/filtrar_planilha_xp.py --xp input/lista-fundos-AAAA-MM-DD.xlsx --base data/fundos.json    --anterior input/lista-fundos.xlsx    --out input/lista-fundos.xlsx
+       python scripts/filtrar_planilha_xp.py --xp input/lista-fundos-AAAA-MM-DD.xlsx --base data/fundos_rf.json --anterior input/lista-fundos-rf.xlsx --out input/lista-fundos-rf.xlsx
+  (para incluir fundos novos, use a exportação direto no --xp do passo 4)
 
-  O script vai:
-  • Baixar apenas o mês novo da CVM (os outros já estão em cache)
-  • Recalcular todas as métricas (Sharpe, Sortino, Drawdown, etc.)
-  • Gerar/atualizar os arquivos em data/
-  • Gerar o cotas.json com a série diária para os gráficos
+PASSO 4 — Rode os pipelines NESTA ORDEM (os dois escrevem data/benchmarks.json;
+  o RF por último porque é ele que grava IMA-B, IMA-B 5 e IHFA da ANBIMA):
+       python scripts/pipeline_fundos.py    --xp input/lista-fundos.xlsx
+       python scripts/pipeline_fundos_rf.py --xp input/lista-fundos-rf.xlsx --imab5 input/IMAB5-HISTORICO.xlsx --imab input/IMAB-HISTORICO.xlsx --ihfa input/IHFA-HISTORICO.xlsx
 
-  ✓ Quando terminar aparece: "Pipeline concluído com sucesso"
+  Cada script baixa só os meses novos da CVM (o resto vem do cache em
+  data/cache_cvm/ e data/cache_cvm_rf/), recalcula as métricas e regrava
+  fundos*.json, cotas*.json, benchmarks.json e meta*.json.
 
-PASSO 4 — Suba o servidor:
-       python servidor.py
+PASSO 5 — Comparador (2 rodadas: ANBIMA e depois BCB + Yahoo):
+       python comparador/atualizar_comparador.py --imab input/IMAB-HISTORICO.xlsx --ihfa input/IHFA-HISTORICO.xlsx
+       python comparador/atualizar_comparador.py
 
-PASSO 5 — Abra no navegador:
-       http://localhost:8080/dashboard.html
-
-PASSO 6 — Para encerrar: Ctrl + C no PowerShell
+PASSO 6 — Confira localmente (python servidor.py → http://localhost:8080),
+  depois commit + push para main e Manual Deploy no Render.
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  ROTINA MENSAL — COMPARADOR
+  ROTINA MENSAL — COMPARADOR (isolado)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-1. Rodar: python comparador/atualizar_comparador.py
-2. Baixar IMA-B e IHFA da ANBIMA manualmente
-3. Rodar: python comparador/atualizar_comparador.py --imab arquivo.xlsx --ihfa arquivo.xlsx
+1. Baixar IMA-B e IHFA da ANBIMA (xlsx) para input/
+2. Rodar: python comparador/atualizar_comparador.py --imab input/IMAB-HISTORICO.xlsx --ihfa input/IHFA-HISTORICO.xlsx
+3. Rodar: python comparador/atualizar_comparador.py      (BCB + Yahoo + sincroniza mercado.json)
+   → com --imab/--ihfa o script SÓ importa a ANBIMA; a rodada sem
+     argumentos é a que atualiza CDI, IPCA+X e os índices de mercado.
 4. git add comparador/ && git commit -m 'atualização comparador' && git push
 
 
