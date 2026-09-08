@@ -653,6 +653,19 @@ def baixar_informes_cvm(cnpjs: set[str], n_meses: int = MESES_HISTORICO,
         return pd.DataFrame()
 
     df = pd.concat(frames, ignore_index=True)
+
+    # Cotas zeradas/negativas são glitch de publicação da CVM (caso real:
+    # Western Asset IMA-B Ativo e IMA-B5 em 14–16/07/2026 com VL_QUOTA=0,
+    # PL=0 e 0 cotistas). Um único zero vira retorno -100% / +inf → vol inf
+    # → o fundo cai no filtro "sem dados CVM" e some do dashboard. Tratar como
+    # dado ausente (linha removida) preserva o fundo e as métricas. NaN fica
+    # como está (comparação com NaN é False) — comportamento anterior mantido.
+    zerados = df['VL_QUOTA'] <= 0
+    if zerados.any():
+        log.warning(f"  [COTA_ZERO] {int(zerados.sum())} registro(s) com VL_QUOTA ≤ 0 removidos "
+                    f"({df.loc[zerados, 'CNPJ_NORM'].nunique()} fundo(s)) — tratados como dado ausente")
+        df = df[~zerados]
+
     df = df.sort_values(['CNPJ_NORM', 'DT_COMPTC'])
     df = dedup_cotas_por_continuidade(df)
     log.info(f"  → Total: {len(df)} registros | {df['CNPJ_NORM'].nunique()} fundos com dados")
@@ -1252,6 +1265,7 @@ def salvar_outputs(
     df_fundos: pd.DataFrame,
     benchmarks: dict,
     output_dir: Path,
+    df_cotas: pd.DataFrame = None,
 ):
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -1273,76 +1287,84 @@ def salvar_outputs(
     log.info(f"  ✓ benchmarks.json → {len(benchmarks)} séries")
 
     # cotas.json — séries diárias normalizadas (base 100) para gráficos
-    # Lê do cache CVM para montar as séries
+    # Fonte preferida: df_cotas em memória (retorno de baixar_informes_cvm),
+    # que INCLUI o mês corrente — este nunca é cacheado em parquet
+    # (eh_mes_atual=True em baixar_informes_cvm). Fallback: parquets do cache,
+    # com defasagem de até 1 mês nos gráficos. Ver BACKLOG_RF #9.
     cotas_dict = {}
     cache_dir = output_dir / 'cache_cvm'
-    if cache_dir.exists():
+    df_c = pd.DataFrame()
+    if df_cotas is not None and not df_cotas.empty:
+        df_c = df_cotas.copy()
+        log.info(f"  cotas.json: fonte = df em memória ({len(df_c)} registros, inclui mês corrente)")
+    elif cache_dir.exists():
         import glob
         parquet_files = sorted(glob.glob(str(cache_dir / '*.parquet')))
         if parquet_files:
             try:
-                import pyarrow.parquet as pq
-                frames_c = []
-                for pf in parquet_files:
-                    frames_c.append(pd.read_parquet(pf))
-                df_c = pd.concat(frames_c, ignore_index=True) if frames_c else pd.DataFrame()
-                if not df_c.empty:
-                    df_c['DT_COMPTC'] = pd.to_datetime(df_c['DT_COMPTC'])
-                    log.info(f"  cotas — colunas disponíveis: {list(df_c.columns)}")
-                    # Detect VL_QUOTA column — CVM may rename it
-                    quota_col = next(
-                        (col for col in df_c.columns
-                         if 'QUOTA' in col.upper() or 'VL_COTA' in col.upper()),
-                        None
-                    )
-                    if not quota_col:
-                        log.warning(f"  ✗ cotas.json: coluna VL_QUOTA não encontrada. Colunas: {list(df_c.columns)}")
-                    else:
-                        if quota_col != 'VL_QUOTA':
-                            log.info(f"  cotas — renomeando {quota_col} → VL_QUOTA")
-                            df_c = df_c.rename(columns={quota_col: 'VL_QUOTA'})
-                        # Ensure numeric (old CVM format uses comma as decimal)
-                        if df_c['VL_QUOTA'].dtype == object:
-                            df_c['VL_QUOTA'] = pd.to_numeric(
-                                df_c['VL_QUOTA'].str.replace(',', '.', regex=False), errors='coerce')
-                        else:
-                            df_c['VL_QUOTA'] = pd.to_numeric(df_c['VL_QUOTA'], errors='coerce')
-                        df_c = df_c.sort_values(['CNPJ_NORM', 'DT_COMPTC'])
-                        cnpj_map = {re.sub(r'[./-]', '', f['cnpj']): f['cnpj'] for f in fundos_list}
-                        matched = 0
-                        for cnpj_norm, grp in df_c.groupby('CNPJ_NORM'):
-                            cnpj_orig = cnpj_map.get(cnpj_norm)
-                            if not cnpj_orig: continue
-                            grp = grp.sort_values('DT_COMPTC')
-                            # Dedup por continuidade: mantém cota mais próxima do dia anterior
-                            indices_manter = []
-                            prev_val = None
-                            for dt, dia_rows in grp.groupby('DT_COMPTC', sort=True):
-                                if len(dia_rows) == 1:
-                                    idx = dia_rows.index[0]
-                                    prev_val = dia_rows.iloc[0]['VL_QUOTA']
-                                else:
-                                    if prev_val is not None and pd.notna(prev_val):
-                                        diffs = (dia_rows['VL_QUOTA'] - prev_val).abs()
-                                        idx = diffs.idxmin()
-                                    else:
-                                        idx = dia_rows['VL_QUOTA'].idxmax()
-                                    prev_val = grp.loc[idx, 'VL_QUOTA']
-                                indices_manter.append(idx)
-                            grp = grp.loc[indices_manter].set_index('DT_COMPTC')
-                            cotas = grp['VL_QUOTA'].dropna()
-                            if len(cotas) < 2: continue
-                            base = cotas.iloc[0]
-                            norm = (cotas / base * 100).round(4)
-                            cotas_dict[cnpj_orig] = {
-                                'datas':   [d.strftime('%Y-%m-%d') for d in norm.index],
-                                'valores': norm.tolist(),
-                            }
-                            matched += 1
-                        log.info(f"  cotas — {matched} fundos com série, {len(cnpj_map)} fundos na planilha")
-                log.info(f"  ✓ cotas.json → {len(cotas_dict)} séries")
+                df_c = pd.concat([pd.read_parquet(pf) for pf in parquet_files], ignore_index=True)
+                log.warning(f"  cotas.json: fonte = fallback parquets ({len(parquet_files)} meses) — "
+                            f"mês corrente AUSENTE, gráficos ficam defasados")
             except Exception as e:
-                log.warning(f"  ✗ cotas.json não gerado: {e}")
+                log.warning(f"  ✗ Falha lendo parquets do cache: {e}")
+    if not df_c.empty:
+        try:
+            df_c['DT_COMPTC'] = pd.to_datetime(df_c['DT_COMPTC'])
+            log.info(f"  cotas — colunas disponíveis: {list(df_c.columns)}")
+            # Detect VL_QUOTA column — CVM may rename it
+            quota_col = next(
+                (col for col in df_c.columns
+                 if 'QUOTA' in col.upper() or 'VL_COTA' in col.upper()),
+                None
+            )
+            if not quota_col:
+                log.warning(f"  ✗ cotas.json: coluna VL_QUOTA não encontrada. Colunas: {list(df_c.columns)}")
+            else:
+                if quota_col != 'VL_QUOTA':
+                    log.info(f"  cotas — renomeando {quota_col} → VL_QUOTA")
+                    df_c = df_c.rename(columns={quota_col: 'VL_QUOTA'})
+                # Ensure numeric (old CVM format uses comma as decimal)
+                if df_c['VL_QUOTA'].dtype == object:
+                    df_c['VL_QUOTA'] = pd.to_numeric(
+                        df_c['VL_QUOTA'].str.replace(',', '.', regex=False), errors='coerce')
+                else:
+                    df_c['VL_QUOTA'] = pd.to_numeric(df_c['VL_QUOTA'], errors='coerce')
+                df_c = df_c.sort_values(['CNPJ_NORM', 'DT_COMPTC'])
+                cnpj_map = {re.sub(r'[./-]', '', f['cnpj']): f['cnpj'] for f in fundos_list}
+                matched = 0
+                for cnpj_norm, grp in df_c.groupby('CNPJ_NORM'):
+                    cnpj_orig = cnpj_map.get(cnpj_norm)
+                    if not cnpj_orig: continue
+                    grp = grp.sort_values('DT_COMPTC')
+                    # Dedup por continuidade: mantém cota mais próxima do dia anterior
+                    indices_manter = []
+                    prev_val = None
+                    for dt, dia_rows in grp.groupby('DT_COMPTC', sort=True):
+                        if len(dia_rows) == 1:
+                            idx = dia_rows.index[0]
+                            prev_val = dia_rows.iloc[0]['VL_QUOTA']
+                        else:
+                            if prev_val is not None and pd.notna(prev_val):
+                                diffs = (dia_rows['VL_QUOTA'] - prev_val).abs()
+                                idx = diffs.idxmin()
+                            else:
+                                idx = dia_rows['VL_QUOTA'].idxmax()
+                            prev_val = grp.loc[idx, 'VL_QUOTA']
+                        indices_manter.append(idx)
+                    grp = grp.loc[indices_manter].set_index('DT_COMPTC')
+                    cotas = grp['VL_QUOTA'].dropna()
+                    if len(cotas) < 2: continue
+                    base = cotas.iloc[0]
+                    norm = (cotas / base * 100).round(4)
+                    cotas_dict[cnpj_orig] = {
+                        'datas':   [d.strftime('%Y-%m-%d') for d in norm.index],
+                        'valores': norm.tolist(),
+                    }
+                    matched += 1
+                log.info(f"  cotas — {matched} fundos com série, {len(cnpj_map)} fundos na planilha")
+            log.info(f"  ✓ cotas.json → {len(cotas_dict)} séries")
+        except Exception as e:
+            log.warning(f"  ✗ cotas.json não gerado: {e}")
     # Only write cotas.json if we generated series — never overwrite a good file with {}
     cotas_path = output_dir / 'cotas.json'
     if cotas_dict:
@@ -1409,6 +1431,7 @@ def main():
     criar_arquivos_manuais_se_nao_existem(output_dir)
     df = aplicar_recomendados(df, output_dir)
 
+    df_cotas = None  # preenchido abaixo; usado por salvar_outputs p/ cotas.json com mês corrente
     if not args.sem_cvm:
         # --- 3. CVM: cadastro (data de início)
         log.info("\n[CVM — Cadastro]")
@@ -1465,7 +1488,7 @@ def main():
 
     # --- 6. Salvar
     log.info("\n[Salvando outputs]")
-    salvar_outputs(df, benchmarks, output_dir)
+    salvar_outputs(df, benchmarks, output_dir, df_cotas=df_cotas)
 
     # --- Resumo final
     log.info("\n" + "=" * 60)

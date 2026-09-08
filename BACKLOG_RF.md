@@ -309,16 +309,24 @@ decisão, postergamos também a reativação da aba.
 
 ---
 
-## 9. Mesmo bug (cotas defasadas pelo mês corrente) existe no pipeline MM
+## 9. ✓ RESOLVIDO — Mesmo bug (cotas defasadas pelo mês corrente) existia no pipeline MM
 
-**Decisão atual:** No pipeline RF, o bug foi corrigido — `gerar_cotas_rf_json`
+**Resolvido em Set/2026:** `salvar_outputs` em `pipeline_fundos.py` passou a
+aceitar `df_cotas` (retorno de `baixar_informes_cvm`, em memória) e usa esse
+DataFrame como fonte preferida do `cotas.json`, com fallback para os parquets
+quando rodando `--sem-cvm`. Na atualização de 08/09/2026 o `cotas.json` do MM
+passou a terminar em 2026-09-03 (antes do fix parava em 2026-08-31, último
+mês cacheado). Log de diagnóstico: `cotas.json: fonte = df em memória` vs
+`fonte = fallback parquets`. Texto original abaixo mantido como histórico.
+
+**Decisão original:** No pipeline RF, o bug foi corrigido — `gerar_cotas_rf_json`
 agora aceita `df_cotas` em memória (preferência) com fallback para parquets.
 Resultado: `cotas_rf.json` inclui o mês corrente (até 2026-05-15 em maio/2026
 em vez de parar em 2026-04-30). Ver commit `fix(rf): include current-month
 CVM data in cotas_rf.json`.
 
-**Problema:** A lógica análoga em `pipeline_fundos.py` (MM) tem a mesma
-falha:
+**Problema (histórico):** A lógica análoga em `pipeline_fundos.py` (MM) tinha a
+mesma falha:
 - A geração de `cotas.json` lê apenas dos parquets cacheados (etapa 7 do
   `salvar_outputs`).
 - `baixar_informes_cvm` não cacheia o mês corrente por design
@@ -434,3 +442,25 @@ Em produção o gráfico do MM mostra IHFA atrasado.
 - `scripts/pipeline_fundos.py` — não muda código, só o caminho passado
   pra `baixar_ihfa(caminho_local=...)`.
 - Operacional: agendar download manual da Anbima.
+
+## 13. ✓ RESOLVIDO — Cotas zeradas na CVM derrubavam fundos do dashboard
+
+**Sintoma (Set/2026):** na atualização de 08/09/2026, `Western Asset IMA-B
+Ativo FIF RF` e `Western Asset IMA-B5 FIF RF` sumiram do `fundos_rf.json`
+(312 → 310) via filtro "sem dados CVM", embora tivessem cota diária até
+31/08/2026. Causa: o informe diário da CVM traz, para os dois fundos,
+3 dias (14, 15 e 16/07/2026) com `VL_QUOTA=0`, `VL_PATRIM_LIQ=0` e
+`NR_COTST=0`. Um único zero gera retorno diário de -100% e depois +inf →
+volatilidade inf → `[JSON_SANITIZE]` vira `None` → filtro de vol remove o
+fundo.
+
+**Fix:** em `baixar_informes_cvm` (`scripts/pipeline_fundos.py`, shared com
+o RF), linhas com `VL_QUOTA ≤ 0` são removidas após concatenar cache +
+download, com log `[COTA_ZERO] N registro(s) ... (M fundo(s))`. NaN não é
+tocado (comportamento anterior). O cache parquet continua bruto — o filtro
+roda em toda execução, então não precisa invalidar `data/cache_cvm*`.
+
+**Sinal para o futuro:** se `[COTA_ZERO]` aparecer com muitos fundos num
+mesmo mês, provavelmente é mudança de layout da CVM, não glitch pontual.
+
+---
