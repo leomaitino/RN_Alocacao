@@ -105,6 +105,7 @@ svg text{font-family:var(--font-m);}
 
 <nav class="tabs-bar">
   <div class="tab active" onclick="switchTab('home',this)">Carteira Sugerida</div>
+  <div class="tab" onclick="switchTab('sim',this)">Simulação</div>
   <div class="tab" onclick="switchTab('painel',this)">Painel</div>
   <div class="tab" onclick="switchTab('pvp',this)">Preço × Valor Patrimonial</div>
   <div class="tab" onclick="switchTab('carteira',this)">Carteira &amp; Stress</div>
@@ -153,7 +154,7 @@ svg text{font-family:var(--font-m);}
       <div class="table-wrapper"><div class="table-header-bar"><div class="table-title">Composição (pesos iguais)</div></div><div id="homeComp" style="padding:12px 16px;"></div></div>
     </div>
     <div class="table-wrapper">
-      <div class="table-header-bar"><div class="table-title">Fundos Aprovados <span class="badge green" id="homeBadge"></span></div><div style="display:flex;gap:7px;"><button class="btn-ghost" onclick="switchTab('painel',document.querySelectorAll('.tab')[1])" style="font-size:11px;padding:5px 9px;">Ver painel completo</button></div></div>
+      <div class="table-header-bar"><div class="table-title">Fundos Aprovados <span class="badge green" id="homeBadge"></span></div><div style="display:flex;gap:7px;"><button class="btn-ghost" onclick="switchTab('painel',document.querySelectorAll('.tab')[2])" style="font-size:11px;padding:5px 9px;">Ver painel completo</button></div></div>
       <table><thead><tr><th>Fundo</th><th>Tipo</th><th>Idx</th><th class="num">R$/cota</th><th class="num">VP/cota</th><th class="num">P/VP</th><th class="num" id="homeThRent" title="valores isentos (líquidos para PF), sem gross-up">Ret. total 12M</th><th class="num" title="isento, sem gross-up">DY 12M</th><th class="num">Últ. prov.</th><th class="num">Yield anualiz.</th><th class="num">PL (R$ M)</th><th class="num">Liq. 3M (R$ mil)</th><th>Stress</th></tr></thead><tbody id="homeTableBody"></tbody></table>
     </div>
   </div>
@@ -161,6 +162,35 @@ svg text{font-family:var(--font-m);}
     <div style="font-size:32px;margin-bottom:12px;">✦</div>
     <div style="font-family:var(--font-d);font-size:20px;margin-bottom:8px;">Nenhum fundo aprovado</div>
     <div style="font-size:13px;color:var(--text3);font-family:var(--font-m);">Marque status "Aprovado" em data/listados_universo.json e rode o pipeline.</div>
+  </div>
+</div></div>
+
+<!-- ═══ SIMULAÇÃO (carteira por regra de P/VP) ═══ -->
+<div id="tab-sim" class="tab-content"><div class="main">
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+    <div>
+      <div style="font-family:var(--font-d);font-size:28px;font-weight:400;letter-spacing:-.3px;line-height:1.1;color:var(--cream);">Carteira Simulada</div>
+      <div style="font-size:12px;color:var(--text3);font-family:var(--font-m);margin-top:3px;">Regra: o fundo só fica na carteira enquanto <b style="color:var(--text2)">P/VP &lt; 1,00</b> e <b style="color:var(--text2)">P/VP &lt; sua média móvel</b>. Pesos iguais entre os elegíveis; sem elegíveis, caixa a CDI. Decisão sempre com o P/VP do pregão anterior (sem look-ahead).</div>
+    </div>
+  </div>
+  <div class="filters-bar">
+    <div class="filter-group"><div class="filter-label">Universo</div><select class="filter-select" id="simUniverso" onchange="renderSim()"><option value="aprovados">Aprovados (13)</option><option value="painel">Painel (22)</option><option value="painel_sug">Painel + Sugeridos</option><option value="todos">Todos (50)</option></select></div>
+    <div class="filter-group"><div class="filter-label">Média do P/VP</div><div class="period-selector" id="simJanelaSel"><button class="period-btn" data-m="6" onclick="setSimOpt('janela',6,this)">6M</button><button class="period-btn active" data-m="12" onclick="setSimOpt('janela',12,this)">12M</button><button class="period-btn" data-m="24" onclick="setSimOpt('janela',24,this)">24M</button></div></div>
+    <div class="filter-group"><div class="filter-label">Rebalanceamento</div><div class="period-selector" id="simRebalSel"><button class="period-btn active" onclick="setSimOpt('rebal','mensal',this)">Mensal</button><button class="period-btn" onclick="setSimOpt('rebal','diario',this)">Diário</button></div></div>
+    <div class="filter-group"><div class="filter-label">Período</div><div class="period-selector" id="simPeriodoSel"><button class="period-btn" onclick="setSimOpt('meses',12,this)">12M</button><button class="period-btn active" onclick="setSimOpt('meses',24,this)">24M</button><button class="period-btn" onclick="setSimOpt('meses',36,this)">36M</button></div></div>
+    <div class="filter-group"><div class="filter-label">Gross-up IR</div><button class="btn-ghost" id="simGuBtn" onclick="toggleHomeGrossUp();renderSim()" style="font-size:11px;padding:6px 10px;"></button></div>
+  </div>
+  <div id="simKPIs" class="kpi-grid" style="margin-bottom:12px;"></div>
+  <div class="table-wrapper" style="margin-bottom:12px;overflow:visible;">
+    <div class="table-header-bar"><div class="table-title">Simulada vs Carteira Sugerida vs CDI <span class="badge" id="simBadge"></span></div></div>
+    <div style="padding:12px 12px 6px;"><div id="simChart"></div><div id="simChartLegend" class="legend" style="padding:8px 4px 0;"></div></div>
+    <div style="padding:0 12px 10px;"><div style="font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin:6px 0 4px;">Fundos na carteira ao longo do tempo</div><div id="simCountChart"></div></div>
+  </div>
+  <div class="grid2" style="grid-template-columns:1.2fr .8fr;">
+    <div class="table-wrapper"><div class="table-header-bar"><div class="table-title">Composição atual (regra aplicada ao último pregão)</div><span class="badge green" id="simCompBadge"></span></div>
+      <table><thead><tr><th>Fundo</th><th>Tipo</th><th class="num">Preço</th><th class="num">VP</th><th class="num">P/VP</th><th class="num" id="simThMedia">Média 12M</th><th class="num">vs média</th><th class="num">DY 12M</th><th>Elegível</th></tr></thead><tbody id="simCompBody"></tbody></table></div>
+    <div class="table-wrapper"><div class="table-header-bar"><div class="table-title">Movimentações (últimas)</div></div>
+      <table><thead><tr><th>Data</th><th>Entradas</th><th>Saídas</th><th class="num">Nº</th></tr></thead><tbody id="simMovBody"></tbody></table></div>
   </div>
 </div></div>
 
@@ -262,7 +292,95 @@ function switchTab(name, el) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active'); el.classList.add('active');
-  if (name === 'home') renderHome(); if (name === 'pvp') renderPvp(); if (name === 'carteira') renderCarteira(); if (name === 'sugestoes') renderSugestoes();
+  if (name === 'home') renderHome(); if (name === 'sim') renderSim(); if (name === 'pvp') renderPvp(); if (name === 'carteira') renderCarteira(); if (name === 'sugestoes') renderSugestoes();
+}
+
+// ───────── SIMULAÇÃO — carteira por regra de P/VP ─────────
+const SIM = { janela: 12, rebal: 'mensal', meses: 24, minObs: 60 };
+function setSimOpt(k, v, btn) { SIM[k] = v; btn.parentElement.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); renderSim(); }
+function simUniverso() {
+  const u = document.getElementById('simUniverso').value;
+  if (u === 'aprovados') return FUNDOS.filter(r => r.status === 'Aprovado');
+  if (u === 'painel') return FUNDOS.filter(r => r.no_painel);
+  if (u === 'painel_sug') return FUNDOS.filter(r => r.no_painel || r.status === 'Sugerido');
+  return FUNDOS.slice();
+}
+// média móvel do P/VP por data (janela em meses), usando a própria série do fundo
+function mediaMovelPvp(t, janelaMeses) {
+  const s = SERIES[t]; const out = new Map(); if (!s || !s.pvp) return out;
+  const ds = s.datas, pv = s.pvp; let j = 0, soma = 0, n = 0;
+  for (let i = 0; i < ds.length; i++) {
+    if (pv[i] != null) { soma += pv[i]; n++; }
+    const lim = new Date(ds[i]); lim.setMonth(lim.getMonth() - janelaMeses);
+    while (j < i && new Date(ds[j]) < lim) { if (pv[j] != null) { soma -= pv[j]; n--; } j++; }
+    if (pv[i] != null) out.set(ds[i], { media: n ? soma / n : null, n, pvp: pv[i] });
+  }
+  return out;
+}
+function simular(tickers, meses, janela, rebal, fator) {
+  const rets = {}, mm = {};
+  tickers.forEach(t => { rets[t] = retornosTotais(t); mm[t] = mediaMovelPvp(t, janela); });
+  const ativos = tickers.filter(t => rets[t].size);
+  if (!ativos.length) return null;
+  const datasAll = Array.from(new Set(ativos.flatMap(t => Array.from(rets[t].keys())))).sort();
+  const last = new Date(datasAll[datasAll.length - 1]); const from = new Date(last); from.setMonth(from.getMonth() - meses);
+  const i0 = Math.max(1, datasAll.findIndex(d => new Date(d) >= from));
+  const elegivel = (t, d) => { const m = mm[t].get(d); return !!(m && m.pvp != null && m.media != null && m.n >= SIM.minObs && m.pvp < 1 && m.pvp < m.media); };
+  const datas = [], vals = [], nFund = [], movs = []; let acc = 100, set = new Set(), mesAtual = null, diasCaixa = 0, somaN = 0;
+  for (let i = i0; i < datasAll.length; i++) {
+    const d = datasAll[i], prev = datasAll[i - 1], mes = d.slice(0, 7);
+    const recalc = rebal === 'diario' || mes !== mesAtual;
+    if (recalc) {
+      const novo = new Set(ativos.filter(t => elegivel(t, prev)));
+      const ent = [...novo].filter(t => !set.has(t)), sai = [...set].filter(t => !novo.has(t));
+      if (datas.length && (ent.length || sai.length)) movs.push({ data: d, entradas: ent, saidas: sai, n: novo.size });
+      set = novo; mesAtual = mes;
+    }
+    const rs = [...set].map(t => rets[t].get(d)).filter(v => v != null);
+    const r = rs.length ? rs.reduce((a, b) => a + b, 0) / rs.length * fator : ((CDI && CDI[d]) || 0);
+    if (!rs.length) diasCaixa++;
+    if (datas.length) acc *= (1 + r);
+    datas.push(d); vals.push(acc); nFund.push(set.size); somaN += set.size;
+  }
+  const mdd = (() => { let pk = -1, dd = 0; vals.forEach(v => { pk = Math.max(pk, v); dd = Math.min(dd, v / pk - 1); }); return dd; })();
+  const hoje = datasAll[datasAll.length - 1];
+  const comp = tickers.map(t => { const m = mm[t].get(hoje) || [...mm[t].values()].slice(-1)[0] || {}; return { t, pvp: m.pvp, media: m.media, n: m.n || 0, eleg: !!(m.pvp != null && m.media != null && m.n >= SIM.minObs && m.pvp < 1 && m.pvp < m.media), motivo: m.pvp == null ? 'sem P/VP' : (m.n < SIM.minObs ? `histórico curto (${m.n} pregões)` : (m.pvp >= 1 ? 'P/VP ≥ 1,00' : (m.pvp >= m.media ? 'acima da média' : 'ok'))) }; });
+  return { datas, vals, nFund, movs, mdd, diasCaixa, mediaN: somaN / Math.max(1, datas.length), comp, setAtual: set };
+}
+function maxDD(vals) { let pk = -1, dd = 0; vals.forEach(v => { pk = Math.max(pk, v); dd = Math.min(dd, v / pk - 1); }); return dd; }
+function renderSim() {
+  const uni = simUniverso(); const tick = uni.map(r => r.ticker); const gu = homeGrossUp ? GROSS_UP_FATOR : 1;
+  document.getElementById('simGuBtn').textContent = homeGrossUp ? 'Ligado (PF 15%) — desligar' : 'Desligado — ligar';
+  document.getElementById('simThMedia').textContent = `Média ${SIM.janela}M`;
+  const sim = simular(tick, SIM.meses, SIM.janela, SIM.rebal, gu);
+  if (!sim) { document.getElementById('simChart').innerHTML = '<div class="loading" style="height:120px">sem séries</div>'; return; }
+  // benchmarks alinhados ao calendário da simulação
+  const apTick = aprovados().map(r => r.ticker); const apRets = apTick.map(retornosTotais);
+  let acc = 100; const sug = sim.datas.map((d, i) => { if (i) { const rs = apRets.map(m => m.get(d)).filter(v => v != null); acc *= 1 + (rs.length ? rs.reduce((a, b) => a + b, 0) / rs.length * gu : 0); } return acc; });
+  const cdi = buildCdiSeries(sim.datas);
+  const fim = a => a[a.length - 1] / a[0] - 1;
+  const rS = fim(sim.vals), rG = fim(sug), rC = cdi ? fim(cdi) : null;
+  const byFund = Object.fromEntries(FUNDOS.map(r => [r.ticker, r]));
+  const k = [
+    [`Simulada ${SIM.meses}M${homeGrossUp ? ' (equiv. bruto)' : ' (isento)'}`, fmtPct(rS, 1), `${cdi ? (rS / rC * 100).toFixed(0) + '% do CDI · ' : ''}DD máx ${fmtPct(sim.mdd, 1)}`, rC != null && rS >= rC ? 'var(--green)' : 'var(--red)'],
+    [`Carteira Sugerida ${SIM.meses}M`, fmtPct(rG, 1), `${cdi ? (rG / rC * 100).toFixed(0) + '% do CDI · ' : ''}DD máx ${fmtPct(maxDD(sug), 1)}`, 'var(--gold)'],
+    [`CDI ${SIM.meses}M`, fmtPct(rC, 1), 'bruto', 'var(--text2)'],
+    ['Fundos hoje', sim.setAtual.size, `de ${tick.length} no universo · média ${fmtNum(sim.mediaN, 1)} no período`, 'var(--teal)'],
+    ['Tempo em caixa (CDI)', fmtPct(sim.diasCaixa / sim.datas.length, 0), `${sim.diasCaixa} de ${sim.datas.length} pregões sem elegíveis`, 'var(--purple)'],
+    ['Rebalanceamentos', sim.movs.length, `${sim.movs.reduce((a, m) => a + m.entradas.length, 0)} entradas · ${sim.movs.reduce((a, m) => a + m.saidas.length, 0)} saídas`, 'var(--accent2)'],
+  ];
+  document.getElementById('simKPIs').innerHTML = k.map(([l, v, s, c]) => `<div class="kpi-card" style="--kpi-color:${c}"><div class="kpi-label">${l}</div><div class="kpi-value">${v}</div><div class="kpi-sub">${s}</div></div>`).join('');
+  document.getElementById('simBadge').textContent = `${SIM.rebal} · média ${SIM.janela}M · ${homeGrossUp ? 'gross-up' : 'isento'}`;
+  const series = [{ label: 'Simulada (regra P/VP)', color: '#5a9898', vals: sim.vals, width: 1.9 }, { label: 'Carteira Sugerida (aprovados, equal-weight)', color: '#c9a96e', vals: sug, width: 1.4 }];
+  if (cdi) series.push({ label: 'CDI', color: '#8a8278', vals: cdi, width: 1.2, dash: true });
+  drawLines('simChart', sim.datas, series, 300, { ref: 100 });
+  document.getElementById('simChartLegend').innerHTML = series.map(s => `<span style="--c:${s.color}">${s.label}</span>`).join('') + `<span style="margin-left:auto;color:var(--text3)">base 100 em ${fmtDate(sim.datas[0])} → simulada ${fmtNum(sim.vals[sim.vals.length - 1], 1)} · sugerida ${fmtNum(sug[sug.length - 1], 1)}${cdi ? ' · CDI ' + fmtNum(cdi[cdi.length - 1], 1) : ''}</span>`;
+  drawLines('simCountChart', sim.datas, [{ label: 'n', color: '#8878b8', vals: sim.nFund, width: 1.2 }], 110, { dec: 0 });
+  // composição atual
+  const comp = sim.comp.slice().sort((a, b) => (b.eleg - a.eleg) || ((a.pvp ?? 9) - (b.pvp ?? 9)));
+  document.getElementById('simCompBadge').textContent = `${comp.filter(c => c.eleg).length} elegíveis`;
+  document.getElementById('simCompBody').innerHTML = comp.map(c => { const r = byFund[c.t]; const vs = c.pvp != null && c.media ? c.pvp / c.media - 1 : null; return `<tr onclick="openDetail('${c.t}')" style="${c.eleg ? '' : 'opacity:.6'}"><td><div class="fund-name">${c.t}</div><div class="fund-gestora">${esc(r.nome)}</div></td><td><span class="badge ${tipoBadge(r.tipo)}">${r.tipo}</span></td><td class="num">${fmtNum(r.preco)}</td><td class="num">${fmtNum(r.vp_cota)}</td><td class="num ${c.pvp != null && c.pvp < 1 ? 'pos' : 'neg'}">${fmtNum(c.pvp, 3)}</td><td class="num">${fmtNum(c.media, 3)}</td><td class="num ${cls(vs == null ? null : -vs)}">${fmtPct(vs, 1)}</td><td class="num">${fmtPct(r.dy_12m, 1)}</td><td>${c.eleg ? '<span class="badge green">na carteira</span>' : `<span class="badge">${esc(c.motivo)}</span>`}</td></tr>`; }).join('');
+  document.getElementById('simMovBody').innerHTML = sim.movs.slice(-15).reverse().map(m => `<tr style="cursor:default"><td style="font-family:var(--font-m)">${fmtDate(m.data)}</td><td class="pos" style="font-family:var(--font-m);font-size:11px;white-space:normal">${m.entradas.join(', ') || '—'}</td><td class="neg" style="font-family:var(--font-m);font-size:11px;white-space:normal">${m.saidas.join(', ') || '—'}</td><td class="num">${m.n}</td></tr>`).join('') || '<tr><td colspan="4" class="neu" style="text-align:center">sem movimentações no período</td></tr>';
 }
 
 async function loadData() {
@@ -576,7 +694,7 @@ function renderFontes() {
   document.getElementById('fontesBox').innerHTML = `<b>Preços/proventos (Yahoo/B3)</b>: até ${fmtDate(dr.yahoo)}<br><b>CVM informe diário (FI-Infra)</b>: até ${fmtDate(dr.cvm_diario)}<br><b>CVM informe mensal FII</b>: ref. ${fmtDate(dr.cvm_fii)}<br><b>CVM informe mensal Fiagro</b>: ref. ${fmtDate(dr.cvm_fiagro)}<br><b>CDA (carteira)</b>: ${dr.cda || '—'}<br><br><b>Cobertura VP</b>: ${Object.keys(cv).map(k => `${k}: ${cv[k]}`).join(' · ')}<br><b>Cobertura carteira</b>: look-through CDA ${cc.cda_look_through || 0} · agregada CVM ${cc.ativo_passivo_cvm || 0} · sem carteira ${cc.sem_carteira || 0}<br><b>Eventos de stress</b>: ${META.eventos_stress || 0} cadastrados · ${META.fundos_com_alerta || 0} fundos com alerta<br><br>Pipeline: <code>python scripts/pipeline_listados.py</code> · universo em <code>data/listados_universo.json</code> · eventos em <code>data/listados_eventos_stress.json</code>`;
 }
 
-window.addEventListener('resize', () => { if (document.getElementById('tab-pvp').classList.contains('active')) renderPvp(); if (document.getElementById('tab-home').classList.contains('active')) renderHome(); });
+window.addEventListener('resize', () => { if (document.getElementById('tab-pvp').classList.contains('active')) renderPvp(); if (document.getElementById('tab-home').classList.contains('active')) renderHome(); if (document.getElementById('tab-sim').classList.contains('active')) renderSim(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 loadData();
 </script>
