@@ -1,5 +1,5 @@
 {
-  "ultima_atualizacao": "2026-09-08T09:29:16.701037",
+  "ultima_atualizacao": "2026-10-06T09:22:04.114505",
   "total_fundos": 194,
   "fundos_captacao_aberta": 165,
   "recomendados": 10,
@@ -29,5 +29,9 @@
     "Renda Variável Long Biased",
     "Renda Variável Long Only Valor",
     "Renda Variável Long Short Direcional"
-  ]
+  ],
+  "rentabilidades_fonte": {
+    "CVM": 194,
+    "XP": 0
+  }
 }
