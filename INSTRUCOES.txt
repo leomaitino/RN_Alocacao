@@ -85,14 +85,28 @@ PASSO 1 — Baixe da ANBIMA (série histórica, Excel) e salve em input/:
   • IHFA     → input/IHFA-HISTORICO.xlsx
   (se o site salvar como .xls, renomeie para .xlsx — o conteúdo já é xlsx)
 
-PASSO 2 — Exporte a lista de fundos da XP (pode ser uma única exportação
-  com MM + RF) e salve em input/ (ex.: input/lista-fundos-AAAA-MM-DD.xlsx).
-  As rentabilidades Dia/Mês/Ano/12M/24M/36M e a data da cota vêm SÓ dessa
-  planilha — sem exportação nova esses campos ficam defasados.
+PASSO 2 — Planilha XP (OPCIONAL desde Out/2026).
+  As rentabilidades Dia/Mês/Ano/12M/24M/36M, o valor e a data da cota são
+  calculados pelo pipeline a partir das cotas CVM (campo rent_fonte="CVM"
+  em cada fundo; meta*.json traz a contagem em rentabilidades_fonte).
+  A planilha XP serve só como BASE CADASTRAL: universo de fundos,
+  classificação CVM/XP, gestora, captação, tipo de investidor, taxas,
+  cotização/liquidação e aplicação mínima.
 
-PASSO 3 — Para atualizar SEM incluir fundos novos, filtre a exportação
-  pelos fundos que já estão no dashboard (fundo que sumiu da XP é mantido
-  com a linha antiga, para os recomendados nunca desaparecerem):
+  • Se NÃO houver exportação nova: pule os passos 2 e 3 e reaproveite
+    input/lista-fundos.xlsx e input/lista-fundos-rf.xlsx (as últimas
+    filtradas). Nada fica defasado além dos campos cadastrais acima.
+  • Se houver exportação no layout ANTIGO (aba "Fundos", 25 colunas,
+    começando por NOME_FUNDO, CNPJ_FUNDO, NOME_GESTORA, CLASSIFICAÇÃO_CVM,
+    CLASSIFICAÇÃO_XP), salve em input/ e siga o passo 3.
+  • ATENÇÃO: a exportação nova da XP (Out/2026: aba "Dados", 8 colunas
+    Ativos / Aplicação Mínima / Cotização / Liquidação / ROA / Rentabilidade
+    Bruta 12M / Risco / Ações) NÃO serve — não tem CNPJ nem classificação.
+
+PASSO 3 — (só com exportação no layout antigo) Para atualizar SEM incluir
+  fundos novos, filtre a exportação pelos fundos que já estão no dashboard
+  (fundo que sumiu da XP é mantido com a linha antiga, para os recomendados
+  nunca desaparecerem):
        python scripts/filtrar_planilha_xp.py --xp input/lista-fundos-AAAA-MM-DD.xlsx --base data/fundos.json    --anterior input/lista-fundos.xlsx    --out input/lista-fundos.xlsx
        python scripts/filtrar_planilha_xp.py --xp input/lista-fundos-AAAA-MM-DD.xlsx --base data/fundos_rf.json --anterior input/lista-fundos-rf.xlsx --out input/lista-fundos-rf.xlsx
   (para incluir fundos novos, use a exportação direto no --xp do passo 4)

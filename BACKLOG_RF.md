@@ -464,3 +464,44 @@ roda em toda execução, então não precisa invalidar `data/cache_cvm*`.
 mesmo mês, provavelmente é mudança de layout da CVM, não glitch pontual.
 
 ---
+
+## 14. ✓ RESOLVIDO — Rentabilidades por período passaram a vir da CVM (XP mudou o layout)
+
+**Contexto (Out/2026):** a exportação "lista de fundos" da XP mudou de
+layout: aba `Dados`, 8 colunas (Ativos, Aplicação Mínima, Cotização,
+Liquidação, ROA, Rentabilidade Bruta 12M, Risco, Ações), sem CNPJ, sem
+classificação CVM/XP e sem rentabilidades por período. Esse arquivo não
+alimenta os pipelines. Decisão do usuário: calcular as rentabilidades
+Dia/Mês/Ano/12M/24M/36M a partir das cotas CVM.
+
+**Implementação:** `calcular_rentabilidades_cvm` + `aplicar_rentabilidades_cvm`
+em `scripts/pipeline_fundos.py` (shared), chamadas em `enriquecer_metricas`
+(MM) e `enriquecer_metricas_rf` (RF). Regra "fonte mais recente vence": a
+CVM substitui a XP só quando a cota CVM é tão ou mais recente que a
+`data_cota` da planilha — FIDCs cuja série CVM parou em 2024/25 mantêm os
+valores XP de set/2026. Incentivadas recebem o gross-up também no valor
+CVM. Cada fundo sai com `rent_fonte` ("CVM" | "XP") e `meta*.json` traz
+`rentabilidades_fonte` com a contagem. Log: `[RENT_CVM]`.
+
+**Validação (08/09/2026, mesma data de referência da XP):** mediana da
+diferença CVM × XP de 0,002–0,003 p.p. em Dia/Mês/Ano/12M (173 fundos MM,
+270 RF); 24M/36M com mediana ≤ 0,09 p.p. Exceções conhecidas: fundos
+"Subclasse" (Kinea Apolo, Kinea IPCA Dinâmico II, Kinea Chronos) divergem
+até 5 p.p. em 24M/36M porque a CVM publica várias classes sob o mesmo CNPJ
+e o dedup por continuidade escolhe uma série; a XP reporta a classe
+específica. É a mesma série já usada para Sharpe/vol, então o dashboard
+fica internamente consistente.
+
+**Pendente / próximo passo opcional:** a base cadastral (taxas, aplicação
+mínima, cotização/liquidação, captação, classificação) segue congelada na
+última exportação no layout antigo (08/09/2026). O layout novo tem
+Aplicação Mínima / Cotização / Liquidação / Risco e poderia atualizar esses
+campos por casamento de NOME (bate 170/194 no MM e 293/312 no RF). Fazer só
+se a XP confirmar que o layout antigo não volta.
+
+**Onde mexer:** `scripts/pipeline_fundos.py` (`RENT_CAMPOS`,
+`calcular_rentabilidades_cvm`, `aplicar_rentabilidades_cvm`),
+`scripts/pipeline_fundos_rf.py` (`enriquecer_metricas_rf`), `INSTRUCOES.txt`
+(passo 2 da rotina mensal).
+
+---

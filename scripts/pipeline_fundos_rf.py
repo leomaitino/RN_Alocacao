@@ -67,6 +67,8 @@ warnings.filterwarnings('ignore', category=UserWarning,
 #   Métricas:              calcular_volatilidade, calcular_sharpe,
 #                          calcular_sortino, calcular_drawdown_max,
 #                          calcular_var_95, calcular_calmar
+#   Rentabilidades:        RENT_CAMPOS, calcular_rentabilidades_cvm,
+#                          aplicar_rentabilidades_cvm
 #   Benchmarks:            baixar_cdi, baixar_ipca, baixar_ihfa,
 #                          _parsear_csv_ihfa, construir_ipca_mais_spread
 #   Outros:                NumpyEncoder, log, DIAS_UTEIS_ANO,
@@ -81,6 +83,7 @@ from pipeline_fundos import (  # noqa: E402
     calcular_retornos_diarios,
     calcular_volatilidade, calcular_sharpe, calcular_sortino,
     calcular_drawdown_max, calcular_var_95, calcular_calmar,
+    RENT_CAMPOS, calcular_rentabilidades_cvm, aplicar_rentabilidades_cvm,
     baixar_cdi, baixar_ipca, baixar_ihfa, _parsear_csv_ihfa,
     construir_ipca_mais_spread,
     _serie_para_dict, calcular_acumulado,
@@ -392,7 +395,7 @@ def aplicar_gross_up_incentivadas(df: pd.DataFrame) -> pd.DataFrame:
     composição). Para 12M com retornos típicos de RF (~10-15% a.a.), a
     diferença é menor que 0.7p.p. — aceitável.
     """
-    rent_cols = ['rent_dia', 'rent_mes', 'rent_ano', 'rent_12m', 'rent_24m', 'rent_36m']
+    rent_cols = RENT_CAMPOS
     mask = df['subgrupo'] == 'Incentivadas'
     n_fundos = int(mask.sum())
     if n_fundos == 0:
@@ -404,7 +407,8 @@ def aplicar_gross_up_incentivadas(df: pd.DataFrame) -> pd.DataFrame:
         # Multiplica apenas onde mask=True E valor não é None/NaN
         col_mask = mask & df[col].notna()
         df.loc[col_mask, col] = df.loc[col_mask, col] * GROSS_UP_FATOR
-    log.info(f"  [GROSS_UP] aplicado em {n_fundos} fundos Incentivadas — rents da planilha XP")
+    log.info(f"  [GROSS_UP] aplicado em {n_fundos} fundos Incentivadas — rents da planilha XP "
+             f"(base; valores CVM, quando mais recentes, são grosseados em enriquecer_metricas_rf)")
     return df
 
 
@@ -488,9 +492,12 @@ def enriquecer_metricas_rf(df_fundos: pd.DataFrame, df_cotas: pd.DataFrame):
             'total_meses':      total_meses,
             '_ret':             ret,
             '_cotas':           cotas,
+            '_rents':           calcular_rentabilidades_cvm(cotas),  # Dia/Mês/Ano/12M/24M/36M
         }
 
     log.info(f"  → Métricas (1ª passagem) calculadas para {len(metricas)} fundos")
+
+    contagem_rent = {'CVM': 0, 'XP': 0, 'gross_up': 0}
 
     def aplicar(row):
         cnpj_n = _normalizar_cnpj(row['cnpj'])
@@ -502,6 +509,15 @@ def enriquecer_metricas_rf(df_fundos: pd.DataFrame, df_cotas: pd.DataFrame):
                       'meses_pos', 'total_meses']:
             if campo in m:
                 row[campo] = m[campo]
+        # Rentabilidades por período: CVM substitui a planilha XP quando a cota
+        # CVM é tão ou mais recente. Incentivadas recebem o gross-up aqui
+        # (os valores XP já foram grosseados em aplicar_gross_up_incentivadas).
+        fator = GROSS_UP_FATOR if row.get('subgrupo') == 'Incentivadas' else 1.0
+        fonte = aplicar_rentabilidades_cvm(row, m.get('_rents'), fator=fator)
+        row['rent_fonte'] = fonte
+        contagem_rent[fonte] += 1
+        if fonte == 'CVM' and fator != 1.0:
+            contagem_rent['gross_up'] += 1
         row['calmar'] = calcular_calmar(row.get('rent_12m'), row.get('drawdown_max'))
         cotas = m.get('_cotas')
         if cotas is not None and len(cotas) > 0:
@@ -509,6 +525,9 @@ def enriquecer_metricas_rf(df_fundos: pd.DataFrame, df_cotas: pd.DataFrame):
         return row
 
     df_fundos = df_fundos.apply(aplicar, axis=1)
+    log.info(f"  [RENT_CVM] rentabilidades Dia/Mês/Ano/12M/24M/36M: "
+             f"{contagem_rent['CVM']} fundos da CVM ({contagem_rent['gross_up']} Incentivadas grosseadas) | "
+             f"{contagem_rent['XP']} mantidos da planilha XP (sem série CVM ou CVM mais antiga)")
     return df_fundos, metricas
 
 
@@ -1226,6 +1245,12 @@ def salvar_outputs_rf(df_fundos: pd.DataFrame,
         "gross_up_premissa":     GROSS_UP_PREMISSA,
         "gross_up_fator":        round(GROSS_UP_FATOR, 4),
         "gross_up_aplicado_em":  GROSS_UP_APLICADO_EM,
+        # Origem das rentabilidades por período (rent_dia..rent_36m, data_cota):
+        # 'CVM' = calculadas da série de cotas; 'XP' = mantidas da planilha.
+        "rentabilidades_fonte": {
+            "CVM": sum(1 for f in fundos_list if f.get('rent_fonte') == 'CVM'),
+            "XP":  sum(1 for f in fundos_list if f.get('rent_fonte') != 'CVM'),
+        },
     }
     with open(output_dir / 'meta_rf.json', 'w', encoding='utf-8') as f:
         json.dump(meta, f, ensure_ascii=False, indent=2)

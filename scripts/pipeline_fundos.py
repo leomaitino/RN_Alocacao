@@ -763,6 +763,88 @@ def calcular_calmar(ret_12m: float | None, drawdown_max: float | None) -> float 
     return round(ret_12m / abs(drawdown_max), 4)
 
 
+# [SHARED-RF] RENT_CAMPOS, calcular_rentabilidades_cvm, aplicar_rentabilidades_cvm
+#             — importadas pelo scripts/pipeline_fundos_rf.py.
+# Campos de rentabilidade no padrão da planilha XP. A partir de Out/2026 a XP
+# deixou de exportar esses campos (novo layout "Ativos", sem CNPJ nem
+# rentabilidades por período), então os dois pipelines passaram a calculá-los
+# da série de cotas CVM. A planilha XP (antiga) segue como base cadastral.
+RENT_CAMPOS = ['rent_dia', 'rent_mes', 'rent_ano', 'rent_12m', 'rent_24m', 'rent_36m']
+
+
+def calcular_rentabilidades_cvm(cotas: pd.Series) -> dict:
+    """
+    Rentabilidades acumuladas no padrão XP (Dia/Mês/Ano/12M/24M/36M) a partir
+    da série de cotas CVM, com data de referência t = última cota disponível.
+
+      rent_dia : cota(t) / cota(dia útil anterior) − 1
+      rent_mes : cota(t) / última cota ANTES do 1º dia do mês de t − 1
+      rent_ano : cota(t) / última cota ANTES de 1º/jan do ano de t − 1
+      rent_12m : cota(t) / última cota ≤ (t − 12 meses) − 1   (idem 24M/36M)
+
+    Janela sem cota-base (fundo mais novo que a janela, ou histórico baixado
+    insuficiente) → None, nunca extrapola. Retorna {} se < 2 cotas.
+    data_cota sai como dd/mm/yyyy (igual XP); data_cota_iso é auxiliar para
+    comparar recência com a planilha e não vai para o JSON.
+    """
+    cotas = cotas.dropna().sort_index()
+    cotas = cotas[cotas > 0]
+    if len(cotas) < 2:
+        return {}
+    t = cotas.index[-1]
+    v_t = float(cotas.iloc[-1])
+
+    def _rent(data_base: pd.Timestamp, inclusive: bool) -> float | None:
+        s = cotas[cotas.index <= data_base] if inclusive else cotas[cotas.index < data_base]
+        if s.empty:
+            return None
+        v0 = float(s.iloc[-1])
+        return round(v_t / v0 - 1, 6) if v0 > 0 else None
+
+    return {
+        'rent_dia':      round(v_t / float(cotas.iloc[-2]) - 1, 6),
+        'rent_mes':      _rent(pd.Timestamp(t.year, t.month, 1), inclusive=False),
+        'rent_ano':      _rent(pd.Timestamp(t.year, 1, 1), inclusive=False),
+        'rent_12m':      _rent(t - pd.DateOffset(months=12), inclusive=True),
+        'rent_24m':      _rent(t - pd.DateOffset(months=24), inclusive=True),
+        'rent_36m':      _rent(t - pd.DateOffset(months=36), inclusive=True),
+        'valor_cota':    round(v_t, 6),
+        'data_cota':     t.strftime('%d/%m/%Y'),
+        'data_cota_iso': t.strftime('%Y-%m-%d'),
+    }
+
+
+def _data_cota_xp_iso(data_cota_xp) -> str | None:
+    """'dd/mm/yyyy' (planilha XP) → 'yyyy-mm-dd'; None se vazio/inválido."""
+    if not data_cota_xp or not isinstance(data_cota_xp, str):
+        return None
+    try:
+        return datetime.strptime(data_cota_xp.strip(), '%d/%m/%Y').strftime('%Y-%m-%d')
+    except ValueError:
+        return None
+
+
+def aplicar_rentabilidades_cvm(row, rents: dict | None, fator: float = 1.0) -> str:
+    """
+    Sobrescreve rent_* / valor_cota / data_cota da linha com os valores CVM
+    quando a cota CVM é tão ou mais recente que a data_cota da planilha XP
+    ("fonte mais recente vence": FIDCs cuja série CVM parou em 2024/25 mantêm
+    a XP). `fator` multiplica os rent_* (gross-up de Incentivadas no RF).
+    Retorna a fonte efetiva: 'CVM' ou 'XP'.
+    """
+    if not rents:
+        return 'XP'
+    xp_iso = _data_cota_xp_iso(row.get('data_cota'))
+    if xp_iso and rents['data_cota_iso'] < xp_iso:
+        return 'XP'
+    for campo in RENT_CAMPOS:
+        v = rents.get(campo)
+        row[campo] = round(v * fator, 6) if v is not None else None
+    row['valor_cota'] = rents['valor_cota']
+    row['data_cota']  = rents['data_cota']
+    return 'CVM'
+
+
 def enriquecer_metricas(df_fundos: pd.DataFrame, df_cotas: pd.DataFrame) -> pd.DataFrame:
     """
     Para cada fundo, calcula as métricas quant a partir da série de cotas CVM.
@@ -842,13 +924,15 @@ def enriquecer_metricas(df_fundos: pd.DataFrame, df_cotas: pd.DataFrame) -> pd.D
             'consistencia':     consistencia,
             'consistencia_36m': consistencia_36m,
             'meses_pos':        meses_pos,
-            '_ret':             ret,   # série completa para segunda passagem
             'total_meses':    total_meses,
-            '_ret':           ret,
+            '_ret':           ret,     # série completa para segunda passagem
             '_cotas':         cotas,
+            '_rents':         calcular_rentabilidades_cvm(cotas),  # Dia/Mês/Ano/12M/24M/36M
         }
 
     log.info(f"  → Métricas calculadas para {len(metricas)} fundos")
+
+    contagem_rent = {'CVM': 0, 'XP': 0}
 
     # Aplica no DataFrame
     def aplicar(row):
@@ -857,6 +941,11 @@ def enriquecer_metricas(df_fundos: pd.DataFrame, df_cotas: pd.DataFrame) -> pd.D
         for campo in ['pl', 'pl_12m_atras', 'variacao_pl_12m', 'num_cotistas', 'volatilidade', 'volatilidade_24m', 'volatilidade_36m', 'drawdown_max', 'drawdown_max_36m', 'var_95', 'consistencia', 'consistencia_36m', 'corr_cdi_36m', 'meses_pos', 'total_meses', 'longevidade_anos']:
             if campo in m:
                 row[campo] = m[campo]
+        # Rentabilidades por período: CVM substitui a planilha XP quando a cota
+        # CVM é tão ou mais recente (ver calcular_rentabilidades_cvm).
+        fonte = aplicar_rentabilidades_cvm(row, m.get('_rents'))
+        row['rent_fonte'] = fonte
+        contagem_rent[fonte] += 1
         row['calmar'] = calcular_calmar(row.get('rent_12m'), row.get('drawdown_max'))
         # Longevidade em anos a partir dos dados CVM (mais preciso que cad_fi)
         m = metricas.get(_normalizar_cnpj(row['cnpj']), {})
@@ -867,6 +956,9 @@ def enriquecer_metricas(df_fundos: pd.DataFrame, df_cotas: pd.DataFrame) -> pd.D
         return row
 
     df_fundos = df_fundos.apply(aplicar, axis=1)
+    log.info(f"  [RENT_CVM] rentabilidades Dia/Mês/Ano/12M/24M/36M: "
+             f"{contagem_rent['CVM']} fundos da CVM | {contagem_rent['XP']} mantidos da planilha XP "
+             f"(sem série CVM ou CVM mais antiga que a data_cota XP)")
 
     # Guarda metricas (com _ret e _cotas) para segunda passagem com CDI
     return df_fundos, metricas
@@ -1389,6 +1481,12 @@ def salvar_outputs(
         "aprovados": sum(1 for f in fundos_list if f.get('aprovado')),
         "benchmarks_disponiveis": list(benchmarks.keys()),
         "classes_xp": sorted(set(f.get('class_xp', '') for f in fundos_list)),
+        # Origem das rentabilidades por período (rent_dia..rent_36m, data_cota):
+        # 'CVM' = calculadas da série de cotas; 'XP' = mantidas da planilha.
+        "rentabilidades_fonte": {
+            "CVM": sum(1 for f in fundos_list if f.get('rent_fonte') == 'CVM'),
+            "XP":  sum(1 for f in fundos_list if f.get('rent_fonte') != 'CVM'),
+        },
     }
     with open(output_dir / 'meta.json', 'w', encoding='utf-8') as f:
         json.dump(meta, f, ensure_ascii=False, indent=2)
