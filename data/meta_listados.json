@@ -1,5 +1,5 @@
 {
-  "ultima_atualizacao": "2026-10-06T10:57:16.842551",
+  "ultima_atualizacao": "2026-10-06T13:04:59.386304",
   "total_fundos": 50,
   "no_painel": 22,
   "por_tipo": {
@@ -19,13 +19,14 @@
     "cvm_diario": "2026-10-02",
     "cvm_fii": "2026-08-01",
     "cvm_fiagro": "2026-08-01",
+    "cvm_fip": "2026-08-31",
     "cda": "202608"
   },
   "cobertura_vp": {
     "CVM informe mensal FII": 19,
     "CVM informe diário": 17,
     "CVM informe mensal FIAGRO": 13,
-    "manual (investidor10 / relatório gerencial ago-2026)": 1
+    "CVM informe quadrimestral FIP": 1
   },
   "cobertura_carteira": {
     "cda_look_through": 17,

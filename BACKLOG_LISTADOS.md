@@ -71,13 +71,20 @@ não marcação a mercado — útil como proxy do carrego, não como TIR.
 relatório gerencial. Alternativa automática: preços indicativos ANBIMA de
 debêntures (data.anbima.com.br) para marcar cada debênture da CDA.
 
-## 6. AZIN11 (FIP-IE de dívida) sem informe diário
+## 6. ✓ PARCIAL — AZIN11 (FIP-IE de dívida) sem informe diário
 
-**Estado:** VP manual (`vp_manual` no universo, 97,90 em 31/08/2026). FIPs
-publicam informe trimestral na CVM (dataset `FIP/DOC/INF_TRIMESTRAL`).
+**Estado (06/10/2026):** o pipeline lê o informe **quadrimestral** de FIP da
+CVM (`FIP/DOC/INF_QUADRIMESTRAL`, abr/ago/dez; o trimestral parou em 2023)
+e monta a série de VP/cota do AZIN11 desde abr/2024 (`VL_QUOTA_CLASSE`,
+classe 1), com filtro de outlier (`[VP_OUTLIER]`: abr/2026 veio com 48,91
+porque a CVM registrou o dobro de cotas) e o ponto manual do relatório
+gerencial (`vp_manual`) complementando quando é mais recente.
 
-**Próximo passo:** ler o informe trimestral de FIP para VP e PL; ou aceitar
-a atualização manual mensal pelo relatório gerencial.
+**Limitação que fica:** VP só a cada 4 meses → o P/VP do AZIN11 entre
+informes usa um VP defasado; para a Simulação ele passa a ter histórico
+suficiente, mas a qualidade do sinal é menor que nos FI-Infra (diário) e
+FII/Fiagro (mensal). Para VP mensal, copiar do relatório gerencial da
+AZ Quest para `vp_manual` (ou uma lista `vp_manual_historico`).
 
 ## 7. Status Aprovado/Não aprovado editável no dashboard
 

@@ -68,6 +68,7 @@ HOJE = date.today()
 CVM_FII_URL    = "https://dados.cvm.gov.br/dados/FII/DOC/INF_MENSAL/DADOS/inf_mensal_fii_{ano}.zip"
 CVM_FIAGRO_URL = "https://dados.cvm.gov.br/dados/FIAGRO/DOC/INF_MENSAL/DADOS/inf_mensal_fiagro_{aaaamm}.zip"
 CVM_CDA_URL    = "https://dados.cvm.gov.br/dados/FI/DOC/CDA/DADOS/cda_fi_{aaaamm}.zip"
+CVM_FIP_URL    = "https://dados.cvm.gov.br/dados/FIP/DOC/INF_QUADRIMESTRAL/DADOS/inf_quadrimestral_fip_{ano}.csv"
 SND_URL = ("https://www.debentures.com.br/exploreosnd/consultaadados/emissoesdedebentures/"
            "caracteristicas_e.asp?op_exc=False&emissor=&isin=&ativo=&dt_ini=&dt_fim=&Submit.x=&Submit.y=")
 UA = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AlphaDesk/1.0'}
@@ -272,6 +273,59 @@ def baixar_cvm_fiagro(cache_dir: Path) -> dict:
             d['N'] = d['CNPJ_Classe'].map(N)
     log.info(f"CVM FIAGRO mensal: {len(main)} linhas | última ref {main['Data_Referencia'].max() if not main.empty else '-'}")
     return {'main': main, 'sub': sub}
+
+
+def baixar_cvm_fip(anos: int, cache_dir: Path) -> pd.DataFrame:
+    """
+    Informe quadrimestral de FIP (abr/ago/dez) — única fonte CVM de VP/cota para
+    FIP-IE listados (ex.: AZIN11). Retorna df com N, data, vp, pl, cotas (classe 1).
+    """
+    frames = []
+    for ano in range(HOJE.year - anos, HOJE.year + 1):
+        dest = cache_dir / f'inf_quadrimestral_fip_{ano}.csv'
+        if not baixar_arquivo(CVM_FIP_URL.format(ano=ano), dest, max_idade_dias=(1 if ano == HOJE.year else None), timeout=120):
+            continue
+        try:
+            d = pd.read_csv(dest, sep=';', encoding='latin-1', dtype=str, low_memory=False)
+        except Exception as e:
+            log.warning(f"  ✗ {dest.name}: {e}"); continue
+        if 'CNPJ_FUNDO_CLASSE' not in d.columns:
+            continue
+        frames.append(d)
+    if not frames:
+        return pd.DataFrame()
+    d = pd.concat(frames, ignore_index=True)
+    d['N'] = d['CNPJ_FUNDO_CLASSE'].map(N)
+    d['data'] = pd.to_datetime(d['DT_COMPTC'], errors='coerce')
+    d['vp'] = d['VL_QUOTA_CLASSE'].map(fnum)
+    d['pl'] = d['VL_PATRIM_LIQ'].map(fnum)
+    d['cotas'] = d['QT_COTA_INTEGR_CLASSE'].map(fnum)
+    d = d[d['data'].notna() & d['vp'].notna() & (d['vp'] > 0)]
+    # classe 1 (cotas negociadas); dedup por data mantendo a maior quantidade de cotas
+    d = d[(d['CLASSE_COTA'].fillna('1') == '1')].sort_values(['N', 'data', 'cotas']).drop_duplicates(['N', 'data'], keep='last')
+    log.info(f"CVM FIP quadrimestral: {d['N'].nunique()} fundos | última ref {d['data'].max().date() if len(d) else '-'}")
+    return d[['N', 'data', 'vp', 'pl', 'cotas']]
+
+
+def filtrar_outliers_vp(serie: pd.Series, tol: float = 0.25) -> pd.Series:
+    """
+    Remove pontos de VP que destoam > tol dos dois vizinhos quando os vizinhos
+    concordam entre si (±10%). Caso real: AZIN11 abr/2026 com VP 48,91 entre
+    97,10 e 97,90 — a CVM registrou o dobro de cotas naquele informe.
+    """
+    s = serie.dropna().sort_index()
+    if len(s) < 3:
+        return s
+    keep = []
+    v = s.values
+    for i in range(len(v)):
+        if 0 < i < len(v) - 1:
+            a, b = v[i - 1], v[i + 1]
+            if abs(a / b - 1) <= 0.10 and (abs(v[i] / a - 1) > tol and abs(v[i] / b - 1) > tol):
+                log.warning(f"  [VP_OUTLIER] {s.index[i].date()}: VP {v[i]:.2f} descartado (vizinhos {a:.2f} / {b:.2f})")
+                continue
+        keep.append(i)
+    return s.iloc[keep]
 
 
 # ---------------------------------------------------------------------------
@@ -545,6 +599,7 @@ def main():
     # ---- CVM mensal FII / FIAGRO
     fii = baixar_cvm_fii(args.anos, cache)
     fiagro = baixar_cvm_fiagro(cache)
+    fip = baixar_cvm_fip(args.anos, cache) if any(f['tipo'] == 'FIP-IE' for f in fundos) else pd.DataFrame()
 
     # ---- CDA + SND
     blocos, snd = {}, pd.DataFrame()
@@ -558,7 +613,7 @@ def main():
 
     # ---- Monta registros
     registros, series, carteiras = [], {}, {}
-    datas_ref = {'yahoo': None, 'cvm_diario': None, 'cvm_fii': None, 'cvm_fiagro': None, 'cda': cda_ref}
+    datas_ref = {'yahoo': None, 'cvm_diario': None, 'cvm_fii': None, 'cvm_fiagro': None, 'cvm_fip': None, 'cda': cda_ref}
 
     for f in fundos:
         t, n, tipo = f['ticker'], N(f['cnpj']), f['tipo']
@@ -646,12 +701,25 @@ def main():
                     if v and base:
                         aloc[label] = r4(v / base, 4)
                 aloc['_ref'] = r['Data_Referencia']; aloc['_fonte'] = 'CVM informe FIAGRO'
-        if vp_serie.empty and f.get('vp_manual'):
-            vm = f['vp_manual']
-            vp_serie = pd.Series([float(vm['valor'])], index=[pd.Timestamp(vm['data'])]); fonte_vp = f"manual ({vm.get('fonte', 'relatório')})"
-            cotas_emitidas = f.get('cotas_emitidas_manual')
-            if cotas_emitidas and vp_serie.iloc[-1]:
-                pl_serie = pd.Series([float(cotas_emitidas) * float(vp_serie.iloc[-1])], index=vp_serie.index)
+        if tipo == 'FIP-IE' and not fip.empty:
+            q = fip[fip['N'] == n].sort_values('data')
+            if len(q):
+                vp_serie = filtrar_outliers_vp(pd.Series(q['vp'].values, index=q['data']))
+                pl_serie = pd.Series(q['pl'].values, index=q['data']).reindex(vp_serie.index)
+                c_ult = q['cotas'].dropna()
+                cotas_emitidas = float(c_ult.iloc[-1]) if len(c_ult) else None
+                fonte_vp = 'CVM informe quadrimestral FIP'
+                datas_ref['cvm_fip'] = max(datas_ref['cvm_fip'] or '', vp_serie.index.max().strftime('%Y-%m-%d'))
+        if f.get('vp_manual'):
+            # ponto manual (relatório gerencial) complementa a série quando é mais recente que a CVM
+            vm = f['vp_manual']; dm = pd.Timestamp(vm['data'])
+            if vp_serie.empty or dm > vp_serie.index.max():
+                vp_serie = pd.concat([vp_serie, pd.Series([float(vm['valor'])], index=[dm])]).sort_index()
+                fonte_vp = (fonte_vp + ' + ' if fonte_vp else '') + f"manual ({vm.get('fonte', 'relatório')})"
+                if f.get('cotas_emitidas_manual'):
+                    cotas_emitidas = f['cotas_emitidas_manual']
+                if cotas_emitidas:
+                    pl_serie = pd.concat([pl_serie, pd.Series([float(cotas_emitidas) * float(vm['valor'])], index=[dm])]).sort_index()
 
         # --- consolidação VP / P/VP
         if len(vp_serie):
@@ -680,7 +748,7 @@ def main():
                 ser['vp'] = [r4(float(v), 4) if pd.notna(v) else None for v in vp_d.values]
                 ser['pvp'] = [r4(float(v), 4) if pd.notna(v) else None for v in (close / vp_d).values]
                 ser['vp_fonte'] = fonte_vp
-                ser['vp_frequencia'] = 'diária' if tipo == 'FI-Infra' else 'mensal'
+                ser['vp_frequencia'] = 'diária' if tipo == 'FI-Infra' else ('quadrimestral' if tipo == 'FIP-IE' else 'mensal')
         elif len(close):
             ser['datas'] = [d.strftime('%Y-%m-%d') for d in close.index]
             ser['preco'] = [r4(float(v), 4) for v in close.values]
