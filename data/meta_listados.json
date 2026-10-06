@@ -1,0 +1,37 @@
+{
+  "ultima_atualizacao": "2026-10-06T10:57:16.842551",
+  "total_fundos": 50,
+  "no_painel": 22,
+  "por_tipo": {
+    "FII": 19,
+    "FI-Infra": 17,
+    "Fiagro": 13,
+    "FIP-IE": 1
+  },
+  "por_status": {
+    "Candidato": 18,
+    "Aprovado": 13,
+    "Sugerido": 10,
+    "Não Aprovado": 9
+  },
+  "datas_referencia": {
+    "yahoo": "2026-10-06",
+    "cvm_diario": "2026-10-02",
+    "cvm_fii": "2026-08-01",
+    "cvm_fiagro": "2026-08-01",
+    "cda": "202608"
+  },
+  "cobertura_vp": {
+    "CVM informe mensal FII": 19,
+    "CVM informe diário": 17,
+    "CVM informe mensal FIAGRO": 13,
+    "manual (investidor10 / relatório gerencial ago-2026)": 1
+  },
+  "cobertura_carteira": {
+    "cda_look_through": 17,
+    "ativo_passivo_cvm": 32,
+    "sem_carteira": 1
+  },
+  "eventos_stress": 15,
+  "fundos_com_alerta": 20
+}

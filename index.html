@@ -204,12 +204,20 @@
       <div class="pcard-foot"><span class="pstatus soon">Em construção</span><span class="parrow">→</span></div>
     </div>
 
-    <div class="pcard soon">
+    <a href="./dashboard_listados.html" class="pcard live">
       <div class="pcard-num">07</div>
       <div class="pcard-name">Fundos Listados</div>
-      <div class="pcard-desc">FIIs e FI-Infra com DY, P/VP, liquidez e análise de portfólio.</div>
-      <div class="pcard-foot"><span class="pstatus soon">Em construção</span><span class="parrow">→</span></div>
-    </div>
+      <div class="pcard-desc">FI-Infra, FIIs de papel e Fiagros: DY, preço × valor patrimonial, carteira look-through (CVM/ANBIMA) e radar de stress.</div>
+      <div class="pcard-foot">
+        <span class="pstatus live">Disponível</span>
+        <span class="parrow">→</span>
+      </div>
+      <div class="pcard-stats">
+        <div><div class="pstat-val" id="lsFundos">—</div><div class="pstat-lbl">no painel</div></div>
+        <div><div class="pstat-val" id="lsAlertas">—</div><div class="pstat-lbl">com alerta</div></div>
+        <div><div class="pstat-val" id="lsUpd">—</div><div class="pstat-lbl">atualização</div></div>
+      </div>
+    </a>
 
     <div class="pcard soon">
       <div class="pcard-num">08</div>
@@ -282,6 +290,13 @@ async function load() {
     // Prefere ultima_data_cota (data dos dados CVM); cai para ultima_atualizacao do pipeline
     const d = m.ultima_data_cota || m.ultima_atualizacao?.slice(0,10) || '—';
     document.getElementById('rfUpd').textContent = d;
+  } catch(e){}
+  try {
+    // Fundos Listados — meta gerado por scripts/pipeline_listados.py
+    const ml = await (await fetch('./data/meta_listados.json?v='+Date.now())).json();
+    document.getElementById('lsFundos').textContent = ml.no_painel ?? ml.total_fundos ?? '—';
+    document.getElementById('lsAlertas').textContent = ml.fundos_com_alerta ?? '—';
+    document.getElementById('lsUpd').textContent = (ml.datas_referencia && ml.datas_referencia.yahoo) || ml.ultima_atualizacao?.slice(0,10) || '—';
   } catch(e){}
   try {
     const c = await (await fetch('./data/cotas.json?v='+Date.now())).json();

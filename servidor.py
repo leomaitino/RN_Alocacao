@@ -5,9 +5,18 @@ Deploy no Render.com (plano free, sem disco externo).
 """
 
 import os
+import sys
 import json
 from pathlib import Path
 from datetime import datetime
+
+# Windows: o console padrão (cp1252) não codifica os emojis dos prints de
+# startup e derruba o uvicorn antes de atender. No Render (Linux/UTF-8) é no-op.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -198,6 +207,11 @@ def serve_data(filename: str):
         # JSON (não é fluxo do usuário no dashboard). Ver BACKLOG #8 para
         # automação futura (snapshot mensal automático).
         "historico_carteira_rf.json",
+        # Listados (FI-Infra, FII de papel, Fiagro) — dashboard_listados.html.
+        # Gerados por scripts/pipeline_listados.py; universo e eventos são
+        # JSONs editados manualmente (sem rota POST — commit no repositório).
+        "listados.json", "listados_series.json", "listados_carteiras.json",
+        "meta_listados.json", "listados_universo.json", "listados_eventos_stress.json",
     }
     if filename not in allowed:
         raise HTTPException(404, "Arquivo não encontrado")
@@ -220,6 +234,12 @@ def dashboard_rf():
     # Etapa 1.3.0 — serve o HTML do dashboard de Renda Fixa.
     # Rotas /api/save-*-rf e /api/load-estado-rf são adicionadas na Etapa 1.3.8.
     return FileResponse(str(BASE_DIR / "dashboard_rf.html"))
+
+@api.get("/dashboard_listados.html", include_in_schema=False)
+def dashboard_listados():
+    # Fundos Listados (FI-Infra, FII de papel, Fiagro) — somente leitura:
+    # status/universo são editados no JSON e commitados.
+    return FileResponse(str(BASE_DIR / "dashboard_listados.html"))
 
 # ── Comparador ─────────────────────────────────────────────────────────────────
 @api.get("/comparador", include_in_schema=False)

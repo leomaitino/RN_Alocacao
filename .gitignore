@@ -13,6 +13,7 @@ env/
 # Cache CVM (parquets gerados pelo pipeline local — reconstruivel)
 data/cache_cvm/
 data/cache_cvm_rf/
+data/cache_cvm_listados/
 data/cache_benchmarks/
 
 # Backups manuais
@@ -37,3 +38,6 @@ input/lista-fundos*.xlsx
 # Pastas de trabalho local (nao sobem no deploy)
 Assistente CIO/
 archive/
+
+# exports gerados (planilhas preenchidas)
+output/

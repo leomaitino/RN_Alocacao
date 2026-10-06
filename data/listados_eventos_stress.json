@@ -1,0 +1,181 @@
+{
+  "_instrucoes": "Eventos de stress curados manualmente. escopo='emissor' casa com a carteira look-through dos FI-Infra (por cnpj_emissor, emissor_regex sobre o nome normalizado em maiúsculas sem acento, codigos ou prefixo_codigo da debênture). escopo='fundo' anexa o alerta diretamente aos tickers listados (usado para FII/Fiagro, cuja carteira não é pública na CVM). severidade: alta | media | baixa. Datas em YYYY-MM-DD. Atualizar a cada rodada mensal.",
+  "_atualizado_em": "2026-10-06",
+  "eventos": [
+    {
+      "id": "oxe-energia-2025",
+      "escopo": "emissor",
+      "emissor_regex": "OXE ENERGIA|OXE ",
+      "prefixo_codigo": ["OXEE", "OXEN"],
+      "tipo": "reestruturacao",
+      "severidade": "alta",
+      "data": "2025-10-01",
+      "titulo": "OXE Energia (térmicas a biomassa, RR): reestruturação da dívida",
+      "descricao": "Principal ativo do XPID11 (~R$ 166M). Renegociação da dívida em curso; desfecho nos próximos dois anos é determinante para o fundo.",
+      "fonte": "https://www.infomoney.com.br/?p=3236248"
+    },
+    {
+      "id": "agrogalaxy-rj-2024",
+      "escopo": "fundo",
+      "tickers": ["AAZQ11", "BBGO11", "CPTR11", "JGPX11", "XPCA11"],
+      "exposicao_pct_pl": {"XPCA11": 0.082},
+      "tipo": "recuperacao_judicial",
+      "severidade": "alta",
+      "data": "2024-09-18",
+      "titulo": "Agrogalaxy: recuperação judicial (CRA R$ 500M, debêntures)",
+      "descricao": "Agrogalaxy deixou de pagar remuneração de debêntures e amortização de CRA de R$ 500M (venc. 2027). Fiagros listados credores: AAZQ11, BBGO11, CPTR11, JGPX11 e XPCA11 (3 CRAs, 8,2% do PL), entre outros.",
+      "fonte": "https://conteudos.xpi.com.br/fundos-imobiliarios/relatorios/quais-fiagros-podem-ser-impactados-pela-inadimplencia-e-recuperacao-judicial-da-agrogalaxy/"
+    },
+    {
+      "id": "agro-north-rj",
+      "escopo": "fundo",
+      "tickers": ["AAZQ11"],
+      "tipo": "recuperacao_judicial",
+      "severidade": "media",
+      "data": "2025-06-01",
+      "titulo": "Agro North: recuperação judicial (CRA extraconcursal, 6.000 CRAs)",
+      "descricao": "Emissor em RJ, mas adimplente com o fundo; garantia de alienação fiduciária de 1.738 ha (> 200% do saldo). CRAs extraconcursais.",
+      "fonte": "https://fnet.bmfbovespa.com.br/fnet/publico/exibirDocumento?id=1168141"
+    },
+    {
+      "id": "cra-stoppe-fidc-caete",
+      "escopo": "fundo",
+      "tickers": ["AAZQ11"],
+      "tipo": "inadimplencia",
+      "severidade": "media",
+      "data": "2024-11-01",
+      "titulo": "CRA Stoppe / FIDC Caetê: execução de garantias (Operação Greenwashing)",
+      "descricao": "Recuperação de crédito em andamento (execução cível contra garantidores e processo criminal). Decisões favoráveis com bloqueio de bens.",
+      "fonte": "https://fnet.bmfbovespa.com.br/fnet/publico/exibirDocumento?id=1168141"
+    },
+    {
+      "id": "belagricola-pre-2025",
+      "escopo": "fundo",
+      "tickers": ["JGPX11"],
+      "tipo": "recuperacao_extrajudicial",
+      "severidade": "media",
+      "data": "2025-12-01",
+      "titulo": "Belagrícola: plano de recuperação extrajudicial (CRAs)",
+      "descricao": "Após período de custódia, a Belagrícola apresentou PRE com apoio de mais de 1/3 dos credores quirografários, ancorado por detentores de CRA.",
+      "fonte": "https://fnet.bmfbovespa.com.br/fnet/publico/exibirDocumento?id=1327867"
+    },
+    {
+      "id": "brasil-bio-fuels-2024",
+      "escopo": "fundo",
+      "tickers": ["VCRA11"],
+      "exposicao_pct_pl": {"VCRA11": 0.11},
+      "tipo": "vencimento_antecipado",
+      "severidade": "media",
+      "data": "2024-02-01",
+      "titulo": "Brasil Bio Fuels: vencimento antecipado de CRA (11% do PL) e tutela de urgência",
+      "descricao": "Fundo declarou vencimento antecipado; empresa obteve suspensão de 60 dias. Em relatório posterior, dívidas reestruturadas sem RJ e operações adimplentes; fundo consolidou propriedade de fazenda dada em garantia para venda.",
+      "fonte": "https://www.seudinheiro.com/2024/empresas/fiagro-quer-executar-garantias-de-cra-apos-empresa-pedir-tutela-de-urgencia-na-justica-lvit"
+    },
+    {
+      "id": "irim11-incorporacao-irdm11",
+      "escopo": "fundo",
+      "tickers": ["IRIM11"],
+      "tipo": "reestruturacao",
+      "severidade": "media",
+      "data": "2025-12-01",
+      "titulo": "IRIM11: incorporação do IRDM11 trouxe ativos problemáticos; dividendos voláteis (regime caixa)",
+      "descricao": "Fusão concluída no fim de 2025. Gestão em processo de reestruturação da carteira; distribuição limitada pelo regime de caixa. P/VP ~0,78.",
+      "fonte": "https://acionista.com.br/iridium-recebiveis-irdm11-em-reestruturacao-entenda-o-que-vem-a-seguir/"
+    },
+    {
+      "id": "xpid11-concentracao",
+      "escopo": "fundo",
+      "tickers": ["XPID11"],
+      "exposicao_pct_pl": {"XPID11": 0.70},
+      "tipo": "concentracao",
+      "severidade": "alta",
+      "data": "2026-01-01",
+      "titulo": "XPID11: carteira concentrada em 5 ativos; OXE Energia ≈ 70% do PL em reestruturação",
+      "descricao": "95,5% investido em cinco ativos (OXE Energia R$ 166M, Arteon Z R$ 74M, Campo Tiba R$ 70M, Onti R$ 20M, PCHs). Distribuição elevada via venda de debêntures.",
+      "fonte": "https://www.infomoney.com.br/?p=3236248"
+    },
+    {
+      "id": "light-rj-2023-2026",
+      "escopo": "emissor",
+      "emissor_regex": "^LIGHT ",
+      "prefixo_codigo": ["LIGH", "LSVE"],
+      "tipo": "recuperacao_judicial",
+      "severidade": "media",
+      "data": "2026-09-04",
+      "titulo": "Light SESA: recuperação judicial (2023) encerrada em set/2026; debêntures novas do plano",
+      "descricao": "Justiça do RJ declarou cumpridas as obrigações da RJ em 04/09/2026. Credores receberam novos títulos (debêntures do plano, venc. 2032/2037) e debêntures conversíveis; conversão obrigatória em ações ainda em execução. Posições em debêntures 'LIGH*' são crédito reestruturado, não original.",
+      "fonte": "https://www.poder360.com.br/poder-infra/light-anuncia-fim-da-recuperacao-judicial/"
+    },
+    {
+      "id": "comerc-waiver-2026",
+      "escopo": "emissor",
+      "emissor_regex": "^COMERC ",
+      "prefixo_codigo": ["COMR"],
+      "tipo": "waiver_covenant",
+      "severidade": "media",
+      "data": "2026-01-22",
+      "titulo": "Comerc Energia: alavancagem 6,1× e waiver de covenant (≤ 5,75× até jun/2027)",
+      "descricao": "Moody's Local manteve AAA.br em jan/2026, mas dívida bruta/EBITDA de 6,1× e cobertura de juros 0,6× (set/2025). AGD convocada para aprovar waiver do índice financeiro entre mar/2026 e jun/2027; 6ª emissão (R$ 1,4 bi) usada para resgatar dívidas anteriores.",
+      "fonte": "https://www.clubefiinews.com.br/acoes/comerc-energia-assembleia-geral-debenturistas-waiver-2026"
+    },
+    {
+      "id": "portocem-nfe-2025",
+      "escopo": "emissor",
+      "emissor_regex": "^PORTOCEM ",
+      "prefixo_codigo": ["PTCE"],
+      "tipo": "monitoramento",
+      "severidade": "baixa",
+      "data": "2025-06-30",
+      "titulo": "Portocem (UTE 1,6 GW, Barcarena/PA): adimplente; controlador New Fortress Energy em deterioração",
+      "descricao": "Debêntures PTCE11 (venc. 2040) sem inadimplência; obra no cronograma para operação em ago/2026 segundo Kinea (jun/2025). Risco de contraparte vem do acionista NFE (forte desvalorização de ações e bonds); SPE segregada.",
+      "fonte": "https://www.kinea.com.br/wp-content/uploads/2025/06/Comunicado-ao-Mercado-KDIF11-junho-25.pdf"
+    },
+    {
+      "id": "origem-energia-mtm",
+      "escopo": "emissor",
+      "emissor_regex": "^ORIGEM ENERGIA",
+      "prefixo_codigo": ["ORIG", "OENA"],
+      "tipo": "marcacao_mercado",
+      "severidade": "baixa",
+      "data": "2026-02-01",
+      "titulo": "Origem Energia: abertura de taxa (14% → ~16% a.a.) com desvalorização das debêntures prefixadas",
+      "descricao": "Sem evento de inadimplência ou renegociação localizado. PU indicativo abaixo da curva (perda de marcação). Emissões 2023 (R$ 1,38 bi) e 2025 (R$ 1,4 bi, quirografária com conversão em garantia real).",
+      "fonte": "https://investidor10.com.br/noticias/debentures-da-origem-energia-pagam-quase-16-ao-ano-ate-2035-veja-simulacao-118503/"
+    },
+    {
+      "id": "invepar-waiver-2026",
+      "escopo": "emissor",
+      "emissor_regex": "^INVEPAR|INVESTIMENTOS E PARTICIPACOES EM INFRA",
+      "prefixo_codigo": ["INVP", "IVPR"],
+      "tipo": "waiver_covenant",
+      "severidade": "alta",
+      "data": "2026-08-17",
+      "titulo": "Invepar: AGD aprova sustação de vencimento antecipado e waiver de obrigações pecuniárias (até 31/12/2026)",
+      "descricao": "Debenturistas da 3ª emissão aprovaram suspensão dos efeitos do vencimento antecipado por descumprimento de obrigações, inclusive pecuniárias, com prazo estendido para cumprimento.",
+      "fonte": "https://www.clubefiinews.com.br/acoes/assembleia-geral-de-debenturistas-3a-emissao-invepar-2026"
+    },
+    {
+      "id": "brisanet-alavancagem",
+      "escopo": "emissor",
+      "emissor_regex": "^BRISANET",
+      "prefixo_codigo": ["BRST", "BRIT"],
+      "tipo": "monitoramento",
+      "severidade": "baixa",
+      "data": "2025-08-12",
+      "titulo": "Brisanet: alavancagem sobe para 2,4× (de 1,5×) com juros altos; novas emissões incentivadas",
+      "descricao": "Lucro −65% no 2T25 por despesa financeira; dívida líquida/EBITDA 2,44×. Sem quebra de covenant localizada; empresa segue acessando mercado (5ª emissão R$ 401 mi; nova incentivada de até R$ 500 mi).",
+      "fonte": "https://teletime.com.br/12/08/2025/brisanet-alta-dos-juros-derruba-lucro-e-expande-endividamento/"
+    },
+    {
+      "id": "cra-mercado-2026",
+      "escopo": "fundo",
+      "tickers": ["KNCA11", "RURA11", "VGIA11", "RZAG11", "SNAG11", "XPCA11", "FGAA11", "VCRA11", "CPTR11", "AAZQ11", "BBGO11", "JGPX11", "EGAF11"],
+      "tipo": "setorial",
+      "severidade": "baixa",
+      "data": "2026-08-01",
+      "titulo": "Agro 2026: emissões de CRA recuam 77%; onda de RJs de produtores e disputas sobre garantias",
+      "descricao": "Média mensal de emissões caiu de R$ 5,3 bi (2S25) para R$ 1,2 bi (1S26). Decisões judiciais têm tratado bens alienados fiduciariamente como essenciais, protegendo-os temporariamente na RJ. Risco setorial, não evento específico do fundo.",
+      "fonte": "https://br.advfn.com/jornal/2026/08/credito-do-agronegocio-perde-forca-em-2026-cras-recuam-77-e-fundos-ficam-mais-seletivos"
+    }
+  ]
+}
