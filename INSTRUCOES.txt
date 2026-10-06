@@ -129,6 +129,31 @@ PASSO 6 — Confira localmente (python servidor.py → http://localhost:8080),
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ROTINA MENSAL — FUNDOS LISTADOS (FI-Infra, FII de papel, Fiagro)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Não precisa de planilha de entrada: tudo vem de fontes públicas.
+
+1. (opcional) Editar data/listados_universo.json — incluir/retirar fundo,
+   mudar status (Aprovado / Não Aprovado / Sugerido / Candidato), ajustar
+   taxa de adm, gestor, tir_relatorio (taxa do relatório gerencial).
+2. (opcional) Editar data/listados_eventos_stress.json — novos eventos
+   (RJ, waiver, reestruturação, concentração) com severidade e fonte.
+3. Rodar:
+       python scripts/pipeline_listados.py
+   Baixa preços/proventos (Yahoo), informe diário CVM dos FI-Infra (cache
+   em data/cache_cvm_listados/), informes mensais FII/Fiagro, CDA do mês
+   fechado mais recente (look-through FIC → master) e o SND da ANBIMA.
+   Gera data/listados.json, listados_series.json, listados_carteiras.json
+   e meta_listados.json. Leva ~1 min com cache (primeira vez ~3 min).
+4. (opcional) Planilha preenchida no layout do painel:
+       python scripts/exportar_painel_listados.py
+   → output/Painel Fundos Listados - preenchido.xlsx (não vai para o git)
+5. Conferir em http://localhost:8000/dashboard_listados.html, commit dos
+   JSONs em data/ e push para main. Limitações e próximos passos em
+   BACKLOG_LISTADOS.md.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   ROTINA MENSAL — COMPARADOR (isolado)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
