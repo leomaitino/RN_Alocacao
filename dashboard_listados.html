@@ -104,17 +104,64 @@ svg text{font-family:var(--font-m);}
 </header>
 
 <nav class="tabs-bar">
-  <div class="tab active" onclick="switchTab('painel',this)">Painel</div>
+  <div class="tab active" onclick="switchTab('home',this)">Carteira Sugerida</div>
+  <div class="tab" onclick="switchTab('painel',this)">Painel</div>
   <div class="tab" onclick="switchTab('pvp',this)">Preço × Valor Patrimonial</div>
   <div class="tab" onclick="switchTab('carteira',this)">Carteira &amp; Stress</div>
-  <div class="tab" onclick="switchTab('sugestoes',this)">Sugestões</div>
+  <div class="tab" onclick="switchTab('sugestoes',this)">Candidatos</div>
   <div class="tab" onclick="switchTab('fontes',this)">Fontes</div>
 </nav>
 
 <div class="notice" id="fontesNotice" style="display:none;"></div>
 
+<!-- ═══ CARTEIRA SUGERIDA (aprovados) ═══ -->
+<div id="tab-home" class="tab-content active"><div class="main">
+  <div id="homeContent">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+      <div>
+        <div style="font-family:var(--font-d);font-size:28px;font-weight:400;letter-spacing:-.3px;line-height:1.1;color:var(--cream);">Carteira Sugerida</div>
+        <div style="font-size:12px;color:var(--text3);font-family:var(--font-m);margin-top:3px;" id="homeSubtitle"></div>
+      </div>
+      <div class="period-selector" id="homePeriodSel">
+        <button class="period-btn" data-field="var_1m" onclick="setHomePeriod(this)">Mês</button>
+        <button class="period-btn" data-field="var_ano" onclick="setHomePeriod(this)">Ano</button>
+        <button class="period-btn" data-field="var_12m" onclick="setHomePeriod(this)">12M preço</button>
+        <button class="period-btn active" data-field="ret_total_12m" onclick="setHomePeriod(this)">12M total</button>
+      </div>
+    </div>
+    <div id="homeKPIs" class="kpi-grid" style="margin-bottom:16px;"></div>
+    <div class="table-wrapper" style="margin-bottom:12px;overflow:visible;">
+      <div class="table-header-bar">
+        <div class="table-title">Carteira Sugerida vs CDI <span class="badge" title="Média dos retornos diários dos fundos aprovados (pesos iguais), com proventos reinvestidos na data ex. Fundos entram no índice a partir da primeira cotação disponível.">equal-weight · retorno total</span></div>
+        <div class="period-selector" id="homeChartPeriodSel">
+          <button class="period-btn" data-m="12" onclick="setHomeChartPeriod(this)">12M</button>
+          <button class="period-btn active" data-m="24" onclick="setHomeChartPeriod(this)">24M</button>
+          <button class="period-btn" data-m="36" onclick="setHomeChartPeriod(this)">36M</button>
+        </div>
+      </div>
+      <div style="padding:12px 12px 6px;">
+        <div id="homeChart"></div>
+        <div id="homeChartLegend" class="legend" style="padding:8px 4px 0;"></div>
+      </div>
+    </div>
+    <div class="grid2" style="grid-template-columns:1.25fr .75fr;margin-bottom:12px;">
+      <div class="table-wrapper"><div class="table-header-bar"><div class="table-title">Correlação — retornos diários 12M</div></div><div id="homeCorr" style="padding:8px;overflow-x:auto;"></div></div>
+      <div class="table-wrapper"><div class="table-header-bar"><div class="table-title">Composição (pesos iguais)</div></div><div id="homeComp" style="padding:12px 16px;"></div></div>
+    </div>
+    <div class="table-wrapper">
+      <div class="table-header-bar"><div class="table-title">Fundos Aprovados <span class="badge green" id="homeBadge"></span></div><div style="display:flex;gap:7px;"><button class="btn-ghost" onclick="switchTab('painel',document.querySelectorAll('.tab')[1])" style="font-size:11px;padding:5px 9px;">Ver painel completo</button></div></div>
+      <table><thead><tr><th>Fundo</th><th>Tipo</th><th>Idx</th><th class="num">R$/cota</th><th class="num">VP/cota</th><th class="num">P/VP</th><th class="num" id="homeThRent">Ret. total 12M</th><th class="num">DY 12M</th><th class="num">Últ. prov.</th><th class="num">Yield anualiz.</th><th class="num">PL (R$ M)</th><th class="num">Liq. 3M (R$ mil)</th><th>Stress</th></tr></thead><tbody id="homeTableBody"></tbody></table>
+    </div>
+  </div>
+  <div id="homeEmpty" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:60px;text-align:center;">
+    <div style="font-size:32px;margin-bottom:12px;">✦</div>
+    <div style="font-family:var(--font-d);font-size:20px;margin-bottom:8px;">Nenhum fundo aprovado</div>
+    <div style="font-size:13px;color:var(--text3);font-family:var(--font-m);">Marque status "Aprovado" em data/listados_universo.json e rode o pipeline.</div>
+  </div>
+</div></div>
+
 <!-- ═══ PAINEL ═══ -->
-<div id="tab-painel" class="tab-content active"><div class="main">
+<div id="tab-painel" class="tab-content"><div class="main">
   <div class="kpi-grid" id="kpiGrid"></div>
   <div class="filters-bar">
     <div class="filter-group"><div class="filter-label">Tipo</div><select class="filter-select" id="fTipo" onchange="renderPainel()"><option value="">Todos</option><option>FI-Infra</option><option>FII</option><option>Fiagro</option><option>FIP-IE</option></select></div>
@@ -139,7 +186,7 @@ svg text{font-family:var(--font-m);}
     <div class="filter-group" style="flex:1;"><div class="filter-label">Comparar P/VP (clique para incluir)</div><div id="pvpPills" style="display:flex;gap:6px;flex-wrap:wrap;"></div></div>
   </div>
   <div class="grid2">
-    <div class="chart-container"><div class="chart-title"><span id="chart1Title">Preço × Valor Patrimonial</span><span class="legend"><span style="--c:var(--gold)">Preço (B3)</span><span style="--c:var(--teal)">VP/cota (CVM)</span></span></div><div id="chartPrecoVp"></div><div id="chart1Foot" style="font-size:11px;color:var(--text3);font-family:var(--font-m);margin-top:6px;"></div></div>
+    <div class="chart-container"><div class="chart-title"><span id="chart1Title">Preço × Valor Patrimonial</span><span class="legend"><span style="--c:var(--gold)">Preço (B3)</span><span style="--c:var(--teal)">VP/cota (CVM)</span><span style="--c:var(--purple)">P/VP (eixo direito)</span></span></div><div id="chartPrecoVp"></div><div id="chart1Foot" style="font-size:11px;color:var(--text3);font-family:var(--font-m);margin-top:6px;"></div></div>
     <div class="chart-container"><div class="chart-title"><span>P/VP — comparação</span><span class="legend" id="chart2Legend"></span></div><div id="chartPvp"></div><div style="font-size:11px;color:var(--text3);font-family:var(--font-m);margin-top:6px;">Linha tracejada = 1,00 (preço igual ao VP). VP dos FIIs/Fiagros é mensal (informe CVM), mantido constante até o mês seguinte.</div></div>
   </div>
   <div class="table-wrapper" style="margin-top:12px;"><div class="table-header-bar"><div class="table-title">P/VP — estatísticas 12 meses</div></div>
@@ -184,8 +231,9 @@ svg text{font-family:var(--font-m);}
 
 <script>
 const IS_PRODUCTION = window.location.hostname.includes('onrender.com');
-let FUNDOS = [], SERIES = {}, CARTEIRAS = {}, META = {};
+let FUNDOS = [], SERIES = {}, CARTEIRAS = {}, META = {}, CDI = null;
 let sortKey = 'ticker', sortDir = 1, pvpMeses = 24, pvpSel = new Set();
+let homeField = 'ret_total_12m', homeMeses = 24;
 
 const fmtPct = (v, d = 2) => (v == null || isNaN(v)) ? '—' : (v * 100).toFixed(d).replace('.', ',') + '%';
 const fmtNum = (v, d = 2) => (v == null || isNaN(v)) ? '—' : Number(v).toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d });
@@ -203,7 +251,7 @@ function switchTab(name, el) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active'); el.classList.add('active');
-  if (name === 'pvp') renderPvp(); if (name === 'carteira') renderCarteira(); if (name === 'sugestoes') renderSugestoes();
+  if (name === 'home') renderHome(); if (name === 'pvp') renderPvp(); if (name === 'carteira') renderCarteira(); if (name === 'sugestoes') renderSugestoes();
 }
 
 async function loadData() {
@@ -211,11 +259,114 @@ async function loadData() {
     const [f, s, c, m] = await Promise.all(['listados.json', 'listados_series.json', 'listados_carteiras.json', 'meta_listados.json'].map(n => fetch('./data/' + n + '?v=' + Date.now()).then(r => { if (!r.ok) throw new Error(n + ' ' + r.status); return r.json(); })));
     FUNDOS = f; SERIES = s; CARTEIRAS = c; META = m;
   } catch (e) { document.getElementById('headerMeta').innerHTML = '<span style="color:var(--red)">Erro ao carregar dados: ' + esc(e.message) + '</span>'; return; }
+  try { const b = await fetch('./data/benchmarks.json?v=' + Date.now()).then(r => r.json()); CDI = (b.CDI && b.CDI.retornos_diarios) || null; } catch (e) { CDI = null; }
   const dr = META.datas_referencia || {};
   document.getElementById('headerMeta').innerHTML = `<span>${META.total_fundos} fundos</span> · painel ${META.no_painel} · preços ${fmtDate(dr.yahoo)} · CVM diário ${fmtDate(dr.cvm_diario)} · CVM mensal ${fmtDate(dr.cvm_fii)} · CDA ${dr.cda || '—'}<br>atualizado ${(META.ultima_atualizacao || '').slice(0, 16).replace('T', ' ')}`;
   const fn = document.getElementById('fontesNotice');
   fn.style.display = ''; fn.textContent = `Dados públicos (B3/Yahoo, CVM, ANBIMA) e eventos curados manualmente. Status Aprovado/Não aprovado reflete o painel da RN; "Sugerido" é proposta de inclusão.`;
-  buildPainelHead(); renderKpis(); renderPainel(); buildPvpControls(); buildCartControls(); renderFontes();
+  buildPainelHead(); renderKpis(); renderPainel(); buildPvpControls(); buildCartControls(); renderFontes(); renderHome();
+}
+
+// ───────── CARTEIRA SUGERIDA (aprovados) ─────────
+function aprovados() { return FUNDOS.filter(r => r.status === 'Aprovado'); }
+function setHomePeriod(btn) { document.querySelectorAll('#homePeriodSel .period-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); homeField = btn.dataset.field; renderHome(); }
+function setHomeChartPeriod(btn) { document.querySelectorAll('#homeChartPeriodSel .period-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); homeMeses = +btn.dataset.m; renderHome(); }
+// retorno diário total (preço + provento na data ex) por fundo: Map(date → ret)
+function retornosTotais(t) {
+  const s = SERIES[t]; if (!s || !s.datas || s.datas.length < 2) return new Map();
+  const dv = new Map(); (s.dividendos || []).forEach(d => dv.set(d.data, (dv.get(d.data) || 0) + (d.valor || 0)));
+  const m = new Map();
+  for (let i = 1; i < s.datas.length; i++) { const p0 = s.preco[i - 1], p1 = s.preco[i]; if (p0 && p1) m.set(s.datas[i], (p1 + (dv.get(s.datas[i]) || 0)) / p0 - 1); }
+  return m;
+}
+function buildCarteiraSeries(tickers, meses) {
+  const rets = tickers.map(retornosTotais).filter(m => m.size);
+  if (!rets.length) return null;
+  const datas = Array.from(new Set(rets.flatMap(m => Array.from(m.keys())))).sort();
+  const last = new Date(datas[datas.length - 1]); const from = new Date(last); from.setMonth(from.getMonth() - meses);
+  const dd = datas.filter(d => new Date(d) >= from);
+  const vals = [], nFund = []; let acc = 100;
+  dd.forEach((d, i) => { const rs = rets.map(m => m.get(d)).filter(v => v != null); const r = rs.length ? rs.reduce((a, b) => a + b, 0) / rs.length : 0; if (i > 0) acc *= (1 + r); vals.push(acc); nFund.push(rs.length); });
+  return { datas: dd, vals, nFund };
+}
+function buildCdiSeries(datas) {
+  if (!CDI) return null; let acc = 100; const vals = [];
+  datas.forEach((d, i) => { if (i > 0) acc *= (1 + (CDI[d] || 0)); vals.push(acc); });
+  return vals;
+}
+function drawLines(elId, datas, seriesList, H = 300, opts = {}) {
+  const el = document.getElementById(elId); const W = el.clientWidth || 800; const pad = { l: 50, r: 16, t: 12, b: 28 }; const n = datas.length;
+  if (!n) { el.innerHTML = '<div class="loading" style="height:120px">sem série</div>'; return; }
+  const xs = datas.map((_, i) => pad.l + (W - pad.l - pad.r) * i / Math.max(1, n - 1));
+  const all = seriesList.flatMap(s => s.vals.filter(v => v != null)); const mn = Math.min(...all) * 0.995, mx = Math.max(...all) * 1.005;
+  const y = v => H - pad.b - (v - mn) / ((mx - mn) || 1) * (H - pad.t - pad.b);
+  let g = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="display:block;overflow:visible">`;
+  ticks(mn, mx, 5).forEach(v => { g += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="#1f1f1f"/><text x="${pad.l - 6}" y="${y(v) + 4}" font-size="10" fill="#4a4740" text-anchor="end">${v.toFixed(opts.dec ?? 1)}</text>`; });
+  if (opts.ref != null) g += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y(opts.ref)}" y2="${y(opts.ref)}" stroke="#8a8278" stroke-dasharray="4,4" opacity=".5"/>`;
+  xLabels(datas).forEach(([k, l]) => { g += `<text x="${xs[k]}" y="${H - 8}" font-size="10" fill="#4a4740" text-anchor="middle">${l}</text>`; });
+  seriesList.forEach(s => { g += `<path d="${pathFor(s.vals, xs, y)}" fill="none" stroke="${s.color}" stroke-width="${s.width || 1.6}" ${s.dash ? 'stroke-dasharray="4,3"' : ''}/>`; });
+  g += '</svg>'; el.innerHTML = g;
+}
+function pearson(a, b) { const n = a.length; if (n < 20) return null; const ma = a.reduce((x, y) => x + y, 0) / n, mb = b.reduce((x, y) => x + y, 0) / n; let sab = 0, saa = 0, sbb = 0; for (let i = 0; i < n; i++) { sab += (a[i] - ma) * (b[i] - mb); saa += (a[i] - ma) ** 2; sbb += (b[i] - mb) ** 2; } return saa && sbb ? sab / Math.sqrt(saa * sbb) : null; }
+function renderHome() {
+  const ap = aprovados();
+  document.getElementById('homeEmpty').style.display = ap.length ? 'none' : '';
+  document.getElementById('homeContent').style.display = ap.length ? '' : 'none';
+  if (!ap.length) return;
+  const dr = META.datas_referencia || {};
+  const labels = { var_1m: 'Mês', var_ano: 'No ano', var_12m: '12M (preço)', ret_total_12m: 'Ret. total 12M' };
+  document.getElementById('homeSubtitle').textContent = `${ap.length} fundos aprovados · ${ap.filter(r => r.tipo === 'FI-Infra' || r.tipo === 'FIP-IE').length} Infra · ${ap.filter(r => r.tipo === 'FII').length} FII · ${ap.filter(r => r.tipo === 'Fiagro').length} Fiagro · preços ${fmtDate(dr.yahoo)}`;
+  document.getElementById('homeBadge').textContent = ap.length + ' aprovados';
+  document.getElementById('homeThRent').textContent = labels[homeField];
+  const avg = (arr, k) => { const v = arr.map(r => r[k]).filter(x => x != null); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
+  // carteira equal-weight
+  const tick = ap.map(r => r.ticker);
+  const cart = buildCarteiraSeries(tick, homeMeses);
+  const c12 = buildCarteiraSeries(tick, 12);
+  const ret12 = c12 && c12.vals.length > 1 ? c12.vals[c12.vals.length - 1] / c12.vals[0] - 1 : null;
+  let cdi12 = null; if (c12) { const v = buildCdiSeries(c12.datas); if (v) cdi12 = v[v.length - 1] / v[0] - 1; }
+  const k = [
+    ['Fundos aprovados', ap.length, `${ap.filter(r => r.indexador === 'CDI').length} CDI · ${ap.filter(r => r.indexador === 'IPCA+').length} IPCA+`, 'var(--gold)'],
+    ['Carteira 12M (ret. total)', fmtPct(ret12, 1), cdi12 != null ? `CDI ${fmtPct(cdi12, 1)} · ${ret12 != null && cdi12 ? (ret12 / cdi12 * 100).toFixed(0) + '% do CDI' : ''}` : 'equal-weight, c/ proventos', ret12 != null && cdi12 != null && ret12 >= cdi12 ? 'var(--green)' : 'var(--red)'],
+    ['DY 12M médio', fmtPct(avg(ap, 'dy_12m'), 1), `yield anualizado ${fmtPct(avg(ap, 'yield_anualizado'), 1)}`, 'var(--purple)'],
+    ['P/VP médio', fmtNum(avg(ap, 'p_vp'), 3), `mín ${fmtNum(Math.min(...ap.map(r => r.p_vp).filter(v => v != null)), 3)} · máx ${fmtNum(Math.max(...ap.map(r => r.p_vp).filter(v => v != null)), 3)}`, 'var(--teal)'],
+    ['PL somado', 'R$ ' + fmtNum(ap.reduce((a, r) => a + (r.pl || 0), 0) / 1e3, 1) + ' bi', `liquidez média R$ ${fmtInt(avg(ap, 'volume_medio_3m_mil'))} mil/dia`, 'var(--accent2)'],
+    ['Com alerta de stress', ap.filter(r => r.stress_n_alertas).length, `${ap.filter(r => r.stress_nivel === 3).length} alta · ${ap.filter(r => r.stress_nivel === 2).length} média`, 'var(--red)'],
+  ];
+  document.getElementById('homeKPIs').innerHTML = k.map(([l, v, s, c]) => `<div class="kpi-card" style="--kpi-color:${c}"><div class="kpi-label">${l}</div><div class="kpi-value">${v}</div><div class="kpi-sub">${s}</div></div>`).join('');
+  // gráfico carteira vs CDI
+  if (cart) {
+    const cdi = buildCdiSeries(cart.datas);
+    const series = [{ label: 'Carteira Sugerida (equal-weight, ret. total)', color: '#c9a96e', vals: cart.vals, width: 1.8 }];
+    if (cdi) series.push({ label: 'CDI', color: '#8a8278', vals: cdi, width: 1.2, dash: true });
+    drawLines('homeChart', cart.datas, series, 300, { ref: 100 });
+    const fim = cart.vals[cart.vals.length - 1], cf = cdi ? cdi[cdi.length - 1] : null;
+    document.getElementById('homeChartLegend').innerHTML = series.map(s => `<span style="--c:${s.color}">${s.label}</span>`).join('') + `<span style="margin-left:auto;color:var(--text3)">base 100 em ${fmtDate(cart.datas[0])} → carteira ${fmtNum(fim, 1)}${cf ? ' · CDI ' + fmtNum(cf, 1) : ''} · ${cart.nFund[cart.nFund.length - 1]} fundos no fim</span>`;
+  } else { document.getElementById('homeChart').innerHTML = '<div class="loading" style="height:120px">sem séries de preço</div>'; }
+  // correlação 12M
+  const rets = tick.map(retornosTotais); const last = tick.map(t => SERIES[t]?.datas?.slice(-1)[0]).filter(Boolean).sort().slice(-1)[0];
+  const from = new Date(last); from.setMonth(from.getMonth() - 12);
+  const datas12 = Array.from(new Set(rets.flatMap(m => Array.from(m.keys())))).filter(d => new Date(d) >= from).sort();
+  const vecs = rets.map(m => datas12.map(d => m.has(d) ? m.get(d) : null));
+  let html = '<table class="corr-table" style="border-collapse:collapse;font-family:var(--font-m);font-size:10px;"><tr><th style="padding:4px 6px;"></th>' + tick.map(t => `<th style="padding:4px 6px;color:var(--text3);">${t}</th>`).join('') + '</tr>';
+  tick.forEach((ti, i) => {
+    html += `<tr><th style="padding:4px 6px;text-align:left;color:var(--text2);">${ti}</th>`;
+    tick.forEach((tj, j) => {
+      const a = [], b = []; for (let q = 0; q < datas12.length; q++) { if (vecs[i][q] != null && vecs[j][q] != null) { a.push(vecs[i][q]); b.push(vecs[j][q]); } }
+      const c = i === j ? 1 : pearson(a, b);
+      const bg = c == null ? 'transparent' : (c >= 0 ? `rgba(201,169,110,${(0.08 + 0.55 * c).toFixed(2)})` : `rgba(176,96,96,${(0.08 + 0.55 * -c).toFixed(2)})`);
+      html += `<td style="padding:4px 6px;text-align:center;border:1px solid var(--border);background:${bg};color:${c != null && Math.abs(c) > 0.6 ? '#000' : 'var(--text)'}">${c == null ? '—' : c.toFixed(2)}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</table><div style="font-size:10px;color:var(--text3);font-family:var(--font-m);margin-top:6px;">Pearson sobre retornos diários totais (preço + proventos) dos últimos 12 meses, em datas comuns.</div>';
+  document.getElementById('homeCorr').innerHTML = html;
+  // composição
+  const comp = (key) => { const m = {}; ap.forEach(r => { m[r[key] || '—'] = (m[r[key] || '—'] || 0) + 1 / ap.length; }); return Object.keys(m).sort((a, b) => m[b] - m[a]).map(k2 => barRow(k2, m[k2])).join(''); };
+  document.getElementById('homeComp').innerHTML = `<h4 style="font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;font-weight:400;">Por tipo</h4>${comp('tipo')}<h4 style="font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin:14px 0 8px;font-weight:400;">Por indexador</h4>${comp('indexador')}<h4 style="font-size:10px;font-family:var(--font-m);color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin:14px 0 8px;font-weight:400;">Por gestor</h4>${comp('gestor')}`;
+  // tabela
+  const rows = ap.slice().sort((a, b) => (b[homeField] ?? -99) - (a[homeField] ?? -99));
+  document.getElementById('homeTableBody').innerHTML = rows.map(r => `<tr onclick="openDetail('${r.ticker}')"><td><div class="fund-name">${r.ticker}</div><div class="fund-gestora">${esc(r.nome)} · ${esc(r.gestor || '')}</div></td><td><span class="badge ${tipoBadge(r.tipo)}">${r.tipo}</span></td><td>${esc(r.indexador)}</td><td class="num">${fmtNum(r.preco)}</td><td class="num">${fmtNum(r.vp_cota)}</td><td class="num ${r.p_vp != null ? (r.p_vp < 0.9 ? 'neg' : (r.p_vp > 1.02 ? 'pos' : '')) : ''}">${fmtNum(r.p_vp, 3)}</td><td class="num ${cls(r[homeField])}"><b>${fmtPct(r[homeField])}</b></td><td class="num">${fmtPct(r.dy_12m, 1)}</td><td class="num">${fmtNum(r.provento_ultimo, 3)} <span class="neu" style="font-size:10px">${fmtDate(r.provento_ultimo_data).slice(0, 5)}</span></td><td class="num">${fmtPct(r.yield_anualizado, 1)}</td><td class="num">${fmtNum(r.pl, 0)}</td><td class="num">${fmtInt(r.volume_medio_3m_mil)}</td><td>${stressDot(r)}<span style="font-family:var(--font-m);font-size:11px;color:var(--text2)">${r.stress_n_alertas || '—'}</span></td></tr>`).join('');
 }
 
 // ───────── PAINEL ─────────
@@ -406,7 +557,7 @@ function renderFontes() {
   document.getElementById('fontesBox').innerHTML = `<b>Preços/proventos (Yahoo/B3)</b>: até ${fmtDate(dr.yahoo)}<br><b>CVM informe diário (FI-Infra)</b>: até ${fmtDate(dr.cvm_diario)}<br><b>CVM informe mensal FII</b>: ref. ${fmtDate(dr.cvm_fii)}<br><b>CVM informe mensal Fiagro</b>: ref. ${fmtDate(dr.cvm_fiagro)}<br><b>CDA (carteira)</b>: ${dr.cda || '—'}<br><br><b>Cobertura VP</b>: ${Object.keys(cv).map(k => `${k}: ${cv[k]}`).join(' · ')}<br><b>Cobertura carteira</b>: look-through CDA ${cc.cda_look_through || 0} · agregada CVM ${cc.ativo_passivo_cvm || 0} · sem carteira ${cc.sem_carteira || 0}<br><b>Eventos de stress</b>: ${META.eventos_stress || 0} cadastrados · ${META.fundos_com_alerta || 0} fundos com alerta<br><br>Pipeline: <code>python scripts/pipeline_listados.py</code> · universo em <code>data/listados_universo.json</code> · eventos em <code>data/listados_eventos_stress.json</code>`;
 }
 
-window.addEventListener('resize', () => { if (document.getElementById('tab-pvp').classList.contains('active')) renderPvp(); });
+window.addEventListener('resize', () => { if (document.getElementById('tab-pvp').classList.contains('active')) renderPvp(); if (document.getElementById('tab-home').classList.contains('active')) renderHome(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 loadData();
 </script>
