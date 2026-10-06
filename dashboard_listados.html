@@ -113,6 +113,7 @@ svg text{font-family:var(--font-m);}
 </nav>
 
 <div class="notice" id="fontesNotice" style="display:none;"></div>
+<div id="grossUpNotice" style="display:none;background:rgba(245,200,66,.08);color:var(--yellow);font-size:12px;padding:8px 14px;border-radius:4px;margin:8px 32px 0;border:1px solid rgba(245,200,66,.2);font-family:var(--font-m);"></div>
 
 <!-- ═══ CARTEIRA SUGERIDA (aprovados) ═══ -->
 <div id="tab-home" class="tab-content active"><div class="main">
@@ -132,11 +133,14 @@ svg text{font-family:var(--font-m);}
     <div id="homeKPIs" class="kpi-grid" style="margin-bottom:16px;"></div>
     <div class="table-wrapper" style="margin-bottom:12px;overflow:visible;">
       <div class="table-header-bar">
-        <div class="table-title">Carteira Sugerida vs CDI <span class="badge" title="Média dos retornos diários dos fundos aprovados (pesos iguais), com proventos reinvestidos na data ex. Fundos entram no índice a partir da primeira cotação disponível.">equal-weight · retorno total</span></div>
+        <div class="table-title">Carteira Sugerida vs CDI <span class="badge" title="Média dos retornos diários dos fundos aprovados (pesos iguais), com proventos reinvestidos na data ex. Fundos entram no índice a partir da primeira cotação disponível.">equal-weight · retorno total</span> <span class="badge yellow" id="homeGuBadge"></span></div>
+        <div style="display:flex;gap:8px;align-items:center;">
+        <button class="btn-ghost" id="homeGuBtn" onclick="toggleHomeGrossUp()" style="font-size:11px;padding:4px 10px;"></button>
         <div class="period-selector" id="homeChartPeriodSel">
           <button class="period-btn" data-m="12" onclick="setHomeChartPeriod(this)">12M</button>
           <button class="period-btn active" data-m="24" onclick="setHomeChartPeriod(this)">24M</button>
           <button class="period-btn" data-m="36" onclick="setHomeChartPeriod(this)">36M</button>
+        </div>
         </div>
       </div>
       <div style="padding:12px 12px 6px;">
@@ -150,7 +154,7 @@ svg text{font-family:var(--font-m);}
     </div>
     <div class="table-wrapper">
       <div class="table-header-bar"><div class="table-title">Fundos Aprovados <span class="badge green" id="homeBadge"></span></div><div style="display:flex;gap:7px;"><button class="btn-ghost" onclick="switchTab('painel',document.querySelectorAll('.tab')[1])" style="font-size:11px;padding:5px 9px;">Ver painel completo</button></div></div>
-      <table><thead><tr><th>Fundo</th><th>Tipo</th><th>Idx</th><th class="num">R$/cota</th><th class="num">VP/cota</th><th class="num">P/VP</th><th class="num" id="homeThRent">Ret. total 12M</th><th class="num">DY 12M</th><th class="num">Últ. prov.</th><th class="num">Yield anualiz.</th><th class="num">PL (R$ M)</th><th class="num">Liq. 3M (R$ mil)</th><th>Stress</th></tr></thead><tbody id="homeTableBody"></tbody></table>
+      <table><thead><tr><th>Fundo</th><th>Tipo</th><th>Idx</th><th class="num">R$/cota</th><th class="num">VP/cota</th><th class="num">P/VP</th><th class="num" id="homeThRent" title="valores isentos (líquidos para PF), sem gross-up">Ret. total 12M</th><th class="num" title="isento, sem gross-up">DY 12M</th><th class="num">Últ. prov.</th><th class="num">Yield anualiz.</th><th class="num">PL (R$ M)</th><th class="num">Liq. 3M (R$ mil)</th><th>Stress</th></tr></thead><tbody id="homeTableBody"></tbody></table>
     </div>
   </div>
   <div id="homeEmpty" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:60px;text-align:center;">
@@ -234,6 +238,13 @@ const IS_PRODUCTION = window.location.hostname.includes('onrender.com');
 let FUNDOS = [], SERIES = {}, CARTEIRAS = {}, META = {}, CDI = null;
 let sortKey = 'ticker', sortDir = 1, pvpMeses = 24, pvpSel = new Set();
 let homeField = 'ret_total_12m', homeMeses = 24;
+// Gross-up de IR na Carteira Sugerida (mesma premissa do dashboard RF: PF, alíquota 15%).
+// Proventos de FII/Fiagro/FI-Infra são isentos para PF e o CDI é bruto; para comparar,
+// o retorno isento é dividido por (1 − 15%). Aplicado só aos retornos diários da carteira
+// e aos KPIs marcados "equiv. bruto"; Painel e tabelas seguem com valores isentos.
+const GROSS_UP_ALIQ = 0.15, GROSS_UP_FATOR = 1 / (1 - GROSS_UP_ALIQ);
+let homeGrossUp = true;
+function toggleHomeGrossUp() { homeGrossUp = !homeGrossUp; renderHome(); }
 
 const fmtPct = (v, d = 2) => (v == null || isNaN(v)) ? '—' : (v * 100).toFixed(d).replace('.', ',') + '%';
 const fmtNum = (v, d = 2) => (v == null || isNaN(v)) ? '—' : Number(v).toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d });
@@ -279,14 +290,14 @@ function retornosTotais(t) {
   for (let i = 1; i < s.datas.length; i++) { const p0 = s.preco[i - 1], p1 = s.preco[i]; if (p0 && p1) m.set(s.datas[i], (p1 + (dv.get(s.datas[i]) || 0)) / p0 - 1); }
   return m;
 }
-function buildCarteiraSeries(tickers, meses) {
+function buildCarteiraSeries(tickers, meses, fator = 1) {
   const rets = tickers.map(retornosTotais).filter(m => m.size);
   if (!rets.length) return null;
   const datas = Array.from(new Set(rets.flatMap(m => Array.from(m.keys())))).sort();
   const last = new Date(datas[datas.length - 1]); const from = new Date(last); from.setMonth(from.getMonth() - meses);
   const dd = datas.filter(d => new Date(d) >= from);
   const vals = [], nFund = []; let acc = 100;
-  dd.forEach((d, i) => { const rs = rets.map(m => m.get(d)).filter(v => v != null); const r = rs.length ? rs.reduce((a, b) => a + b, 0) / rs.length : 0; if (i > 0) acc *= (1 + r); vals.push(acc); nFund.push(rs.length); });
+  dd.forEach((d, i) => { const rs = rets.map(m => m.get(d)).filter(v => v != null); const r = rs.length ? rs.reduce((a, b) => a + b, 0) / rs.length : 0; if (i > 0) acc *= (1 + r * fator); vals.push(acc); nFund.push(rs.length); });
   return { datas: dd, vals, nFund };
 }
 function buildCdiSeries(datas) {
@@ -319,16 +330,24 @@ function renderHome() {
   document.getElementById('homeBadge').textContent = ap.length + ' aprovados';
   document.getElementById('homeThRent').textContent = labels[homeField];
   const avg = (arr, k) => { const v = arr.map(r => r[k]).filter(x => x != null); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
+  const gu = homeGrossUp ? GROSS_UP_FATOR : 1;
+  const guBadge = document.getElementById('homeGuBadge'); guBadge.textContent = homeGrossUp ? `gross-up IR ÷ ${(1 - GROSS_UP_ALIQ).toFixed(2)}` : 'isento (sem gross-up)'; guBadge.className = 'badge ' + (homeGrossUp ? 'yellow' : '');
+  document.getElementById('homeGuBtn').textContent = homeGrossUp ? 'Desligar gross-up' : 'Ligar gross-up (PF 15%)';
+  const gn = document.getElementById('grossUpNotice');
+  gn.style.display = ''; gn.innerHTML = homeGrossUp
+    ? `Carteira Sugerida com <b>gross-up de IR</b>: retornos diários da carteira ÷ ${(1 - GROSS_UP_ALIQ).toFixed(2)} (premissa PF, alíquota ${(GROSS_UP_ALIQ * 100).toFixed(0)}%), como no dashboard de RF, para comparar com o CDI bruto. Painel, tabelas e DY por fundo seguem nos valores isentos. Simplificação: em FII/Fiagro só os proventos são isentos (ganho de capital na venda tem 20%); em FI-Infra proventos e ganho são isentos para PF.`
+    : `Carteira Sugerida <b>sem gross-up</b>: retornos isentos (líquidos para PF) comparados ao CDI bruto — o CDI aparece favorecido em ~${((GROSS_UP_FATOR - 1) * 100).toFixed(0)}%.`;
   // carteira equal-weight
   const tick = ap.map(r => r.ticker);
-  const cart = buildCarteiraSeries(tick, homeMeses);
-  const c12 = buildCarteiraSeries(tick, 12);
+  const cart = buildCarteiraSeries(tick, homeMeses, gu);
+  const c12 = buildCarteiraSeries(tick, 12, gu), c12n = buildCarteiraSeries(tick, 12, 1);
   const ret12 = c12 && c12.vals.length > 1 ? c12.vals[c12.vals.length - 1] / c12.vals[0] - 1 : null;
+  const ret12n = c12n && c12n.vals.length > 1 ? c12n.vals[c12n.vals.length - 1] / c12n.vals[0] - 1 : null;
   let cdi12 = null; if (c12) { const v = buildCdiSeries(c12.datas); if (v) cdi12 = v[v.length - 1] / v[0] - 1; }
   const k = [
     ['Fundos aprovados', ap.length, `${ap.filter(r => r.indexador === 'CDI').length} CDI · ${ap.filter(r => r.indexador === 'IPCA+').length} IPCA+`, 'var(--gold)'],
-    ['Carteira 12M (ret. total)', fmtPct(ret12, 1), cdi12 != null ? `CDI ${fmtPct(cdi12, 1)} · ${ret12 != null && cdi12 ? (ret12 / cdi12 * 100).toFixed(0) + '% do CDI' : ''}` : 'equal-weight, c/ proventos', ret12 != null && cdi12 != null && ret12 >= cdi12 ? 'var(--green)' : 'var(--red)'],
-    ['DY 12M médio', fmtPct(avg(ap, 'dy_12m'), 1), `yield anualizado ${fmtPct(avg(ap, 'yield_anualizado'), 1)}`, 'var(--purple)'],
+    [homeGrossUp ? 'Carteira 12M (equiv. bruto)' : 'Carteira 12M (isento)', fmtPct(ret12, 1), (cdi12 != null ? `CDI ${fmtPct(cdi12, 1)} · ${ret12 != null && cdi12 ? (ret12 / cdi12 * 100).toFixed(0) + '% do CDI' : ''}` : 'equal-weight, c/ proventos') + (homeGrossUp ? ` · isento ${fmtPct(ret12n, 1)}` : ''), ret12 != null && cdi12 != null && ret12 >= cdi12 ? 'var(--green)' : 'var(--red)'],
+    ['DY 12M médio (isento)', fmtPct(avg(ap, 'dy_12m'), 1), `equiv. bruto ${fmtPct(avg(ap, 'dy_12m') * GROSS_UP_FATOR, 1)} · yield anualiz. ${fmtPct(avg(ap, 'yield_anualizado'), 1)}`, 'var(--purple)'],
     ['P/VP médio', fmtNum(avg(ap, 'p_vp'), 3), `mín ${fmtNum(Math.min(...ap.map(r => r.p_vp).filter(v => v != null)), 3)} · máx ${fmtNum(Math.max(...ap.map(r => r.p_vp).filter(v => v != null)), 3)}`, 'var(--teal)'],
     ['PL somado', 'R$ ' + fmtNum(ap.reduce((a, r) => a + (r.pl || 0), 0) / 1e3, 1) + ' bi', `liquidez média R$ ${fmtInt(avg(ap, 'volume_medio_3m_mil'))} mil/dia`, 'var(--accent2)'],
     ['Com alerta de stress', ap.filter(r => r.stress_n_alertas).length, `${ap.filter(r => r.stress_nivel === 3).length} alta · ${ap.filter(r => r.stress_nivel === 2).length} média`, 'var(--red)'],
@@ -337,7 +356,7 @@ function renderHome() {
   // gráfico carteira vs CDI
   if (cart) {
     const cdi = buildCdiSeries(cart.datas);
-    const series = [{ label: 'Carteira Sugerida (equal-weight, ret. total)', color: '#c9a96e', vals: cart.vals, width: 1.8 }];
+    const series = [{ label: homeGrossUp ? 'Carteira Sugerida (equal-weight, ret. total, gross-up IR)' : 'Carteira Sugerida (equal-weight, ret. total, isento)', color: '#c9a96e', vals: cart.vals, width: 1.8 }];
     if (cdi) series.push({ label: 'CDI', color: '#8a8278', vals: cdi, width: 1.2, dash: true });
     drawLines('homeChart', cart.datas, series, 300, { ref: 100 });
     const fim = cart.vals[cart.vals.length - 1], cf = cdi ? cdi[cdi.length - 1] : null;
