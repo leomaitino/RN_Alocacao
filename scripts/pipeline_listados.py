@@ -562,6 +562,76 @@ def metricas_preco(close: pd.Series, vol_fin: pd.Series, divs: pd.Series) -> dic
 
 
 # ---------------------------------------------------------------------------
+# Sinal operacional — carteira por regra de P/VP (espelha a aba Simulação)
+# ---------------------------------------------------------------------------
+
+SINAL_PARAMS = {'universo': 'Aprovado', 'janela_meses': 12, 'min_obs': 60, 'rebalanceamento': 'mensal'}
+
+
+def proximo_dia_util(d: date) -> date:
+    d = d + timedelta(days=1)
+    while d.weekday() >= 5:
+        d += timedelta(days=1)
+    return d
+
+
+def gerar_sinal(registros: list[dict], series: dict, params: dict = SINAL_PARAMS) -> dict:
+    """
+    Aplica a regra da Simulação ao último pregão disponível e devolve a
+    carteira-alvo: fundo elegível ⇔ P/VP < 1,00 E P/VP < média móvel dos últimos
+    `janela_meses` meses (inclusive), com pelo menos `min_obs` observações.
+    Pesos iguais entre elegíveis; sem elegíveis → 100% caixa (CDI).
+    Mesma lógica de `mediaMovelPvp`/`simular` do dashboard_listados.html.
+    """
+    uni = [r for r in registros if r.get('status') == params['universo']]
+    fundos, ref = [], None
+    for r in uni:
+        s = series.get(r['ticker']) or {}
+        datas = s.get('datas') or []; pvp = s.get('pvp') or []
+        pts = [(pd.Timestamp(d), v) for d, v in zip(datas, pvp) if v is not None]
+        item = {'ticker': r['ticker'], 'tipo': r['tipo'], 'indexador': r['indexador'], 'preco': r.get('preco'), 'data_preco': r.get('data_preco'),
+                'vp_cota': r.get('vp_cota'), 'vp_data': r.get('vp_data'), 'vp_fonte': r.get('rent_fonte_vp'), 'dy_12m': r.get('dy_12m'),
+                'pvp': None, 'media_pvp': None, 'n_obs': 0, 'desconto_vs_media': None, 'elegivel': False, 'motivo': 'sem P/VP'}
+        if pts:
+            t, v = pts[-1]
+            lim = t - pd.DateOffset(months=params['janela_meses'])
+            jan = [x for d, x in pts if d >= lim]
+            media = sum(jan) / len(jan)
+            item.update(pvp=r4(v, 4), media_pvp=r4(media, 4), n_obs=len(jan), desconto_vs_media=r4(v / media - 1, 4), data_sinal=t.strftime('%Y-%m-%d'))
+            ref = max(ref or '', item['data_sinal'])
+            if len(jan) < params['min_obs']:
+                item['motivo'] = f"histórico curto ({len(jan)} pregões < {params['min_obs']})"
+            elif v >= 1:
+                item['motivo'] = 'P/VP ≥ 1,00'
+            elif v >= media:
+                item['motivo'] = 'P/VP ≥ média móvel'
+            else:
+                item['elegivel'] = True; item['motivo'] = 'ok'
+        fundos.append(item)
+    eleg = [f['ticker'] for f in fundos if f['elegivel']]
+    peso = r4(1 / len(eleg), 6) if eleg else 0
+    hoje = HOJE
+    prox = date(hoje.year + (hoje.month == 12), (hoje.month % 12) + 1, 1)
+    while prox.weekday() >= 5:
+        prox += timedelta(days=1)
+    fundos.sort(key=lambda f: (not f['elegivel'], f['pvp'] if f['pvp'] is not None else 9))
+    return {
+        'gerado_em': datetime.now().isoformat(timespec='seconds'),
+        'data_referencia': ref,
+        'regra': {'descricao': 'fundo na carteira ⇔ P/VP < 1,00 e P/VP < média móvel do P/VP (janela), decidido com o P/VP do último pregão; pesos iguais; sem elegíveis → caixa a CDI',
+                  **params, 'universo_tickers': [r['ticker'] for r in uni]},
+        'proximo_rebalanceamento': prox.strftime('%Y-%m-%d'),
+        'n_elegiveis': len(eleg), 'elegiveis': eleg, 'pesos_alvo': {t: peso for t in eleg}, 'caixa_pct': 0.0 if eleg else 1.0,
+        'fundos': fundos,
+        'avisos': ['gerar o feed após o fechamento: rodando durante o pregão, o último preço é intradiário e fundos perto do limiar mudam de lado',
+                   'VP de FII/Fiagro é mensal (informe CVM) e de FIP-IE é quadrimestral: o P/VP entre informes usa VP defasado',
+                   'preços e proventos vêm do Yahoo Finance (B3) e podem ter lacunas; conferir n_obs',
+                   'custos de transação, lotes, liquidez e slippage não são considerados',
+                   'sinal informativo: a execução é responsabilidade do operador'],
+    }
+
+
+# ---------------------------------------------------------------------------
 # MAIN
 # ---------------------------------------------------------------------------
 
@@ -877,6 +947,9 @@ def main():
     (out_dir / 'listados.json').write_text(json.dumps(clean(registros), ensure_ascii=False, indent=1), encoding='utf-8')
     (out_dir / 'listados_series.json').write_text(json.dumps(clean(series), ensure_ascii=False), encoding='utf-8')
     (out_dir / 'listados_carteiras.json').write_text(json.dumps(clean(carteiras), ensure_ascii=False, indent=1), encoding='utf-8')
+    sinal = gerar_sinal(clean(registros), clean(series))
+    (out_dir / 'listados_sinal.json').write_text(json.dumps(clean(sinal), ensure_ascii=False, indent=1), encoding='utf-8')
+    log.info(f"  [SINAL] {sinal['n_elegiveis']} elegíveis em {sinal['data_referencia']}: {', '.join(sinal['elegiveis']) or '— (caixa)'} | próximo rebal. {sinal['proximo_rebalanceamento']}")
     meta = {
         'ultima_atualizacao': datetime.now().isoformat(),
         'total_fundos': len(registros),
@@ -893,7 +966,7 @@ def main():
     }
     (out_dir / 'meta_listados.json').write_text(json.dumps(clean(meta), ensure_ascii=False, indent=2), encoding='utf-8')
     log.info("\n" + "=" * 70)
-    log.info(f"✓ listados.json ({len(registros)}) | listados_series.json | listados_carteiras.json | meta_listados.json")
+    log.info(f"✓ listados.json ({len(registros)}) | listados_series.json | listados_carteiras.json | listados_sinal.json | meta_listados.json")
     log.info(f"  referências: {datas_ref}")
     log.info(f"  cobertura VP: {meta['cobertura_vp']} | carteira: {meta['cobertura_carteira']} | com alerta: {meta['fundos_com_alerta']}")
 

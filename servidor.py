@@ -212,6 +212,9 @@ def serve_data(filename: str):
         # JSONs editados manualmente (sem rota POST — commit no repositório).
         "listados.json", "listados_series.json", "listados_carteiras.json",
         "meta_listados.json", "listados_universo.json", "listados_eventos_stress.json",
+        # listados_sinal.json: carteira-alvo da regra de P/VP (aba Simulação), feed
+        # para o modelo de compra automática. Ver SIMULACAO_LISTADOS.md.
+        "listados_sinal.json",
     }
     if filename not in allowed:
         raise HTTPException(404, "Arquivo não encontrado")
