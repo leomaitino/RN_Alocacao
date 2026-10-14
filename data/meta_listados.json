@@ -1,5 +1,5 @@
 {
-  "ultima_atualizacao": "2026-10-06T15:38:54.773104",
+  "ultima_atualizacao": "2026-10-14T08:07:40.667515",
   "total_fundos": 50,
   "no_painel": 22,
   "por_tipo": {
@@ -15,8 +15,8 @@
     "Não Aprovado": 9
   },
   "datas_referencia": {
-    "yahoo": "2026-10-06",
-    "cvm_diario": "2026-10-02",
+    "yahoo": "2026-10-13",
+    "cvm_diario": "2026-10-09",
     "cvm_fii": "2026-08-01",
     "cvm_fiagro": "2026-08-01",
     "cvm_fip": "2026-08-31",

@@ -213,7 +213,7 @@
   "pl_cda": 1531.21,
   "n_emissores": 8,
   "pct_incentivadas": 0.8556,
-  "prazo_medio_anos": 7.06,
+  "prazo_medio_anos": 7.04,
   "stress_nivel": 0,
   "stress_exposicao_pct_pl": 0.0
  },
@@ -306,7 +306,7 @@
   "pl_cda": 1461.95,
   "n_emissores": 3,
   "pct_incentivadas": 1.0,
-  "prazo_medio_anos": 5.65,
+  "prazo_medio_anos": 5.63,
   "stress_nivel": 0,
   "stress_exposicao_pct_pl": 0.0
  },
@@ -2158,7 +2158,7 @@
   "pl_cda": 2062.92,
   "n_emissores": 83,
   "pct_incentivadas": 0.9859,
-  "prazo_medio_anos": 10.33,
+  "prazo_medio_anos": 10.3,
   "stress_nivel": 2,
   "stress_exposicao_pct_pl": 0.00664
  },
@@ -3527,7 +3527,7 @@
   "pl_cda": 2764.67,
   "n_emissores": 67,
   "pct_incentivadas": 0.8916,
-  "prazo_medio_anos": 13.01,
+  "prazo_medio_anos": 12.98,
   "stress_nivel": 2,
   "stress_exposicao_pct_pl": 0.08607
  },
@@ -4489,7 +4489,7 @@
   "pl_cda": 1175.03,
   "n_emissores": 39,
   "pct_incentivadas": 0.5515,
-  "prazo_medio_anos": 9.55,
+  "prazo_medio_anos": 9.53,
   "stress_nivel": 0,
   "stress_exposicao_pct_pl": 0.0
  },
@@ -4656,7 +4656,7 @@
   "pl_cda": 231.1,
   "n_emissores": 1,
   "pct_incentivadas": 0.0,
-  "prazo_medio_anos": 8.19,
+  "prazo_medio_anos": 8.17,
   "stress_nivel": 3,
   "stress_exposicao_pct_pl": 0.7
  },
@@ -6264,7 +6264,7 @@
   "pl_cda": 1219.57,
   "n_emissores": 79,
   "pct_incentivadas": 0.9836,
-  "prazo_medio_anos": 10.14,
+  "prazo_medio_anos": 10.12,
   "stress_nivel": 1,
   "stress_exposicao_pct_pl": 0.02197
  },
@@ -7774,7 +7774,7 @@
   "pl_cda": 1422.52,
   "n_emissores": 68,
   "pct_incentivadas": 0.8991,
-  "prazo_medio_anos": 10.58,
+  "prazo_medio_anos": 10.56,
   "stress_nivel": 2,
   "stress_exposicao_pct_pl": 0.04861
  },
@@ -8824,8 +8824,8 @@
     "valor_mil": 711.8,
     "pct_pl": 0.00975,
     "via": "RIO BRAVO ESG IS MASTER III  FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA",
-    "emissor": "SIMPAR S.A.",
-    "cnpj_emissor": "07415333000120",
+    "emissor": "JSL S.A",
+    "cnpj_emissor": "52548435000179",
     "indexador": "IPCA+",
     "taxa": 7.9677,
     "incentivada": false,
@@ -8972,7 +8972,7 @@
   "pl_cda": 73.03,
   "n_emissores": 19,
   "pct_incentivadas": 0.9891,
-  "prazo_medio_anos": 11.26,
+  "prazo_medio_anos": 11.24,
   "stress_nivel": 1,
   "stress_exposicao_pct_pl": 0.06792
  }
